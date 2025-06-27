@@ -1,23 +1,30 @@
 'use client';
 
 import { useState } from 'react';
-import { Input } from '../../../node_modules/postcss/lib/postcss';
 
 const alumnos = Array(15).fill('Nombre Apellido');
-const trimestres = ['1° TRIMESTRE', '2° TRIMESTRE', '3° TRIMESTRE'];
-const notasPorTrimestre = 4;
 
-const columnas = trimestres.flatMap((t) =>
-  Array.from({ length: notasPorTrimestre }, (_, i) => ({
-    trimestre: t,
-    label: `${t} - ${i + 1}`,
-  }))
-);
+type Columna = {
+  tipo: string;
+  trimestre: string;
+  fecha: string;
+};
 
-export default function TablaNotasTrimestres() {
+export default function TablaNotasEditable() {
+  const [columnas, setColumnas] = useState<Columna[]>([
+    { tipo: '', trimestre: '', fecha: '' },
+    { tipo: '', trimestre: '', fecha: '' },
+    { tipo: '', trimestre: '', fecha: '' },
+  ]);
+
   const [datos, setDatos] = useState<string[][]>(
-    alumnos.map(() => columnas.map(() => ''))
+    alumnos.map(() => Array(3).fill(''))
   );
+
+  const agregarColumna = () => {
+    setColumnas((prev) => [...prev, { tipo: '', trimestre: '', fecha: '' }]);
+    setDatos((prev) => prev.map((fila) => [...fila, '']));
+  };
 
   const handleInputChange = (alumnoIndex: number, colIndex: number, value: string) => {
     setDatos((prev) =>
@@ -29,38 +36,70 @@ export default function TablaNotasTrimestres() {
     );
   };
 
+  const handleColumnaChange = (
+    index: number,
+    campo: keyof Columna,
+    value: string
+  ) => {
+    setColumnas((prev) =>
+      prev.map((col, i) =>
+        i === index ? { ...col, [campo]: value } : col
+      )
+    );
+  };
+
   return (
     <div className="overflow-x-auto p-4">
       <div className="min-w-max">
-        <table className="border-collapse border-none table-">
+        <table className="border-collapse border-none">
           <thead>
             <tr>
-              <th className="sticky left-0 z-10 bg-purple-700 text-white p-2 w-12 border-none">
+              <th className="sticky left-0 z-10 bg-purple-700 text-white p-2 w-48 border-none">
                 Nombre
               </th>
-              {trimestres.map((t, ti) => (
-                <th
-                  key={ti}
-                  colSpan={notasPorTrimestre}
-                  className="text-center bg-purple-300 text-purple-900 w-10 font-semibold border-none"
+              {columnas.map((_, i) => (
+                <th key={i} className="text-xs bg-purple-900 text-purple-100 border-none p-1 w-36">
+                  <select
+                    className="bg-violet-800 rounded-xl text-sm w-full mb-1"
+                    value={columnas[i].tipo}
+                    onChange={(e) => handleColumnaChange(i, 'tipo', e.target.value)}
+                  >
+                    <option value="">EVALUACIÓN</option>
+                    <option value="TP">TRABAJO PRÁCTICO</option>
+                    <option value="OTRO">OTRO</option>
+                    <option value="FINAL">FINAL</option>
+                  </select>
+                  <select
+                    className="bg-yellow-500 text-violet-900 rounded-xl text-sm w-full mb-1"
+                    value={columnas[i].trimestre}
+                    onChange={(e) => handleColumnaChange(i, 'trimestre', e.target.value)}
+                  >
+                    <option value="">Trimestre</option>
+                    <option value="1">1° Trimestre</option>
+                    <option value="2">2° Trimestre</option>
+                    <option value="3">3° Trimestre</option>
+                    <option value="Mesa">Mesa</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Fecha"
+                    className="text-violet-100 text-sm bg-violet-700 w-full rounded px-1"
+                    value={columnas[i].fecha}
+                    onChange={(e) => handleColumnaChange(i, 'fecha', e.target.value)}
+                  />
+                </th>
+              ))}
+              {/* Botón + */}
+              <th className='bg-yellow-500 w-24'>
+                <button
+                  onClick={agregarColumna}
+                  className="text-violet-900 px-3 py-1  text-2xl h-full font-light hover:bg-green-700"
+                  title="Agregar columna"
                 >
-                  {t}
-                </th>
-              ))}
-            </tr>
-            <tr>
-              <th className="sticky left-0 z-10 bg-purple-700 p-2 border-none" />
-              {columnas.map((col, i) => (
-                <th key={i} className="text-xs  bg-purple-900 text-purple-100 border-none p-1">
-          <select name="examen" id="1">
-            <option value="">EVALUACION</option>
-            <option value="">TRABAJO PRÁCTICO</option>
-            <option value="">OTRO</option>
-            </select> <br />
-            <input type="text" className='text-violet-100 text-xl text-center'></input>
-                </th>
-                
-              ))}
+                  + 
+              
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>

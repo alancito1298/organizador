@@ -1,7 +1,8 @@
-// components/BottomNav.tsx
-"use client"; // Si usás App Router
+
+"use client"; 
 
 import { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import {
   Home,
@@ -10,10 +11,13 @@ import {
   Bell,
   User
 } from "lucide-react";
+import { ArrowLeft } from 'lucide-react';
 
 const BottomNav = () => {
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const router = useRouter();
+  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,9 +44,12 @@ const BottomNav = () => {
       }`}
     >
       <div className="max-w-md mx-auto flex justify-around items-center h-16">
-        <Link href="/" className=" text-amber-300 hover:text-blue-600">
-          <Home size={24} />
-        </Link>
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 p-2 text-amber-300 hover:bg-violet-800 rounded"
+      >
+        <ArrowLeft size={28} />
+      </button>
         <Link href="/buscar" className="text-amber-300 hover:text-blue-600">
           <Search size={24} />
         </Link>

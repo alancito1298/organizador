@@ -5,16 +5,21 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react"; // Instalar con: npm install lucide-react
 
-const Navbar = () => {
+type Props = {
+  titulo: string;
+  data: string;
+};
+const Navbar = ({ titulo, data }: Props) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="bg-violet-900 border-b w-full m-0 p-0  shadow-md">
+    <nav className="bg-violet-900 border-b w-full mb-4 p-0  shadow-md">
       <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo / Brand */}
-          <div className="flex-shrink-0 text-xl font-bold text-violet-300">
-            <Link href="/">OD</Link>
+          <div className="flex-shrink-0 text-xl  text-violet-300">
+           <p className="text-violet-200">{titulo}</p>
+           <strong className="text-amber-300 font-light text-sm">{data}</strong>
           </div>
 
           {/* Menu Desktop */}

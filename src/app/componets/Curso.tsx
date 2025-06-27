@@ -1,5 +1,5 @@
 export default function Curso() {
-    return (
+    return (<a href="/sub-menu-curso">
       <div className="flex w-fit bg-violet-200  text-violet-950 rounded-xl overflow-hidden shadow-md">
         <div className="flex items-center justify-center px-6 py-4 text-5xl font-bold">
           3°
@@ -11,6 +11,6 @@ export default function Curso() {
           <span className="text-xl font-bold italic tracking-wider">GEOGRAFÍA</span>
         </div>
       </div>
-    );
+      </a> );
   }
   
