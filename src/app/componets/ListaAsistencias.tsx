@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 import { ThumbsUp, ThumbsDown, X } from 'lucide-react';
 
 const estados = ['violeta', 'verde', 'rojo', 'gris'] as const;

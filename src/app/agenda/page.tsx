@@ -9,7 +9,7 @@ import Agenda from "../componets/Agenda"
 export default function agenda() {
   return (
     <div className=" bg-violet-600 h-full">
-     <Navbar titulo="Agenda" data=""></Navbar>
+     <Navbar titulo="Agenda" data="a"></Navbar>
     <Agenda></Agenda>
      <BottomNav></BottomNav>
     </div>

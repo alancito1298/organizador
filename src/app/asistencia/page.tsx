@@ -10,7 +10,7 @@ import Referencias from "../componets/referencias"
 export default function Asistencias() {
   return (
     <div className=" bg-fuchsia-200 h-full">
-     <Navbar></Navbar>
+     <Navbar titulo={"aaa"} data={"aaa"}></Navbar>
      <Referencias></Referencias>
      <ListaAsistencias ></ListaAsistencias>
      <BottomNav></BottomNav>
