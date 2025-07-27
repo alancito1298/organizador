@@ -1,24 +1,16 @@
-// tailwind.config.mjs
-export default {
-    content: [
-      "./src/app/**/*.{js,ts,jsx,tsx}",
-      "./src/components/**/*.{js,ts,jsx,tsx}",
-    ],
-    theme: {
-      extend: {
-        colors: {
-          brand: {
-            light: 'blue-100',
-            primary: 'red-500',
-            secondary: '#8BC6A3',
-            accent: '#F2716B',
-            text: '#2E3A59',
-            neutral: '#E5E7EB',
-            dark: '#6B7280',
-          },
-        },
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        bebas: ['Bebas Neue', 'sans-serif'],
+        atma:['Atma Bold', 'arial']
       },
     },
-    plugins: [],
-  }
-  
+  },
+  plugins: [],
+}

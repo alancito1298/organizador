@@ -14,10 +14,11 @@ export default function subMenuCurso() {
      <Navbar titulo="Curso" data="Menu"></Navbar>
  <ItemsCurso titulo="ASITENCIAS" ruta="/asistencia"></ItemsCurso>
  <ItemsCurso titulo="CALIFIACIONES" ruta="/calificaciones"></ItemsCurso>
- <ItemsCurso titulo="PLANIFICACIONES" ruta="/"></ItemsCurso>
+ <ItemsCurso titulo="PLANIFICACIONES" ruta="/planificaciones"></ItemsCurso>
  <ItemsCurso titulo="BIBLIOGRAFIA" ruta="/"></ItemsCurso>
  <ItemsCurso titulo="AGENDA" ruta="/agenda"></ItemsCurso>
  <ItemsCurso titulo="ASITENCIAS" ruta="/asistencia"></ItemsCurso>
+ <ItemsCurso titulo="ALUMNOS" ruta="/alumnos"></ItemsCurso>
      <BottomNav></BottomNav>
     </div>
   );

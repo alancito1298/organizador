@@ -9,7 +9,8 @@ import {
   Search,
   PlusCircle,
   Bell,
-  User
+  User,
+  
 } from "lucide-react";
 import { ArrowLeft } from 'lucide-react';
 
@@ -54,7 +55,7 @@ const BottomNav = () => {
           <Search size={24} />
         </Link>
         <Link href="/crear" className="text-amber-300 hover:text-blue-600">
-          <PlusCircle size={36} />
+          <Home size={36} />
         </Link>
         <Link href="/notificaciones" className="text-amber-300 hover:text-blue-600">
           <Bell size={24} />

@@ -1,177 +1,110 @@
-'use client';
+// components/Agenda.tsx
+import { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
-import { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
-
-const meses = [
-  'Enero', 'Febrero', 'Marzo', 'Abril',
-  'Mayo', 'Junio', 'Julio', 'Agosto',
-  'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
-];
-
-type Feriado = {
-  date: string;
-  name: string;
+type Recordatorio = {
+  id: string;
+  fecha: string; // YYYY-MM-DD
+  nota: string;
+  asunto: string;
 };
 
 export default function Agenda() {
-  const [mesSeleccionado, setMesSeleccionado] = useState<number | null>(null);
-  const [anotaciones, setAnotaciones] = useState<Record<string, string[]>>({});
-  const [nuevaNota, setNuevaNota] = useState<Record<string, string>>({});
-  const [feriados, setFeriados] = useState<Feriado[]>([]);
+  const [recordatorios, setRecordatorios] = useState<Recordatorio[]>([]);
+  const [fecha, setFecha] = useState('');
+  const [asunto, setAsunto] = useState('');
+  const [nota, setNota] = useState('');
 
-  const year = dayjs().year();
-
-  // 🟡 Cargar feriados desde API
+  // Cargar recordatorios desde localStorage al iniciar
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const obtenerFeriados = async () => {
-      try {
-        const res = await fetch(`https://argentina-publicholidays-api.vercel.app/api/v1/holidays?year=${year}`);
-        const data = await res.json();
-        setFeriados(data);
-      } catch (error) {
-        console.error('Error al obtener feriados:', error);
-      }
+    const data = localStorage.getItem('recordatorios');
+    if (data) setRecordatorios(JSON.parse(data));
+  }, []);
+
+  // Guardar en localStorage cada vez que cambian
+  useEffect(() => {
+    localStorage.setItem('recordatorios', JSON.stringify(recordatorios));
+  }, [recordatorios]);
+
+  const agregarRecordatorio = () => {
+    if (!fecha || !nota) return;
+
+    const nuevo: Recordatorio = {
+      id: uuidv4(),
+      fecha,
+      asunto,
+      nota,
     };
 
-    obtenerFeriados();
-  }, [year]);
-
-  const seleccionarMes = (index: number) => {
-    setMesSeleccionado(index);
+    setRecordatorios([...recordatorios, nuevo]);
+    setFecha('');
+    setAsunto('');
+    setNota('');
+    
   };
 
-  const manejarCambio = (dia: number, valor: string) => {
-    const clave = `${mesSeleccionado}-${dia}`;
-    setNuevaNota((prev) => ({ ...prev, [clave]: valor }));
+  const eliminar = (id: string) => {
+    setRecordatorios(recordatorios.filter(r => r.id !== id));
   };
-
-  const agregarAnotacion = (dia: number) => {
-    const clave = `${mesSeleccionado}-${dia}`;
-    const nota = nuevaNota[clave]?.trim();
-    if (!nota) return;
-
-    setAnotaciones((prev) => ({
-      ...prev,
-      [clave]: [...(prev[clave] || []), nota],
-    }));
-    setNuevaNota((prev) => ({ ...prev, [clave]: '' }));
-  };
-
-  const eliminarAnotacion = (clave: string, index: number) => {
-    setAnotaciones((prev) => {
-      const nuevas = [...(prev[clave] || [])];
-      nuevas.splice(index, 1);
-      return { ...prev, [clave]: nuevas };
-    });
-  };
-
-  const esFeriado = (fecha: string) => feriados.find((f) => f.date === fecha);
 
   return (
-    <div className="p-4 pb-76">
-      {!mesSeleccionado && (
-        <div className="grid grid-cols-2 gap-4">
-          {meses.map((mes, index) => (
-            <button
-              key={index}
-              onClick={() => seleccionarMes(index)}
-              className="bg-violet-200 text-violet-900 rounded-lg p-4 h-20 shadow-amber-300 font-extralight text-2xl hover:bg-violet-300"
-            >
-              {mes}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="p-4 min-h-180">
+      <h2 className="text-2xl uppercase mb-4">Agenda</h2>
 
-      {mesSeleccionado !== null && (
-        <div>
-          <h2 className="text-4xl text-center text-amber-300 font-light uppercase mb-4">
-            {meses[mesSeleccionado]}
-          </h2>
-
-          <button
-            onClick={() => setMesSeleccionado(null)}
-            className="mb-4 text-violet-200 text-2xl"
-          >
-            ← Volver a los meses
-          </button>
-
-          {(() => {
-            const diasEnEsteMes = dayjs(`${year}-${mesSeleccionado + 1}`, 'YYYY-M').daysInMonth();
+      {/* Formulario */}
+      <div className="mb-4 bg-yellow-400 p-3 rounded-l">
+     <label htmlFor="fecha" className='uppercase m-3 text-violet-900 font-bebas'style={{ fontFamily: 'Bebas Neue' }}>fecha</label>
+        <input
+          type="date"
+          value={fecha}
+          onChange={e => setFecha(e.target.value)}
+          className="border-none bg-yellow-100 text-violet-900  p-1 h-12  m-2 rounded-l px-2 py-1 mr-2 w-auto min-w-8/9"
+        />
+           <label className='font-atma' style={{ fontFamily: 'Atma Bold' }}>Asunto</label>
+        <input
+          type="text"
+          placeholder="Asunto?"
+          value={asunto}
+          onChange={e => setAsunto(e.target.value)}
+          className="border-none bg-yellow-100 text-violet-900 p-1 h-12  m-2 rounded-l px-2 py-1 mr-2  min-w-8/9"
+        />
+       
+        <input
+          type="text"
+          placeholder="Escribe la nota..."
+          value={nota}
+          onChange={e => setNota(e.target.value)}
+          className="border-none bg-yellow-100 text-violet-900 p-1  h-12 m-2  rounded-l px-2 py-1 mr-2 w-auto min-w-8/9"
+        />
+        <button onClick={agregarRecordatorio} className="bg-violet-900 m-4 text-white px-4 py-1 rounded">
+          Agregar
+        </button>
+      </div>
+ <h5 className='text-xl mb-10 mt-15 bg-violet-900 p-3 rounded-l'>Fechas Importantes!!!</h5>
+      {/* Lista de fechas programadas */}
+      <ul className="space-y-2">
+        {recordatorios.map(r => {
+            const dateObj = new Date(r.fecha);
+            const diaSemana = dateObj.toLocaleDateString('es-AR',{
+              weekday: 'long',
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            });
 
             return (
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {[...Array(diasEnEsteMes)].map((_, dia) => {
-                  const numeroDia = dia + 1;
-                  const clave = `${mesSeleccionado}-${numeroDia}`;
-                  const fechaCompleta = dayjs(`${year}-${mesSeleccionado + 1}-${numeroDia}`).format('YYYY-MM-DD');
-                  const feriado = esFeriado(fechaCompleta);
-
-                  return (
-                    <div
-                      key={dia}
-                      className={`p-3 border rounded shadow ${
-                        feriado ? 'bg-red-100 border-red-400' : 'bg-white border-purple-200'
-                      }`}
-                    >
-                      <div className="font-semibold text-4xl text-start my-4 text-violet-900">
-                        <span className={`p-3 h-20 w-20 mr-4 mb-4 rounded-full text-white inline-block text-center ${
-                          feriado ? 'bg-red-600' : 'bg-violet-900'
-                        }`}>
-                          {numeroDia}
-                        </span>
-                        <small className="text-sm align-middle">
-                          de {meses[mesSeleccionado]}
-                        </small>
-                      </div>
-
-                      {feriado && (
-                        <p className="text-red-700 text-sm font-medium mb-2">
-                          🎉 {feriado.name}
-                        </p>
-                      )}
-
-                      {/* Lista de anotaciones */}
-                      {anotaciones[clave]?.length > 0 && (
-                        <ul className="mb-2 text-violet-200 text-md uppercase">
-                          {anotaciones[clave].map((nota, i) => (
-                            <li key={i} className="flex justify-between items-center bg-violet-900 px-2 py-1 rounded mb-1">
-                              <span className="flex-1">{nota}</span>
-                              <button
-                                onClick={() => eliminarAnotacion(clave, i)}
-                                className="text-red-600 font-bold ml-2"
-                              >
-                                ❌
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-
-                      {/* Textarea nueva nota */}
-                      <textarea
-                        placeholder="Escribí una nueva anotación..."
-                        value={nuevaNota[clave] || ''}
-                        onChange={(e) => manejarCambio(numeroDia, e.target.value)}
-                        className="w-full border rounded text-violet-950 border-violet-900 px-2 py-1 text-sm mb-2"
-                      />
-
-                      <button
-                        onClick={() => agregarAnotacion(numeroDia)}
-                        className="bg-purple-600 text-white text-sm px-3 py-1 rounded hover:bg-purple-700"
-                      >
-                        Agregar anotación
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+              <li key={r.id} className="flex justify-between items-center text-gray-800 bg-gray-100 px-4 py-2 rounded">
+                <div>
+                 {diaSemana}<br /> <strong className='uppercase text-violet-900'>{r.asunto}</strong> 
+                  <br /> {r.nota}
+                </div>
+                <button onClick={() => eliminar(r.id)} className="text-red-500 hover:underline">
+                  Eliminar
+                </button>
+              </li>
             );
-          })()}
-        </div>
-      )}
+            })}
+      </ul>
     </div>
   );
 }

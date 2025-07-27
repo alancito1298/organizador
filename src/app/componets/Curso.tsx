@@ -64,7 +64,7 @@ export default function ListaCursos() {
   
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-3  bg-amber-300 min-h-180">
       <h2 className="text-2xl font-bold text-violet-700">Cursos</h2>
 
       {/* Lista de cursos */}
@@ -76,17 +76,17 @@ export default function ListaCursos() {
         {/* Botón tipo curso para agregar */}
         <div
           onClick={() => setMostrarFormulario((prev) => !prev)}
-          className="flex w-8/9 cursor-pointer bg-violet-100 text-violet-900 rounded-xl overflow-hidden shadow-md hover:bg-none transition"
+          className="flex w-full cursor-pointer bg-violet-100 text-violet-900 rounded-xl overflow-hidden shadow-md hover:bg-none transition"
         >
-          <div className="flex flex-row items-center justify-center 
-          bg-none text-6xl font-light w-full gap-2">
+          <div className="w-full flex flex-row items-center justify-center 
+          bg-none text-6xl font-light  gap-2">
           <span>+</span> <small className='text-xs font-light uppercase'>Agergar curso</small>
           </div>
         </div>
 
         {/* Formulario si se activa */}
         {mostrarFormulario && (
-          <div className="w-fit bg-gray-100 border border-violet-200 p-4 rounded-xl shadow-md">
+          <div className="w-8/9 bg-gray-100 border  border-violet-200 p-4 rounded-xl shadow-md">
             <h3 className="text-lg font-medium text-violet-700 mb-2">Nuevo Curso</h3>
 
             <div className="flex flex-col space-y-2">
