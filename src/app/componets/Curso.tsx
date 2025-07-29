@@ -28,8 +28,8 @@ function Curso({ curso, institucion, materia, ruta }: CursoProps) {
 
 export default function ListaCursos() {
   const [cursos, setCursos] = useState<CursoProps[]>([
-    { curso: '3°', institucion: 'Nombre Insti', materia: 'GEOGRAFÍA', ruta: '/sub-menu-curso' },
-    { curso: '3°', institucion: 'Nombre Instiiutciontecnica  dsffsdfdf  dfsads', materia: 'GEOGRAFÍA', ruta: '/sub-menu-curso' },
+    { curso: '3°', institucion: 'Nombre Institución', materia: 'MATERIA', ruta: '/sub-menu-curso' },
+    { curso: '4°', institucion: 'Nombre Institución', materia: 'MATERIA', ruta: '/sub-menu-curso' },
   ]);
 
   const [nuevoCurso, setNuevoCurso] = useState<CursoProps>({

@@ -51,10 +51,10 @@ const BottomNav = () => {
       >
         <ArrowLeft size={28} />
       </button>
-        <Link href="/buscar" className="text-amber-300 hover:text-blue-600">
+        <Link href="/" className="text-amber-300 hover:text-blue-600">
           <Search size={24} />
         </Link>
-        <Link href="/crear" className="text-amber-300 hover:text-blue-600">
+        <Link href="/menu-cursos" className="text-amber-300 hover:text-blue-600">
           <Home size={36} />
         </Link>
         <Link href="/notificaciones" className="text-amber-300 hover:text-blue-600">

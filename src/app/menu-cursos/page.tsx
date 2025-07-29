@@ -4,7 +4,7 @@ import ListaCursos from "@/app/componets/Curso";
 
   export default function MenuCursos() {
     return (
-      <><Navbar titulo="Tus" data="Cursos"></Navbar><ListaCursos></ListaCursos><BottomNav></BottomNav></>
+      <><Navbar titulo="Tus Cursos" data=""></Navbar><ListaCursos></ListaCursos><BottomNav></BottomNav></>
     );
   }
   

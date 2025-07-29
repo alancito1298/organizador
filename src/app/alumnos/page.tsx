@@ -10,7 +10,7 @@ import ListaAlumnos from "../componets/ListaAlumnos";
 export default function Asistencias() {
   return (
     <div className=" bg-fuchsia-200 h-full">
-     <Navbar titulo={"aaa"} data={"aaa"}></Navbar>
+     <Navbar titulo={"Materia"} data={"1°"}></Navbar>
      <ListaAlumnos></ListaAlumnos>
      <BottomNav></BottomNav>
     </div>
