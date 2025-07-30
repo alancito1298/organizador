@@ -57,5 +57,9 @@ td, .bebas, button{
 }
 
 p, span {
-  font-family: poppins;
+  font-family: 'poppins';
+}
+
+a{
+  font-family: 'Poppins';
 }

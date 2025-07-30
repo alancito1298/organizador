@@ -34,7 +34,7 @@ export default function ListaPlanificaciones() {
   };
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-4 space-y-6 bg-violet-300 min-h-225">
       <h2 className="text-2xl text-violet-700 font-bold">Planificaciones</h2>
 
       {/* Formulario */}
@@ -90,7 +90,7 @@ export default function ListaPlanificaciones() {
               <p className="text-violet-800 font-semibold">{plan.curso} - {plan.escuela}</p>
               <p className="text-sm text-violet-500 mb-1">{plan.fecha}</p>
               <p className="text-violet-900">{plan.detalle}</p>
-              <a href={plan.link} target="_blank" className="text-blue-600 underline mt-2 block">
+              <a href={plan.link} target="_blank" className="text-yellow-600 poppins decoration-none underline mt-2 block">
                 Ver planificación
               </a>
             </div>

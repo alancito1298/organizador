@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react"; // Instalar con: npm install lucide-react
+import { Bell, X } from "lucide-react"; // Instalar con: npm install lucide-react
 
 type Props = {
   titulo: string;
@@ -24,16 +24,20 @@ const Navbar = ({ titulo, data }: Props) => {
 
           {/* Menu Desktop */}
           <div className="hidden md:flex space-x-6">
+           {/*
+          
             <Link href="/" className="text-gray-700 hover:text-blue-600">Inicio</Link>
             <Link href="/cursos" className="text-gray-700 hover:text-blue-600">Cursos</Link>
             <Link href="/usuarios" className="text-gray-700 hover:text-blue-600">Usuarios</Link>
             <Link href="/perfil" className="text-gray-700 hover:text-blue-600">Perfil</Link>
-          </div>
+         */ }
+            </div>
 
           {/* Botón hamburguesa */}
-          <div className="md:hidden flex items-center">
-            <button onClick={() => setOpen(!open)} className="text-gray-700">
-              {open ? <X size={24} /> : <Menu size={24} />}
+          <div className="md:hidden flex items-center p-4">
+            <button onClick={() => setOpen(!open)} className="text-white-400">
+              {open ? <X size={24} /> : 
+          <Bell size={24} />}
             </button>
           </div>
         </div>
@@ -41,12 +45,13 @@ const Navbar = ({ titulo, data }: Props) => {
 
       {/* Menu Mobile */}
       {open && (
-        <div className="md:hidden px-4 pb-4 space-y-2">
-          <Link href="/" className="block text-gray-700 hover:text-blue-600">Inicio</Link>
+        <div className="md:hidden px-4 pb-4 space-y-2 bg-white min-h-96">
+           <p className="text-gray-400 font-light text-center">Actualmente no tiene Notificaciones </p>
+           {/*  <Link href="/" className="block text-gray-700 hover:text-blue-600">Inicio</Link>
           <Link href="/cursos" className="block text-gray-700 hover:text-blue-600">Cursos</Link>
           <Link href="/usuarios" className="block text-gray-700 hover:text-blue-600">Agenda</Link>
           <Link href="/perfil" className="block text-gray-700 hover:text-blue-600">Salir</Link>
-        </div>
+        */ }</div>
       )}
     </nav>
   );

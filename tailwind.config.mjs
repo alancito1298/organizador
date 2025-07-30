@@ -8,7 +8,8 @@ module.exports = {
     extend: {
       fontFamily: {
         bebas: ['Bebas Neue', 'sans-serif'],
-        atma:['Atma Bold', 'arial']
+        atma:['Atma Bold', 'arial'],
+        poppins:['Poppins', 'sans-serif']
       },
     },
   },

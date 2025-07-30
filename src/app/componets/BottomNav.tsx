@@ -55,11 +55,9 @@ const BottomNav = () => {
           <Search size={24} />
         </Link>
         <Link href="/menu-cursos" className="text-amber-300 hover:text-blue-600">
-          <Home size={36} />
+          <Home size={30} />
         </Link>
-        <Link href="/notificaciones" className="text-amber-300 hover:text-blue-600">
-          <Bell size={24} />
-        </Link>
+      
         <Link href="/perfil" className="text-amber-300 hover:text-blue-600">
           <User size={24} />
         </Link>
