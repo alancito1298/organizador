@@ -50,15 +50,15 @@ export default function TablaNotasEditable() {
 
   return (
     <div className="overflow-x-auto p-4">
-      <div className="min-w-max">
+      <div className="">
         <table className="border-collapse border-none">
           <thead>
             <tr>
-              <th className="sticky left-0 z-10 bg-purple-700 text-white p-2 w-48 border-none">
+              <th className="sticky left-0   bg-purple-700 text-white p-2 w-48 border-none">
                 Nombre
-              </th>
+              </th >
               {columnas.map((_, i) => (
-                <th key={i} className="text-xs bg-purple-900 text-purple-100 border-none p-1 w-36">
+                <th key={i} className="text-xs bg-purple-900 text-purple-100 border-none p-1 min-w-36">
                   <select
                     className="bg-violet-800 rounded-xl text-sm w-full mb-1"
                     value={columnas[i].tipo}

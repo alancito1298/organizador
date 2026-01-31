@@ -1,10 +1,10 @@
 'use client'
 
 import React from "react"
-import Navbar from "../componets/Navbar"
-import BottomNav from "../componets/BottomNav"
-import ListaAsistencias from "../componets/ListaAsistencias"
-import Referencias from "../componets/referencias"
+import Navbar from "../components/Navbar"
+import BottomNav from "../components/BottomNav"
+import ListaAsistencias from "../components/ListaAsistencias"
+import Referencias from "../components/referencias"
 
 
 export default function Asistencias() {

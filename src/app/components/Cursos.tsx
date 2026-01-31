@@ -1,32 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import ListaCursos from './ListaCursos';
 
-type CursoProps = {
+export type CursoProps = {
   curso: any;
   institucion: string;
   materia: string;
   ruta: string;
 };
 
-function Curso({ curso, institucion, materia, ruta }: CursoProps) {
-  return (
-    <a href={ruta}>
-      <div className="flex w-full bg-violet-200 text-violet-950 rounded-xl overflow-hidden shadow-md hover:bg-violet-300 transition">
-        <div className="flex items-center justify-center px-6 py-4 text-5xl font-bold">
-          {curso}
-        </div>
-        <div className="w-1 bg-white my-4"></div>
-        <div className="flex flex-col justify-center px-4 py-2 leading-tight">
-          <p className="text-sm">{institucion}</p>
-          <span className="text-xl font-bold italic tracking-wider">{materia}</span>
-        </div>
-      </div>
-    </a>
-  );
-}
-
-export default function ListaCursos() {
+export default function Curso() {
   const [cursos, setCursos] = useState<CursoProps[]>([
     { curso: '3°', institucion: 'Nombre Institución', materia: 'MATERIA', ruta: '/sub-menu-curso' },
     { curso: '4°', institucion: 'Nombre Institución', materia: 'MATERIA', ruta: '/sub-menu-curso' },
@@ -70,7 +54,7 @@ export default function ListaCursos() {
       {/* Lista de cursos */}
       <div className="flex flex-col jusitfy-center aling-center w-full gap-4">
         {cursos.map((c, i) => (
-          <Curso key={i} {...c} />
+          <ListaCursos key={i} {...c} />
         ))}
 
         {/* Botón tipo curso para agregar */}

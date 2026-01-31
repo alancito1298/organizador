@@ -1,9 +1,9 @@
 'use client'
 
 import React from "react"
-import Navbar from "../componets/Navbar"
-import BottomNav from "../componets/BottomNav"
-import Agenda from "../componets/Agenda"
+import Navbar from "../components/Navbar"
+import BottomNav from "../components/BottomNav"
+import Agenda from "../components/Agenda"
 
 
 export default function agenda() {

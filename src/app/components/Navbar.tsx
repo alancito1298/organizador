@@ -2,7 +2,7 @@
 "use client"; // Solo si estás usando App Router
 
 import { useState } from "react";
-import Link from "next/link";
+
 import { Bell, X } from "lucide-react"; // Instalar con: npm install lucide-react
 
 type Props = {
@@ -13,9 +13,9 @@ const Navbar = ({ titulo, data }: Props) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="bg-violet-900 border-b w-full  px-4 m-0 shadow-md">
-      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div className="flex justify-between  h-16">
+    <nav className="bg-violet-900 border-b w-full  px-4 m-0 shadow-md  ">
+      <div className="max-w-7xl sm:px-6 lg:px-8" >
+        <div className="flex justify-between  h-16 w-full m-0">
           {/* Logo / Brand */}
           <div className="flex-shrink-0 text-xl  text-violet-300">
            <p className="text-violet-200 atma">{titulo}</p>

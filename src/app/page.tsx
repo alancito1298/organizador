@@ -1,7 +1,7 @@
 
-import BottomNav from "./componets/BottomNav";
+import BottomNav from "./components/BottomNav";
 
-import Navbar from "./componets/Navbar";
+import Navbar from "./components/Navbar";
 
 export default function Home() {
   return (
