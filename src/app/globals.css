@@ -65,7 +65,7 @@ a{
 
 :root {
   --font-bebas: 'Bebas Neue', sans-serif;
-  --font-atma: 'Atma', cursive;
+  --font-atma: 'Atma', Roboto;
   --font-poppins: 'Poppins', sans-serif;
 }
 
