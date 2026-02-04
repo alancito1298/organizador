@@ -48,11 +48,11 @@ export default function Curso() {
   
 
   return (
-    <div className="p-3  bg-amber-300 min-h-180">
-      <h2 className="text-2xl font-bold text-violet-700">Cursos</h2>
+    <div className="p-3  bg-violet-100 min-h-180">
+      <h2 className="text-2xl font-bold text-violet-700 text-center py-6 uppercase font-atma">Cursos</h2>
 
       {/* Lista de cursos */}
-      <div className="flex flex-col jusitfy-center aling-center w-full gap-4">
+      <div className="flex flex-col jusitfy-center px-4 aling-center w-full gap-4">
         {cursos.map((c, i) => (
           <ListaCursos key={i} {...c} />
         ))}

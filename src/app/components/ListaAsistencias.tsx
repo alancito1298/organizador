@@ -45,11 +45,12 @@ export default function AsistenciasTabla() {
 
   return (
     <div className="overflow-x-auto p-2 pb-96 ">
+      <p className='text-center text-violet-600 font-bold uppercase'> toca los casillero</p>
       <div className="min-w-max">
         <table className="table-fixed border-collapse gap-2">
           <thead>
             <tr>
-              <th className="sticky left-0 bg-violet-200 border-none z-10 border flex flex-col items-end justify-end text-violet-900 p-2 w-48 text-left">
+              <th className="sticky left-0 bg-violet-200 border-none z-10 border flex flex-col items-end justify-end text-violet-900 p-2 w-20 text-left">
                <span>Clase:</span> 
                 <span>Fecha:</span>
               </th>
@@ -63,7 +64,7 @@ export default function AsistenciasTabla() {
           <tbody>
             {datos.map((fila, i) => (
               <tr key={i}>
-                <td className="sticky left-0 bg-violet-200 text-violet-900 ronde p-2 w-48 text-m font-bold z-10">
+                <td className="sticky left-0 font-poppins font-700 border-violet-400 border-b-2 bg-violet-200 text-violet-900 ronde p-2 w-20 text-m font-bold z-10">
                   {alumnos[i]}
                 </td >
                 {fila.map((estado, j) => (

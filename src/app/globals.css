@@ -5,6 +5,12 @@
   --foreground: #171717;
 }
 
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+}
+
+
 
 
 @media (prefers-color-scheme: dark) {
@@ -21,19 +27,8 @@ body {
 }
 
 
-@font-face {
-  font-family: 'Bebas Neue';
-  src: url('/fonts/BebasNeue-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-}
 
-@font-face {
-  font-family: 'Atma Bold';
-  src: url('/public/fonts/Atma-Bold.ttf') format('truetype');
-  font-weight: 400;
-  font-style: bold;
-}
+
 
 div{
   padding: 0
@@ -64,4 +59,25 @@ p, span {
 
 a{
   font-family: 'Poppins';
+}
+
+
+
+:root {
+  --font-bebas: 'Bebas Neue', sans-serif;
+  --font-atma: 'Atma', cursive;
+  --font-poppins: 'Poppins', sans-serif;
+}
+
+.font-bebas {
+  font-family: var(--font-bebas);
+}
+
+.font-atma {
+  font-family: var(--font-atma);
+  font-weight: 700;
+}
+
+.font-poppins {
+  font-family: var(--font-poppins);
 }

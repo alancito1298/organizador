@@ -13,13 +13,13 @@ const Navbar = ({ titulo, data }: Props) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="bg-violet-900 border-b w-full  px-4 m-0 shadow-md  ">
+    <nav className="bg-violet-900 border-b w-full  font-atma px-4 m-0 shadow-md  ">
       <div className="max-w-7xl sm:px-6 lg:px-8" >
         <div className="flex justify-between  h-16 w-full m-0">
           {/* Logo / Brand */}
           <div className="flex-shrink-0 text-xl  text-violet-300">
-           <p className="text-violet-200 atma">{titulo}</p>
-           <strong className="text-amber-300 font-light text-sm bebas">{data}</strong>
+           <p className="text-violet-200 font-atma">{titulo}</p>
+           <strong className="text-amber-300 font-light text-sm font-atma">{data}</strong>
           </div>
 
           {/* Menu Desktop */}

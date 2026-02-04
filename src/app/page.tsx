@@ -10,8 +10,8 @@ export default function Home() {
       <Navbar titulo={"BIENVENIDO"} data={"INCIO"}></Navbar>
       
 <div>
-        <a href="/menu-cursos" className="text-violet-950 m-4 bg-amber-300 rounded-xl p-2 flex justify-center align-center">Ir a Cursos</a> 
-        <p className="p-5">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veritatis nemo, suscipit ab hic cum quod quas vero deserunt omnis repellat iusto molestiae iste nesciunt nam quae fugiat id provident itaque?</p>   
+        <a href="/menu-cursos" className="font-bebas text-violet-950 m-4 bg-amber-300 rounded-xl p-2 flex justify-center align-center">Ir a Cursos</a> 
+        <p className="p-5 font-bebas">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veritatis nemo, suscipit ab hic cum quod quas vero deserunt omnis repellat iusto molestiae iste nesciunt nam quae fugiat id provident itaque?</p>   
 </div>
 
 
