@@ -45,7 +45,7 @@ export default function AsistenciasTabla() {
 
   return (
     <div className="overflow-x-auto p-2 pb-96 ">
-      <p className='text-center text-violet-600 font-bold uppercase'> toca los casillero</p>
+      <p className='text-center text-violet-600 font-bold uppercase'> toca los casilleros</p>
       <div className="min-w-max">
         <table className="table-fixed border-collapse gap-2">
           <thead>
@@ -55,28 +55,31 @@ export default function AsistenciasTabla() {
                 <span>Fecha:</span>
               </th>
               {clases.map((n) => (
-                <th key={n} className=" border-2 border-violet-200  text-violet-900 text-center min-w-[40px]">
-                  {n}<input className='w-full h-10 bg-violet-900 text-amber-300 rounded-l p-1'></input>
+                <th key={n} className=" border-2 p-1 border-violet-200  text-violet-900 text-center">
+                  {n}<input className=' w-20 bg-violet-900 text-amber-300 rounded-l p-1'></input>
                 </th>
-              ))}
+              ))}  <button className='bg-gray-800 h-10 w-10'>G</button>
             </tr>
           </thead>
           <tbody>
             {datos.map((fila, i) => (
               <tr key={i}>
-                <td className="sticky left-0 font-poppins font-700 border-violet-400 border-b-2 bg-violet-200 text-violet-900 ronde p-2 w-20 text-m font-bold z-10">
+                <td className="sticky left-0 font-poppins font-700 border-violet-400 border-b-2 bg-violet-200 text-violet-900 ronde  w-20 text-m font-bold z-10">
                   {alumnos[i]}
                 </td >
                 {fila.map((estado, j) => (
                   <td
                     key={j}
-                    className={`border w-10 h-10 cursor-pointer transition-colors rounded-xl duration-200 text-center ${coloresTailwind[estado]}`}
+                    className={` w-20 h-20 border-2 border-violet-400 cursor-pointer transition-colors duration-200 text-center ${coloresTailwind[estado]}`}
                     onClick={() => cambiarEstado(i, j)}
                   >
                     {iconos[estado]}
+                  
                   </td>
+                  
                 ))}
-              </tr>
+            </tr>
+              
             ))}
           </tbody>
         </table>

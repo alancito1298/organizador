@@ -59,6 +59,7 @@ export default function TablaNotasEditable() {
               </th >
               {columnas.map((_, i) => (
                 <th key={i} className="text-xs bg-purple-900 text-purple-100 border-none p-1 min-w-36">
+                 <small className='font-light text-start'>Elige uno</small> 
                   <select
                     className="bg-violet-800 rounded-xl text-sm w-full mb-1"
                     value={columnas[i].tipo}
@@ -66,7 +67,7 @@ export default function TablaNotasEditable() {
                   >
                     <option value="">EVALUACIÓN</option>
                     <option value="TP">TRABAJO PRÁCTICO</option>
-                    <option value="OTRO">OTRO</option>
+                    <option value="OTRO">OTRO/RECUPERATORIO</option>
                     <option value="FINAL">FINAL</option>
                   </select>
                   <select

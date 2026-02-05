@@ -35,11 +35,11 @@ export default function TablaAlumnos() {
   };
 
   return (
-    <div className="overflow-x-auto max-w-full p-4 min-h-200 ">
-         <h4 className='text-violet-900 text-xl font-bold'>E.E.T n°79</h4>
-      <h3 className='text-violet-500 font-light uppercase text-3xl'>5to Matematica</h3>
+    <div className="overflow-x-auto max-w-full m-4 min-h-200 ">
+         <h4 className='text-violet-900 text-xl m-2 font-bebas font-bold'>E.E.T n°79</h4>
+      <h3 className='text-violet-500 font-light m-2  uppercase text-3xl'>5to Matematica</h3>
    
-      <table className="min-w-full border-collapse  text-center">
+      <table className="min-w-full border-collapse  p-2 text-center">
         <thead>
           <tr className="bg-blue-300 text-white">
             <th className= " bg-violet-900 rounded-tl-xl px-4 py-2">NOMBRE</th>
