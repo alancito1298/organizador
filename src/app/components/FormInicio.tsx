@@ -11,12 +11,32 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    // 👉 Acá luego conectás tu backend
-    setTimeout(() => {
+  
+    try {
+      const res = await fetch("https://backend-organizador.vercel.app/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+  
+      if (!res.ok) {
+        throw new Error("Credenciales incorrectas");
+      }
+  
+      const data = await res.json();
+  
+      // 👇 Ajustar según cómo devuelva tu backend
+      localStorage.setItem("token", data.access_token);
+  
+      window.location.href = "/"; // o la ruta que quieras
+    } catch (error) {
+      alert("Error al iniciar sesión");
+      console.error(error);
+    } finally {
       setLoading(false);
-      alert("Login simulado");
-    }, 1000);
+    }
   };
 
   return (
@@ -73,20 +93,19 @@ export default function LoginForm() {
           </div>
           <GoogleButton></GoogleButton>
           {/* BOTÓN */}
-          <a
-            type="submit"
-            /*disabled={loading}*/
-            href="/"
-            className="
-              w-full flex justify-center items-center
-              rounded-lg bg-blue-600 text-white
-              py-2 text-sm font-medium
+          <button
+              type="submit"
+              disabled={loading}
+              className="
+               w-full flex justify-center items-center
+                rounded-lg bg-blue-600 text-white
+                py-2 text-sm font-medium
               hover:bg-blue-700 transition
-              disabled:opacity-60 disabled:cursor-not-allowed
-            "
-          >
-            {loading ? "Ingresando..." : "Ingresar"}
-          </a>
+                disabled:opacity-60 disabled:cursor-not-allowed
+              "
+            >
+              {loading ? "Ingresando..." : "Ingresar"}
+            </button>
         </form>
 
         {/* FOOTER */}

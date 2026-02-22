@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ListaCursos from './ListaCursos';
 
 export type CursoProps = {
@@ -10,43 +10,66 @@ export type CursoProps = {
   ruta: string;
 };
 
-export default function Curso() {
-  const [cursos, setCursos] = useState<CursoProps[]>([
-    { curso: '3°', institucion: 'Nombre Institución', materia: 'MATERIA', ruta: '/sub-menu-curso' },
-    { curso: '4°', institucion: 'Nombre Institución', materia: 'MATERIA', ruta: '/sub-menu-curso' },
-  ]);
 
-  const [nuevoCurso, setNuevoCurso] = useState<CursoProps>({
-    curso: '',
-    institucion: '',
-    materia: '',
-    ruta: '',
+export default function Curso() {
+  const [cursos, setCursos] = useState<any[]>([]);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [nuevoCurso, setNuevoCurso] = useState({
+    escuela: "",
+    anio: "",
+    materia: "",
   });
 
-  const generarRuta = (materia: string) => {
-    const slug = materia.toLowerCase().replace(/\s+/g, '-');
-    return "/sub-menu-curso"
-    //`/sub-menu-${slug}`;
-  };
+  useEffect(() => {
+    const fetchCursos = async () => {
+      const token = localStorage.getItem("token");
 
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+      const res = await fetch(
+        "https://backend-organizador.vercel.app/cursos",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-  const agregarCurso = () => {
-    if (
-      nuevoCurso.curso.trim() &&
-      nuevoCurso.institucion.trim() &&
-      nuevoCurso.materia.trim()
-    ) {
-      const rutaGenerada = generarRuta(nuevoCurso.materia);
-      const cursoConRuta = { ...nuevoCurso, ruta: rutaGenerada };
+      const data = await res.json();
+      setCursos(data);
+    };
+
+    fetchCursos();
+  }, []);
+
+  const agregarCurso = async () => {
+    if (!nuevoCurso.escuela || !nuevoCurso.anio || !nuevoCurso.materia) return;
   
-      setCursos([...cursos, cursoConRuta]);
-      setNuevoCurso({ curso: '', institucion: '', materia: '', ruta: '' });
+    try {
+      const token = localStorage.getItem("token");
+  
+      const res = await fetch(
+        "https://backend-organizador.vercel.app/cursos",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ...nuevoCurso,
+            docenteId: 1, // ⚠️ temporal hasta que lo manejes desde backend
+          }),
+        }
+      );
+  
+      const data = await res.json();
+  
+      setCursos((prev) => [...prev, data]);
+      setNuevoCurso({ escuela: "", anio: "", materia: "" });
       setMostrarFormulario(false);
+    } catch (error) {
+      console.error("Error al crear curso", error);
     }
   };
-  
-
   return (
     <div className="p-3  bg-violet-100 min-h-180">
       <h2 className="text-2xl font-bold text-violet-700 text-center py-6 uppercase font-atma">Cursos</h2>
@@ -75,29 +98,35 @@ export default function Curso() {
 
             <div className="flex flex-col space-y-2">
             <label className='text-violet-900'>Año</label>
-              <input
-                type="text"
-                placeholder="Curso (ej. 2°)"
-                value={nuevoCurso.curso}
-                onChange={(e) => setNuevoCurso({ ...nuevoCurso, curso: e.target.value })}
-                className="border border-violet-300 rounded p-2 w-full text-violet-900"
-              />
+            <input
+  type="text"
+  placeholder="Año (ej. 2°)"
+  value={nuevoCurso.anio}
+  onChange={(e) =>
+    setNuevoCurso({ ...nuevoCurso, anio: e.target.value })
+  }
+  className="border border-violet-300 rounded p-2 w-full text-violet-900"
+/>
               <label className='text-violet-900'>Institución</label>
               <input
-                type="text"
-                placeholder="Institución"
-                value={nuevoCurso.institucion}
-                onChange={(e) => setNuevoCurso({ ...nuevoCurso, institucion: e.target.value })}
-                className="border border-violet-300 rounded p-2 w-full text-violet-900"
-                />
+  type="text"
+  placeholder="Escuela"
+  value={nuevoCurso.escuela}
+  onChange={(e) =>
+    setNuevoCurso({ ...nuevoCurso, escuela: e.target.value })
+  }
+  className="border border-violet-300 rounded p-2 w-full text-violet-900"
+/>
               <label className='text-violet-900'> Materia</label>
               <input
-                type="text"
-                placeholder="Materia"
-                value={nuevoCurso.materia}
-                onChange={(e) => setNuevoCurso({ ...nuevoCurso, materia: e.target.value })}
-                className="border border-violet-300 rounded p-2 w-full text-violet-900"
-              />
+  type="text"
+  placeholder="Materia"
+  value={nuevoCurso.materia}
+  onChange={(e) =>
+    setNuevoCurso({ ...nuevoCurso, materia: e.target.value })
+  }
+  className="border border-violet-300 rounded p-2 w-full text-violet-900"
+/>
               
            
 
