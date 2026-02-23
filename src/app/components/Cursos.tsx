@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import ListaCursos from './ListaCursos';
 
 export type CursoProps = {
-  curso: any;
-  institucion: string;
+  anio: any;
+  escuela: string;
   materia: string;
   ruta: string;
 };
