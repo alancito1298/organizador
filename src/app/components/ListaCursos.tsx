@@ -1,7 +1,7 @@
 'use client';
-import { CursoProps } from './Cursos';
+import { Curso } from './Cursos';
 
-export default function ListaCursos({ anio, escuela, materia, ruta }: CursoProps) {
+export default function ListaCursos({ anio, escuela, materia, ruta }: Curso) {
   return (
     <a href={ruta}>
       <div className="flex sm:w-full md:w-2/3 mx-2 bg-yellow-200 shadow-2xs text-violet-950 rounded-xl overflow-hidden  hover:bg-violet-300 transition">

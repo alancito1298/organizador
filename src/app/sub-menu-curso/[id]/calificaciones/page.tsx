@@ -1,10 +1,10 @@
 'use client'
 
 import React from "react"
-import Navbar from "../components/Navbar"
-import BottomNav from "../components/BottomNav"
+import Navbar from "../../../components/Navbar"
+import BottomNav from "../../../components/BottomNav"
 
-import ListaCalificaciones from "../components/ListaCalficaciones"
+import ListaCalificaciones from "../../../components/ListaCalficaciones"
 
 
 export default function Calificaciones() {
