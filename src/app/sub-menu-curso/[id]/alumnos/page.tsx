@@ -1,18 +1,68 @@
-'use client'
+'use client';
 
-import React from "react"
-import Navbar from "../../../components/Navbar"
-import BottomNav from "../../../components/BottomNav"
-import ListaAlumnos from "../../../components/ListaAlumnos";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import FormularioAlumno from "./FormularioAlumno";
 
+export type Alumno = {
+  id: number;
+  nombre: string;
+  apellido: string;
+};
 
+export default function CursoPage() {
+  const params = useParams();
+  const cursoId = params.id as string;
 
-export default function Asistencias() {
+  const [alumnos, setAlumnos] = useState<Alumno[]>([]);
+
+  useEffect(() => {
+    const fetchAlumnos = async () => {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `https://backend-organizador.vercel.app/inscripciones/curso/${cursoId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+      console.log("INSCRIPCIONES:", data);
+
+      if (Array.isArray(data)) {
+        const alumnosDelCurso = data
+          .map((i: any) => i.alumno)
+          .filter(Boolean);
+
+        setAlumnos(alumnosDelCurso);
+      }
+    };
+
+    if (cursoId) fetchAlumnos();
+  }, [cursoId]);
+
   return (
-    <div className=" bg-fuchsia-200 h-full">
-     <Navbar titulo={"Materia"} data={"1°"}></Navbar>
-     <ListaAlumnos></ListaAlumnos>
-     <BottomNav></BottomNav>
-    </div>
+    <>
+      <FormularioAlumno
+        cursoId={cursoId}
+        onAlumnoCreado={(nuevo) =>
+          setAlumnos((prev) => [...prev, nuevo])
+        }
+      />
+
+{alumnos.length === 0 && <p>No hay alumnos</p>}
+
+{alumnos.map((alumno) => (
+  <div key={alumno.id}>
+    {alumno.nombre ?? "Sin nombre"}{" "}
+    {alumno.apellido ?? ""}
+  </div>
+))}
+      
+      
+    </>
   );
 }

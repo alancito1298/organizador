@@ -43,12 +43,12 @@ export default function CursoLayout({
   if (!curso) return <p className="text-center mt-10">Cargando...</p>;
 
   const menuItems = [
-    { name: "Inicio", path: `/sub-menu-curso/${id}` },
+    //{ name: "Inicio", path: `/sub-menu-curso/${id}` },
     { name: "Asistencia", path: `/sub-menu-curso/${id}/asistencia` },
     { name: "Alumnos", path: `/sub-menu-curso/${id}/alumnos` },
     { name: "Calificaciones", path: `/sub-menu-curso/${id}/calificaciones` },
     { name: "Planificaciones", path: `/sub-menu-curso/${id}/planificaciones` },
-    { name: "Bibliografía", path: `/sub-menu-curso/${id}/bibliografia` },
+    //{ name: "Bibliografía", path: `/sub-menu-curso/${id}/bibliografia` },
   ];
 
   return (
