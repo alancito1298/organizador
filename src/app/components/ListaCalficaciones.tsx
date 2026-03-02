@@ -1,8 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-const alumnos = Array(15).fill('Nombre Apellido');
+const API = process.env.NEXT_PUBLIC_API_URL ?? "https://backend-organizador.vercel.app";
+
+type AlumnoCurso = {
+  id: number;
+  alumno: { id: number; nombre: string; apellido: string };
+};
 
 type Columna = {
   tipo: string;
@@ -10,120 +16,336 @@ type Columna = {
   fecha: string;
 };
 
-export default function TablaNotasEditable() {
-  const [columnas, setColumnas] = useState<Columna[]>([
-    { tipo: '', trimestre: '', fecha: '' },
-    { tipo: '', trimestre: '', fecha: '' },
-    { tipo: '', trimestre: '', fecha: '' },
-  ]);
+type Calificacion = {
+  id: number;
+  valor: number;
+  alumnoCursoId: number;
+  tipo: string;
+  trimestre: number;
+  fecha: string;
+};
 
-  const [datos, setDatos] = useState<string[][]>(
-    alumnos.map(() => Array(3).fill(''))
-  );
+const colKey = (c: Columna) => `${c.tipo}||${c.trimestre}||${c.fecha}`;
 
+export default function ListaCalificaciones() {
+  const params = useParams();
+  const cursoId = Number(params.id);
+
+  const [inscripciones, setInscripciones] = useState<AlumnoCurso[]>([]);
+  const [columnas, setColumnas] = useState<Columna[]>([]);
+  // datos[fila][col] = valor string
+  const [datos, setDatos] = useState<string[][]>([]);
+  // calificacionIds[fila][col] = id existente en BD, o null si es nueva
+  const [calificacionIds, setCalificacionIds] = useState<(number | null)[][]>([]);
+  const [guardando, setGuardando] = useState(false);
+
+  // ===============================
+  // CARGA INICIAL
+  // ===============================
+  useEffect(() => {
+    if (!cursoId) return;
+
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const resAlumnos = await fetch(`${API}/inscripciones/curso/${cursoId}`, { headers });
+      const alumnosData: AlumnoCurso[] = await resAlumnos.json();
+      alumnosData.sort((a, b) => a.alumno.apellido.localeCompare(b.alumno.apellido));
+
+      const resNotas = await fetch(`${API}/calificaciones/curso/${cursoId}`, { headers });
+      const notasData: Calificacion[] = await resNotas.json();
+
+      // Columnas únicas desde las calificaciones existentes
+      const colsMap = new Map<string, Columna>();
+      for (const nota of notasData) {
+        const col: Columna = {
+          tipo: nota.tipo,
+          trimestre: String(nota.trimestre),
+          fecha: nota.fecha.split("T")[0],
+        };
+        const key = colKey(col);
+        if (!colsMap.has(key)) colsMap.set(key, col);
+      }
+
+      const colsOrdenadas = [...colsMap.values()].sort((a, b) => {
+        if (a.trimestre !== b.trimestre) return Number(a.trimestre) - Number(b.trimestre);
+        return a.fecha.localeCompare(b.fecha);
+      });
+
+      // Columna vacía al final para nuevas notas
+      colsOrdenadas.push({ tipo: '', trimestre: '', fecha: '' });
+
+      // Construir matrices de valores e IDs
+      const matriz: string[][] = [];
+      const idsMatriz: (number | null)[][] = [];
+
+      for (const insc of alumnosData) {
+        const filaValores: string[] = [];
+        const filaIds: (number | null)[] = [];
+
+        for (const col of colsOrdenadas) {
+          if (!col.tipo) {
+            filaValores.push("");
+            filaIds.push(null);
+            continue;
+          }
+          const nota = notasData.find(
+            (n) =>
+              n.alumnoCursoId === insc.id &&
+              n.tipo === col.tipo &&
+              String(n.trimestre) === col.trimestre &&
+              n.fecha.split("T")[0] === col.fecha
+          );
+          filaValores.push(nota ? String(nota.valor) : "");
+          filaIds.push(nota ? nota.id : null);
+        }
+
+        matriz.push(filaValores);
+        idsMatriz.push(filaIds);
+      }
+
+      setInscripciones(alumnosData);
+      setColumnas(colsOrdenadas);
+      setDatos(matriz);
+      setCalificacionIds(idsMatriz);
+    };
+
+    fetchData();
+  }, [cursoId]);
+
+  // ===============================
+  // AGREGAR COLUMNA
+  // ===============================
   const agregarColumna = () => {
     setColumnas((prev) => [...prev, { tipo: '', trimestre: '', fecha: '' }]);
     setDatos((prev) => prev.map((fila) => [...fila, '']));
+    setCalificacionIds((prev) => prev.map((fila) => [...fila, null]));
   };
 
-  const handleInputChange = (alumnoIndex: number, colIndex: number, value: string) => {
+  // ===============================
+  // CAMBIO EN CELDA
+  // ===============================
+  const handleInputChange = (filaIndex: number, colIndex: number, value: string) => {
     setDatos((prev) =>
       prev.map((fila, i) =>
-        fila.map((celda, j) =>
-          i === alumnoIndex && j === colIndex ? value : celda
-        )
+        i === filaIndex ? fila.map((celda, j) => (j === colIndex ? value : celda)) : fila
       )
     );
   };
 
-  const handleColumnaChange = (
-    index: number,
-    campo: keyof Columna,
-    value: string
-  ) => {
+  // ===============================
+  // CAMBIO EN CABECERA
+  // ===============================
+  const handleColumnaChange = (colIndex: number, campo: keyof Columna, valor: string) => {
     setColumnas((prev) =>
-      prev.map((col, i) =>
-        i === index ? { ...col, [campo]: value } : col
-      )
+      prev.map((c, idx) => (idx === colIndex ? { ...c, [campo]: valor } : c))
     );
   };
 
+  // ===============================
+  // GUARDAR TODO (POST o PUT según si ya existe)
+  // ===============================
+  const guardarTodo = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) { alert("No hay sesión activa"); return; }
+
+    for (let j = 0; j < columnas.length; j++) {
+      const col = columnas[j];
+      const tieneAlgunDato = datos.some((fila) => fila[j] !== "");
+      if (tieneAlgunDato && (!col.tipo || !col.trimestre || !col.fecha)) {
+        alert(`La columna ${j + 1} tiene notas pero le falta tipo, trimestre o fecha.`);
+        return;
+      }
+    }
+
+    setGuardando(true);
+    try {
+      const promesas: Promise<Response>[] = [];
+
+      for (let i = 0; i < datos.length; i++) {
+        for (let j = 0; j < columnas.length; j++) {
+          const valor = datos[i][j];
+          const col = columnas[j];
+          if (!valor || !col.tipo || !col.trimestre || !col.fecha) continue;
+
+          const calificacionId = calificacionIds[i]?.[j];
+          const alumnoCursoId = inscripciones[i].id;
+
+          const body = JSON.stringify({
+            valor: parseFloat(valor),
+            fecha: col.fecha,
+            trimestre: Number(col.trimestre),
+            tipo: col.tipo,
+            alumnoCursoId,
+          });
+
+          if (calificacionId) {
+            // ✏️ Ya existe → PUT
+            promesas.push(
+              fetch(`${API}/calificaciones/${calificacionId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body,
+              })
+            );
+          } else {
+            // 🆕 Nueva → POST y guardar el nuevo ID para ediciones futuras sin recargar
+            const capturedI = i;
+            const capturedJ = j;
+            promesas.push(
+              fetch(`${API}/calificaciones`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body,
+              }).then(async (res) => {
+                if (res.ok) {
+                  const nueva: Calificacion = await res.clone().json();
+                  setCalificacionIds((prev) => {
+                    const copia = prev.map((f) => [...f]);
+                    copia[capturedI][capturedJ] = nueva.id;
+                    return copia;
+                  });
+                }
+                return res;
+              })
+            );
+          }
+        }
+      }
+
+      await Promise.all(promesas);
+      alert("✅ Calificaciones guardadas correctamente");
+    } catch (error) {
+      console.error(error);
+      alert("❌ Error al guardar");
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  // ===============================
+  // COLOR DEL INPUT
+  // ===============================
+  const colorNota = (valor: string) => {
+    if (valor === "") return "text-gray-400";
+    return Number(valor) >= 6 ? "text-green-600" : "text-red-600";
+  };
+
+  // ===============================
+  // RENDER
+  // ===============================
   return (
     <div className="overflow-x-auto p-4">
-      <div className="">
-        <table className="border-collapse border-none">
-          <thead>
-            <tr>
-              <th className="sticky left-0   bg-purple-700 text-white p-2 w-48 border-none">
-                Nombre
-              </th >
-              {columnas.map((_, i) => (
-                <th key={i} className="text-xs bg-purple-900 text-purple-100 border-none p-1 min-w-36">
-                 <small className='font-light text-start'>Elige uno</small> 
-                  <select
-                    className="bg-violet-800 rounded-xl text-sm w-full mb-1"
-                    value={columnas[i].tipo}
-                    onChange={(e) => handleColumnaChange(i, 'tipo', e.target.value)}
-                  >
-                    <option value="">EVALUACIÓN</option>
-                    <option value="TP">TRABAJO PRÁCTICO</option>
-                    <option value="OTRO">OTRO/RECUPERATORIO</option>
-                    <option value="FINAL">FINAL</option>
-                  </select>
-                  <select
-                    className="bg-yellow-500 text-violet-900 rounded-xl text-sm w-full mb-1"
-                    value={columnas[i].trimestre}
-                    onChange={(e) => handleColumnaChange(i, 'trimestre', e.target.value)}
-                  >
-                    <option value="">Trimestre</option>
-                    <option value="1">1° Trimestre</option>
-                    <option value="2">2° Trimestre</option>
-                    <option value="3">3° Trimestre</option>
-                    <option value="Mesa">Mesa</option>
-                  </select>
-                  <input
-                    type="text"
-                    placeholder="Fecha"
-                    className="text-violet-100 text-sm bg-violet-700 w-full rounded px-1"
-                    value={columnas[i].fecha}
-                    onChange={(e) => handleColumnaChange(i, 'fecha', e.target.value)}
-                  />
-                </th>
-              ))}
-              {/* Botón + */}
-              <th className='bg-yellow-500 w-24'>
-                <button
-                  onClick={agregarColumna}
-                  className="text-violet-900 px-3 py-1  text-2xl h-full font-light hover:bg-green-700"
-                  title="Agregar columna"
+      <table className="border-collapse w-full text-sm">
+        <thead>
+          <tr>
+            <th className="sticky left-0 z-10 bg-purple-700 text-white p-2 w-48">
+              Alumno
+            </th>
+
+            {columnas.map((col, i) => (
+              <th key={i} className="bg-purple-900 text-purple-100 p-2 min-w-40">
+                <select
+                  className="bg-violet-800 rounded text-sm w-full mb-1"
+                  value={col.tipo}
+                  onChange={(e) => handleColumnaChange(i, "tipo", e.target.value)}
                 >
-                  + 
-              
-                </button>
+                  <option value="">Evaluación</option>
+                  <option value="trabajo_practico">Trabajo práctico</option>
+                  <option value="Examen">Examen</option>
+                  <option value="final">Final</option>
+                </select>
+
+                <select
+                  className="bg-yellow-500 text-violet-900 rounded text-sm w-full mb-1"
+                  value={col.trimestre}
+                  onChange={(e) => handleColumnaChange(i, "trimestre", e.target.value)}
+                >
+                  <option value="">Trimestre</option>
+                  <option value="1">1°</option>
+                  <option value="2">2°</option>
+                  <option value="3">3°</option>
+                </select>
+
+                <input
+                  type="date"
+                  className="bg-violet-700 rounded text-sm w-full px-1"
+                  value={col.fecha}
+                  onChange={(e) => handleColumnaChange(i, "fecha", e.target.value)}
+                />
               </th>
-            </tr>
-          </thead>
-          <tbody>
-            {datos.map((fila, i) => (
-              <tr key={i}>
-                <td className="sticky left-0 z-10 bg-purple-600 text-white border px-2 py-1 w-48">
-                  {alumnos[i]}
-                </td>
-                {fila.map((valor, j) => (
-                  <td key={j} className="border p-1 bg-purple-100">
+            ))}
+
+            <th className="p-2 ">
+              <button
+                onClick={agregarColumna}
+                className="bg-yellow-400 font-sans flex pt-2 flex-col aling-center  justify-center text-5xl h-20 w-20 text-purple-900 font-extrabold px-3 py-1 rounded  hover:bg-yellow-300 transition"
+                title="Agregar columna"
+              >
+                
+                <svg xmlns="http://www.w3.org/2000/svg" width="%100" height="auto" fill="currentColor" className="bi bi-plus-circle" viewBox="0 0 16 16">
+  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+</svg>
+<small className="uppercase pt-1 font-mono text-violet-90 text-sm">Agregar</small>
+              </button>
+             
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {inscripciones.map((inscripcion, filaIndex) => (
+            <tr key={inscripcion.id} className="hover:bg-purple-50">
+              <td className="sticky left-0 z-10 bg-purple-600 text-white px-2 py-1 font-medium">
+                {inscripcion.alumno.apellido}, {inscripcion.alumno.nombre}
+              </td>
+
+              {datos[filaIndex]?.map((valor, colIndex) => {
+                const esExistente = !!calificacionIds[filaIndex]?.[colIndex];
+                return (
+                  <td key={colIndex} className="bg-purple-100 p-1 relative">
+                    {/* Indicador visual: lápiz si la nota ya existe en BD */}
+                    {esExistente && (
+                      <span
+                        className="absolute top-1 right-1 text-xs text-purple-400"
+                        title="Editando nota existente"
+                      >
+                        ✏️
+                      </span>
+                    )}
                     <input
-                      type="text"
+                      type="number"
+                      min={0}
+                      max={10}
+                      step={0.5}
                       value={valor}
-                      onChange={(e) => handleInputChange(i, j, e.target.value)}
-                      className="w-full h-10 text-center text-violet-900 text-xl font-bold border border-none rounded bg-white outline-none focus:ring-2 focus:ring-purple-400"
+                      onChange={(e) => handleInputChange(filaIndex, colIndex, e.target.value)}
+                      className={`w-full text-center font-bold bg-white rounded h-10 focus:outline-none focus:ring-2 focus:ring-purple-500 border
+                        ${esExistente ? "border-purple-400" : "border-purple-200"}
+                        ${colorNota(valor)}
+                      `}
                     />
                   </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                );
+              })}
+
+              <td />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <button
+        onClick={guardarTodo}
+        disabled={guardando}
+        className="fixed bottom-14 right-6 bg-green-600 hover:bg-green-700 disabled:bg-gray-400
+                   text-white px-6 py-3 rounded-full shadow-2xl
+                   text-lg font-semibold transition-all"
+      >
+        {guardando ? "Guardando..." : "💾 Guardar Calificaciones"}
+      </button>
     </div>
   );
 }
