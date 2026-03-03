@@ -46,23 +46,8 @@ div{
   font-style: normal;
 }
 
-h1,h2,h3,h4,h5,h6, .atma{
-  font-family: 'Atma';
-  font-weight: 700;
-}
 
-td, .bebas, button{
-  font-family: 'Bebas Neue';
-  font-weight: 400;
-}
 
-p, span {
-  font-family: 'poppins';
-}
-
-a{
-  font-family: 'Poppins';
-}
 
 
 

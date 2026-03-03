@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import FormularioAlumno from "./FormularioAlumno";
-
+import BottomNav from "@/app/components/BottomNav";
 
 
 
@@ -71,11 +71,13 @@ export default function CursoPage() {
           setAlumnos((prev) => [...prev, nuevo])
         }
       />
-
+ <h3 className="text-black text-2xl text-center font-bebas "> Alumnos listados de este curso </h3>
 {alumnos.length === 0 ? (
   <p>No hay alumnos</p>
 ) : (
-  <table className="text-black"style={{ borderCollapse: "collapse", width: "100%" }}>
+
+ <table className="text-black mt-6"style={{ borderCollapse: "collapse", width: "100%" }}>
+   
     <thead >
       <tr className="bg-violet-300">
         <th className="text-centro border-violet-900 border-1 w-1/3">Apellido</th>
@@ -109,7 +111,7 @@ export default function CursoPage() {
   </table>
 )}
  
-  
+  <BottomNav></BottomNav>
     </>
   );
 }

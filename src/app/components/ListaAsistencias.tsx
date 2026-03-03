@@ -1,89 +1,354 @@
 'use client';
 
-import { JSX, useState } from 'react';
-import { ThumbsUp, ThumbsDown, X } from 'lucide-react';
+import { useEffect, useState, JSX } from 'react';
+import { useParams } from 'next/navigation';
+import { ThumbsUp, ThumbsDown, X, Clock } from 'lucide-react';
 
-const estados = ['violeta', 'verde', 'rojo', 'gris'] as const;
-type Estado = typeof estados[number];
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
-const getNextEstado = (estado: Estado): Estado => {
-  const index = estados.indexOf(estado);
-  return estados[(index + 1) % estados.length];
+// =====================
+// TIPOS
+// =====================
+type EstadoVisual = 'vacio' | 'presente_buen_concepto' | 'presente_mal_concepto' | 'ausente' | 'justificada';
+
+type AlumnoCurso = {
+  id: number;
+  alumno: { id: number; nombre: string; apellido: string };
 };
 
-const coloresTailwind: Record<Estado, string> = {
-  violeta: 'bg-amber-300',
-  verde: 'bg-green-500',
-  rojo: 'bg-red-500',
-  gris: 'bg-gray-400',
+type Asistencia = {
+  id: number;
+  fecha: string;
+  estado: string;
+  alumnoCursoId: number;
 };
 
-const iconos: Record<Estado, JSX.Element | null> = {
-  violeta: null,
-  verde: <ThumbsUp size={20} className="text-white mx-auto" />,
-  rojo: <ThumbsDown size={20} className="text-white mx-auto" />,
-  gris: <X size={20} className="text-white mx-auto" />,
+// =====================
+// CONFIGURACIÓN DE ESTADOS
+// =====================
+// 'justificada' se guarda en backend como 'ausente' pero se distingue visualmente
+// por eso usamos un campo extra en la matriz de IDs
+
+const ciclo: EstadoVisual[] = [
+  'vacio',
+  'presente_buen_concepto',
+  'presente_mal_concepto',
+  'ausente',
+  'justificada',
+];
+
+const colores: Record<EstadoVisual, string> = {
+  vacio:                   'bg-amber-300',
+  presente_buen_concepto:  'bg-green-500',
+  presente_mal_concepto:   'bg-orange-400',
+  ausente:                 'bg-red-500',
+  justificada:             'bg-cyan-400',
 };
 
-const alumnos = Array(15).fill('Nombre Apellido');
-const clases = Array.from({ length: 25 }, (_, i) => i + 1);
+const iconos: Record<EstadoVisual, JSX.Element | null> = {
+  vacio:                   null,
+  presente_buen_concepto:  <ThumbsUp  size={20} className="text-white mx-auto" />,
+  presente_mal_concepto:   <ThumbsDown size={20} className="text-white mx-auto" />,
+  ausente:                 <X         size={20} className="text-white mx-auto" />,
+  justificada:             <Clock     size={20} className="text-white mx-auto" />,
+};
 
+const estadoBackendAVisual = (estado: string): EstadoVisual => {
+  if (estado === 'presente_buen_concepto') return 'presente_buen_concepto';
+  if (estado === 'presente_mal_concepto')  return 'presente_mal_concepto';
+  if (estado === 'ausente')                return 'ausente';
+  if (estado === 'justificada')            return 'justificada';
+  return 'vacio';
+};
+
+const estadoVisualABackend = (estado: EstadoVisual): string | null => {
+  if (estado === 'vacio') return null;
+  if (estado === 'justificada') return 'ausente'; // backend no tiene justificada, se guarda como ausente
+  return estado;
+};
+
+const getSiguienteEstado = (estado: EstadoVisual): EstadoVisual => {
+  const idx = ciclo.indexOf(estado);
+  return ciclo[(idx + 1) % ciclo.length];
+};
+
+// =====================
+// COMPONENTE
+// =====================
 export default function AsistenciasTabla() {
-  const [datos, setDatos] = useState<Estado[][]>(
-    alumnos.map(() => clases.map(() => 'violeta'))
-  );
+  const params = useParams();
+  const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const cursoId = Number(rawId);
 
-  const cambiarEstado = (alumnoIndex: number, claseIndex: number) => {
+  const [inscripciones, setInscripciones]   = useState<AlumnoCurso[]>([]);
+  const [fechas, setFechas]                 = useState<string[]>([]);         // YYYY-MM-DD[]
+  const [datos, setDatos]                   = useState<EstadoVisual[][]>([]);  // [alumno][fecha]
+  const [asistenciaIds, setAsistenciaIds]   = useState<(number | null)[][]>([]); // id en BD o null
+  const [guardando, setGuardando]           = useState(false);
+
+  // =====================
+  // CARGA INICIAL
+  // =====================
+  useEffect(() => {
+    if (!cursoId) return;
+
+    const fetchData = async () => {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // 1. Alumnos
+      const resAlumnos = await fetch(`${API}/inscripciones/curso/${rawId}`, { headers });
+      const alumnosData: AlumnoCurso[] = await resAlumnos.json();
+      alumnosData.sort((a, b) => a.alumno.apellido.localeCompare(b.alumno.apellido));
+
+      // 2. Asistencias existentes
+      const resAsistencias = await fetch(`${API}/asistencias/curso/${rawId}`, { headers });
+
+      const asistenciasData: Asistencia[] = await resAsistencias.json();
+
+      // 3. Fechas únicas ordenadas
+      const fechasSet = new Set<string>();
+      for (const a of asistenciasData) {
+        fechasSet.add(a.fecha.split('T')[0]);
+      }
+      const fechasOrdenadas = [...fechasSet].sort();
+
+      // 4. Construir matrices
+      const matriz:    EstadoVisual[][]    = [];
+      const idsMatriz: (number | null)[][] = [];
+
+      for (const insc of alumnosData) {
+        const filaEstados: EstadoVisual[]    = [];
+        const filaIds:     (number | null)[] = [];
+
+        for (const fecha of fechasOrdenadas) {
+          const asist = asistenciasData.find(
+            (a) => a.alumnoCursoId === insc.id && a.fecha.split('T')[0] === fecha
+          );
+          filaEstados.push(asist ? estadoBackendAVisual(asist.estado) : 'vacio');
+          filaIds.push(asist ? asist.id : null);
+        }
+
+        matriz.push(filaEstados);
+        idsMatriz.push(filaIds);
+      }
+
+      setInscripciones(alumnosData);
+      setFechas(fechasOrdenadas);
+      setDatos(matriz);
+      setAsistenciaIds(idsMatriz);
+    };
+
+    fetchData();
+  }, [cursoId]);
+
+  // =====================
+  // AGREGAR FECHA
+  // =====================
+  const agregarFecha = () => {
+    const hoy = new Date().toISOString().split('T')[0];
+    // Evitar duplicados
+    if (fechas.includes(hoy)) {
+      alert('Ya existe una columna para hoy. Editá la fecha manualmente.');
+    }
+    setFechas((prev) => [...prev, hoy]);
+    setDatos((prev) => prev.map((fila) => [...fila, 'vacio']));
+    setAsistenciaIds((prev) => prev.map((fila) => [...fila, null]));
+  };
+
+  const editarFecha = (colIndex: number, valor: string) => {
+    setFechas((prev) => prev.map((f, i) => (i === colIndex ? valor : f)));
+  };
+
+  // =====================
+  // CAMBIO DE ESTADO (click en celda)
+  // =====================
+  const cambiarEstado = (filaIndex: number, colIndex: number) => {
     setDatos((prev) =>
       prev.map((fila, i) =>
         fila.map((estado, j) =>
-          i === alumnoIndex && j === claseIndex ? getNextEstado(estado) : estado
+          i === filaIndex && j === colIndex ? getSiguienteEstado(estado) : estado
         )
       )
     );
   };
 
+  // =====================
+  // GUARDAR TODO
+  // =====================
+  const guardarTodo = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) { alert('No hay sesión activa'); return; }
+
+    for (let j = 0; j < fechas.length; j++) {
+      if (!fechas[j]) {
+        alert(`La columna ${j + 1} no tiene fecha.`);
+        return;
+      }
+    }
+
+    setGuardando(true);
+    try {
+      const promesas: Promise<Response>[] = [];
+
+      for (let i = 0; i < datos.length; i++) {
+        for (let j = 0; j < fechas.length; j++) {
+          const estadoVisual  = datos[i][j];
+          const estadoBackend = estadoVisualABackend(estadoVisual);
+          const asistenciaId  = asistenciaIds[i]?.[j];
+          const alumnoCursoId = inscripciones[i].id;
+          const fecha         = fechas[j];
+
+          if (asistenciaId) {
+            // Ya existe en BD
+            if (estadoVisual === 'vacio') {
+              // Si lo dejaron en vacío, borrar la asistencia
+              promesas.push(
+                fetch(`${API}/asistencias/${asistenciaId}`, {
+                  method: 'DELETE',
+                  headers: { Authorization: `Bearer ${token}` },
+                })
+              );
+            } else {
+              // PUT con el nuevo estado
+              promesas.push(
+                fetch(`${API}/asistencias/${asistenciaId}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                  body: JSON.stringify({ estado: estadoBackend }),
+                })
+              );
+            }
+          } else if (estadoBackend) {
+            // No existe → POST
+            const ci = i, cj = j;
+            promesas.push(
+              fetch(`${API}/asistencias`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ fecha, estado: estadoBackend, alumnoCursoId }),
+              }).then(async (res) => {
+                if (res.ok) {
+                  const nueva: Asistencia = await res.clone().json();
+                  setAsistenciaIds((prev) => {
+                    const copia = prev.map((f) => [...f]);
+                    copia[ci][cj] = nueva.id;
+                    return copia;
+                  });
+                }
+                return res;
+              })
+            );
+          }
+        }
+      }
+
+      await Promise.all(promesas);
+      alert('✅ Asistencias guardadas');
+    } catch (err) {
+      console.error(err);
+      alert('❌ Error al guardar');
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  // =====================
+  // LEYENDA
+  // =====================
+  const leyenda: { estado: EstadoVisual; label: string }[] = [
+    { estado: 'presente_buen_concepto', label: 'Presente (buen concepto)' },
+    { estado: 'presente_mal_concepto',  label: 'Presente (mal concepto)'  },
+    { estado: 'ausente',                label: 'Ausente'                  },
+    { estado: 'justificada',            label: 'Falta justificada'        },
+    { estado: 'vacio',                  label: 'Sin registrar'            },
+  ];
+
+  // =====================
+  // RENDER
+  // =====================
   return (
-    <div className="overflow-x-auto p-2 pb-96 ">
-      <p className='text-center text-violet-600 font-bold uppercase'> toca los casilleros</p>
+    <div className="overflow-x-auto p-2 pb-32">
+
+      {/* Leyenda */}
+      <div className="flex flex-wrap gap-3 mb-4 justify-center">
+        {leyenda.map(({ estado, label }) => (
+          <div key={estado} className="flex items-center gap-1 text-xs text-violet-800">
+            <span className={`w-5 h-5 rounded flex items-center justify-center ${colores[estado]}`}>
+              {iconos[estado]}
+            </span>
+            {label}
+          </div>
+        ))}
+      </div>
+
+      <p className="text-center text-violet-600 font-bold uppercase mb-2">
+        Tocá los casilleros para cambiar el estado
+      </p>
+
       <div className="min-w-max">
-        <table className="table-fixed border-collapse gap-2">
+        <table className="table-fixed border-collapse">
           <thead>
             <tr>
-              <th className="sticky left-0 bg-violet-200 border-none z-10 border flex flex-col items-end justify-end text-violet-900 p-2 w-20 text-left">
-               <span>Clase:</span> 
-                <span>Fecha:</span>
+              <th className="sticky left-0 bg-violet-200 z-10 text-violet-900 p-2 w-40 text-left">
+                Alumno
               </th>
-              {clases.map((n) => (
-                <th key={n} className=" border-2 p-1 border-violet-200  text-violet-900 text-center">
-                  {n}<input className=' w-20 bg-violet-900 text-amber-300 rounded-l p-1'></input>
+
+              {fechas.map((fecha, j) => (
+                <th key={j} className="border-2 border-violet-200 p-1 text-violet-900 text-center min-w-[90px]">
+                  <input
+                    type="date"
+                    value={fecha}
+                    onChange={(e) => editarFecha(j, e.target.value)}
+                    className="w-full bg-violet-900 text-amber-300 rounded p-1 text-xs"
+                  />
                 </th>
-              ))}  <button className='bg-gray-800 h-10 w-10'>G</button>
+              ))}
+
+              <th className="p-1">
+                <button
+                  onClick={agregarFecha}
+                  className="bg-yellow-400 text-purple-900 font-bold w-10 h-10 rounded text-lg hover:bg-yellow-300 transition"
+                  title="Agregar fecha"
+                >
+                  +
+                </button>
+              </th>
             </tr>
           </thead>
+
           <tbody>
-            {datos.map((fila, i) => (
-              <tr key={i}>
-                <td className="sticky left-0 font-poppins font-700 border-violet-400 border-b-2 bg-violet-200 text-violet-900 ronde  w-20 text-m font-bold z-10">
-                  {alumnos[i]}
-                </td >
-                {fila.map((estado, j) => (
+            {inscripciones.map((insc, i) => (
+              <tr key={insc.id}>
+                <td className="sticky left-0 bg-violet-200 text-violet-900 z-10 px-2 py-1 font-bold w-40 border-b-2 border-violet-300">
+                  {insc.alumno.apellido}, {insc.alumno.nombre}
+                </td>
+
+                {datos[i]?.map((estado, j) => (
                   <td
                     key={j}
-                    className={` w-20 h-20 border-2 border-violet-400 cursor-pointer transition-colors duration-200 text-center ${coloresTailwind[estado]}`}
                     onClick={() => cambiarEstado(i, j)}
+                    className={`w-20 h-16 border-2 border-violet-300 cursor-pointer transition-colors duration-150 text-center ${colores[estado]}`}
                   >
                     {iconos[estado]}
-                  
                   </td>
-                  
                 ))}
-            </tr>
-              
+
+                <td />
+              </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <button
+        onClick={guardarTodo}
+        disabled={guardando}
+        className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 disabled:bg-gray-400
+                   text-white px-6 py-3 rounded-full shadow-2xl text-lg font-semibold transition-all"
+      >
+        {guardando ? 'Guardando...' : '💾 Guardar Asistencias'}
+      </button>
     </div>
   );
 }

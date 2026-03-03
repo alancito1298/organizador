@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Alumno } from "./page";
 
 type Props = {
-  cursoId: string;
+  cursoId: number;
   onAlumnoCreado: (alumno: Alumno) => void;
 };
 
@@ -108,28 +108,30 @@ export default function FormularioAlumno({
   };
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow">
-      <div className="grid grid-cols-2 gap-4">
+    <div className="bg-violet-950 p-4  shadow m-2">
+      <h2 className="text-center uppercase p-6 text-2xl">Agregar Alumno</h2>
+      <div className="flex flex-col gap-4 m-2 ">
+        <label>Nombre:</label>
         <input
           type="text"
-          placeholder="Nombre"
+          placeholder="Nombre/s"
           value={form.nombre}
           onChange={(e) =>
             setForm({ ...form, nombre: e.target.value })
           }
           className="border p-2 rounded"
         />
-
+         <label>Apellido:</label>
         <input
           type="text"
-          placeholder="Apellido"
+          placeholder="Ingresa Apellido/s"
           value={form.apellido}
           onChange={(e) =>
             setForm({ ...form, apellido: e.target.value })
           }
           className="border p-2 rounded"
         />
-
+        <label>DNI:</label>
         <input
           type="text"
           placeholder="DNI (opcional)"
@@ -139,7 +141,7 @@ export default function FormularioAlumno({
           }
           className="border p-2 rounded"
         />
-
+        <label>Contacto:</label>
         <input
           type="text"
           placeholder="Contacto (opcional)"
