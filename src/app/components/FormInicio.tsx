@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import GoogleButton from "./GoogleBoton";
+import { setToken } from "@/lib/token";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -26,11 +27,10 @@ export default function LoginForm() {
       }
   
       const data = await res.json();
+
+      setToken(data.access_token);
   
-      // 👇 Ajustar según cómo devuelva tu backend
-      localStorage.setItem("token", data.access_token);
-  
-      window.location.href = "/"; // o la ruta que quieras
+      window.location.replace("/");
     } catch (error) {
       alert("Error al iniciar sesión");
       console.error(error);
@@ -41,7 +41,7 @@ export default function LoginForm() {
 
   return (
     <div className="min-h-96 flex items-center justify-center px-4">
-      <div className="w-full max-w-md  rounded-xl  p-8">
+      <div className="w-full max-w-md rounded-xl p-8">
         <h1 className="text-2xl font-semibold text-yellow-200 text-center">
           Iniciar sesión
         </h1>
@@ -53,7 +53,7 @@ export default function LoginForm() {
         <form onSubmit={handleSubmit} className="mt-6 space-y-5">
           {/* EMAIL */}
           <div>
-            <label className="block text-sm  text-white font-bold">
+            <label className="block text-sm text-white font-bold">
               Email
             </label>
             <input
@@ -74,7 +74,7 @@ export default function LoginForm() {
 
           {/* PASSWORD */}
           <div>
-            <label className="block text-sm  text-white font-bold">
+            <label className="block text-sm text-white font-bold">
               Contraseña
             </label>
             <input
@@ -87,25 +87,27 @@ export default function LoginForm() {
                 mt-1 w-full rounded-lg border border-slate-300
                 px-3 py-2 text-sm
                 focus:outline-none focus:ring-2 focus:ring-blue-500
-                focus:border-blue-500  bg-white font-bold text-violet-900
+                focus:border-blue-500 bg-white font-bold text-violet-900
               "
             />
           </div>
-          <GoogleButton></GoogleButton>
+
+          <GoogleButton />
+
           {/* BOTÓN */}
           <button
-              type="submit"
-              disabled={loading}
-              className="
-               w-full flex justify-center items-center
-                rounded-lg bg-blue-600 text-white
-                py-2 text-sm font-medium
+            type="submit"
+            disabled={loading}
+            className="
+              w-full flex justify-center items-center
+              rounded-lg bg-blue-600 text-white
+              py-2 text-sm font-medium
               hover:bg-blue-700 transition
-                disabled:opacity-60 disabled:cursor-not-allowed
-              "
-            >
-              {loading ? "Ingresando..." : "Ingresar"}
-            </button>
+              disabled:opacity-60 disabled:cursor-not-allowed
+            "
+          >
+            {loading ? "Ingresando..." : "Ingresar"}
+          </button>
         </form>
 
         {/* FOOTER */}
@@ -113,8 +115,11 @@ export default function LoginForm() {
           ¿No tenés cuenta?{" "}
           <span className="text-violet-900 hover:underline cursor-pointer">
             Registrate
-          </span><tr></tr>
-        <strong className="bg-white text-red-800">Precioná ingresar para testear la prueba</strong>
+          </span>
+          <br />
+          <strong className="bg-white text-red-800">
+            Precioná ingresar para testear la prueba
+          </strong>
         </div>
       </div>
     </div>
