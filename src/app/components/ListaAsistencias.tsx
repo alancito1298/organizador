@@ -79,6 +79,7 @@ export default function AsistenciasTabla() {
   const params = useParams();
   const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
   const cursoId = Number(rawId);
+  const [guardadoOk, setGuardadoOk] = useState(false);
 
   const [inscripciones, setInscripciones]   = useState<AlumnoCurso[]>([]);
   const [fechas, setFechas]                 = useState<string[]>([]);         // YYYY-MM-DD[]
@@ -244,7 +245,10 @@ export default function AsistenciasTabla() {
       }
 
       await Promise.all(promesas);
-      alert('✅ Asistencias guardadas');
+      setGuardadoOk(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000); 
     } catch (err) {
       console.error(err);
       alert('❌ Error al guardar');
@@ -268,7 +272,7 @@ export default function AsistenciasTabla() {
   // RENDER
   // =====================
   return (
-    <div className="overflow-x-auto p-2 pb-32">
+    <div className="p-2 pb-32">
 
       {/* Leyenda */}
       <div className="flex flex-wrap gap-3 mb-4 justify-center">
@@ -285,8 +289,13 @@ export default function AsistenciasTabla() {
       <p className="text-center text-violet-600 font-bold uppercase mb-2">
         Tocá los casilleros para cambiar el estado
       </p>
+      <p className="text-center text-violet-600 font-bold uppercase mb-2">
+      <p className="text-center text-violet-600 font-bold uppercase mb-2">
+      no te olvides de 💾 antes de salir
+      </p>
+      </p>
 
-      <div className="min-w-max">
+      <div className="overflow-x-auto relative">
         <table className="table-fixed border-collapse">
           <thead>
             <tr>
@@ -295,15 +304,24 @@ export default function AsistenciasTabla() {
               </th>
 
               {fechas.map((fecha, j) => (
-                <th key={j} className="border-2 border-violet-200 p-1 text-violet-900 text-center min-w-[90px]">
-                  <input
-                    type="date"
-                    value={fecha}
-                    onChange={(e) => editarFecha(j, e.target.value)}
-                    className="w-full bg-violet-900 text-amber-300 rounded p-1 text-xs"
-                  />
-                </th>
-              ))}
+  <th key={j} className="border-2 border-violet-200 p-1 text-violet-900 text-center min-w-[70px]">
+    <div className="flex flex-col items-center gap-1">
+      <span className="text-amber-300 bg-violet-900 rounded px-2 py-1 text-xs font-bold">
+        {fecha ? new Date(fecha + 'T00:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' }) : '--/--'}
+      </span>
+      <button
+        onClick={() => {
+          const nueva = prompt('Nueva fecha (YYYY-MM-DD):', fecha);
+          if (nueva) editarFecha(j, nueva);
+        }}
+        className="text-violet-400 text-xs hover:text-violet-700 transition"
+        title="Editar fecha"
+      >
+        ✏️
+      </button>
+    </div>
+  </th>
+))}
 
               <th className="p-1">
                 <button
@@ -328,7 +346,7 @@ export default function AsistenciasTabla() {
                   <td
                     key={j}
                     onClick={() => cambiarEstado(i, j)}
-                    className={`w-20 h-16 border-2 border-violet-300 cursor-pointer transition-colors duration-150 text-center ${colores[estado]}`}
+                    className={`w-16 h-16 border-2 border-violet-300 cursor-pointer transition-colors duration-150 text-center rounded-xl m-1 ${colores[estado]}`}
                   >
                     {iconos[estado]}
                   </td>
@@ -344,11 +362,16 @@ export default function AsistenciasTabla() {
       <button
         onClick={guardarTodo}
         disabled={guardando}
-        className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 disabled:bg-gray-400
+        className="fixed bottom-20 right-6 bg-green-600 hover:bg-green-700 disabled:bg-gray-400
                    text-white px-6 py-3 rounded-full shadow-2xl text-lg font-semibold transition-all"
       >
-        {guardando ? 'Guardando...' : '💾 Guardar Asistencias'}
+        {guardando ? 'Guardando...' : '💾'}
       </button>
+      {guardadoOk && (
+  <div className="fixed top-30 left-1/2 -translate-x-1/2 z-50 p-6 bg-violet-500 text-center text-white px-6 py-3 rounded-full shadow-2xl text-lg font-semibold animate-bounce">
+    ✅ Asistencias guardadas
+  </div>
+)}
     </div>
   );
 }
