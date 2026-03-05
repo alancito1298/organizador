@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import GoogleButton from "./GoogleBoton";
-import { setToken } from "@/lib/token";
+import { setToken } from "../../lib/token";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
