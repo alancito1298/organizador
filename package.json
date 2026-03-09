@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
+    "@vercel/analytics": "^1.6.1",
     "bootstrap-icons": "^1.13.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
