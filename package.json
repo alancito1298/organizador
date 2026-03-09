@@ -10,13 +10,17 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
+    "@types/react-big-calendar": "^1.16.3",
+    "@vercel/analytics": "^1.6.1",
     "bootstrap-icons": "^1.13.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "lucide-react": "^0.515.0",
     "motion": "^12.34.3",
     "next": "^14.2.35",
     "react": "^18.2.0",
+    "react-big-calendar": "^1.19.4",
     "react-dom": "^18.2.0",
     "uuid": "^11.1.0"
   },

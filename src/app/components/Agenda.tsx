@@ -1,110 +1,261 @@
-// components/Agenda.tsx
-import { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+'use client';
 
-type Recordatorio = {
-  id: string;
-  fecha: string; // YYYY-MM-DD
-  nota: string;
-  asunto: string;
+import { useEffect, useState } from 'react';
+
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
+
+type AgendaItem = { id: number; fecha: string; descripcion: string };
+
+const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+const MESES = [
+  'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+  'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
+];
+
+const toKey = (y: number, m: number, d: number) =>
+  `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+const hoyKey = () => {
+  const h = new Date();
+  return toKey(h.getFullYear(), h.getMonth(), h.getDate());
 };
 
-export default function Agenda() {
-  const [recordatorios, setRecordatorios] = useState<Recordatorio[]>([]);
-  const [fecha, setFecha] = useState('');
-  const [asunto, setAsunto] = useState('');
-  const [nota, setNota] = useState('');
+export default function AgendaCalendario() {
+  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
+  const [year, setYear]   = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(new Date().getMonth());
 
-  // Cargar recordatorios desde localStorage al iniciar
-  useEffect(() => {
-    const data = localStorage.getItem('recordatorios');
-    if (data) setRecordatorios(JSON.parse(data));
-  }, []);
+  const [modalAgregar, setModalAgregar]           = useState(false);
+  const [modalVer, setModalVer]                   = useState(false);
+  const [diaSeleccionado, setDiaSeleccionado]     = useState<string>('');
+  const [notasDia, setNotasDia]                   = useState<AgendaItem[]>([]);
+  const [descripcion, setDescripcion]             = useState('');
+  const [guardando, setGuardando]                 = useState(false);
+  const [eliminandoId, setEliminandoId]           = useState<number | null>(null);
 
-  // Guardar en localStorage cada vez que cambian
-  useEffect(() => {
-    localStorage.setItem('recordatorios', JSON.stringify(recordatorios));
-  }, [recordatorios]);
+  useEffect(() => { fetchAgenda(); }, []);
 
-  const agregarRecordatorio = () => {
-    if (!fecha || !nota) return;
-
-    const nuevo: Recordatorio = {
-      id: uuidv4(),
-      fecha,
-      asunto,
-      nota,
-    };
-
-    setRecordatorios([...recordatorios, nuevo]);
-    setFecha('');
-    setAsunto('');
-    setNota('');
-    
+  const fetchAgenda = async () => {
+    const token = localStorage.getItem('token');
+    const res   = await fetch(`${API}/agenda`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data: AgendaItem[] = await res.json();
+    setAgendaItems(data);
   };
 
-  const eliminar = (id: string) => {
-    setRecordatorios(recordatorios.filter(r => r.id !== id));
+  const diasConNotas = new Set(
+    agendaItems.map((i) => i.fecha.split('T')[0])
+  );
+
+  // Construir grilla del mes
+  const primerDia   = new Date(year, month, 1);
+  const ultimoDia   = new Date(year, month + 1, 0).getDate();
+  // Lunes = 0 ... Domingo = 6
+  let offsetInicio  = primerDia.getDay() - 1;
+  if (offsetInicio < 0) offsetInicio = 6;
+
+  const celdas: (number | null)[] = [
+    ...Array(offsetInicio).fill(null),
+    ...Array.from({ length: ultimoDia }, (_, i) => i + 1),
+  ];
+  // Rellenar hasta múltiplo de 7
+  while (celdas.length % 7 !== 0) celdas.push(null);
+
+  const navMes = (dir: number) => {
+    let m = month + dir;
+    let y = year;
+    if (m > 11) { m = 0; y++; }
+    if (m < 0)  { m = 11; y--; }
+    setMonth(m);
+    setYear(y);
+  };
+
+  const handleClickDia = (dia: number) => {
+    const key   = toKey(year, month, dia);
+    const notas = agendaItems.filter((i) => i.fecha.split('T')[0] === key);
+    setDiaSeleccionado(key);
+    if (notas.length > 0) {
+      setNotasDia(notas);
+      setModalVer(true);
+    } else {
+      setDescripcion('');
+      setModalAgregar(true);
+    }
+  };
+
+  const guardarNota = async () => {
+    if (!descripcion.trim() || !diaSeleccionado) return;
+    setGuardando(true);
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API}/agenda`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          fecha: new Date(diaSeleccionado + 'T12:00:00').toISOString(),
+          descripcion: descripcion.trim(),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setModalAgregar(false);
+      setDescripcion('');
+      await fetchAgenda();
+    } catch { alert('❌ Error al guardar'); }
+    finally { setGuardando(false); }
+  };
+
+  const eliminarNota = async (id: number) => {
+    setEliminandoId(id);
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API}/agenda/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error();
+      setNotasDia((prev) => prev.filter((n) => n.id !== id));
+      await fetchAgenda();
+    } catch { alert('❌ Error al eliminar'); }
+    finally { setEliminandoId(null); }
+  };
+
+  const formatDia = (key: string) => {
+    const [y, m, d] = key.split('-').map(Number);
+    const fecha = new Date(y, m - 1, d);
+    return fecha.toLocaleDateString('es-AR', {
+      weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+    });
   };
 
   return (
-    <div className="p-4 min-h-180">
-      <h2 className="text-2xl uppercase mb-4">Agenda</h2>
+    <div className="p-4 max-w-lg mx-auto select-none bg-violet-900 min-h-screen">
 
-      {/* Formulario */}
-      <div className="mb-4 bg-yellow-400 p-3 rounded-l">
-     <label htmlFor="fecha" className='uppercase m-3 text-violet-900 font-bebas'style={{ fontFamily: 'Bebas Neue' }}>fecha</label>
-        <input
-          type="date"
-          value={fecha}
-          onChange={e => setFecha(e.target.value)}
-          className="border-none bg-yellow-100 text-violet-900  p-1 h-12  m-2 rounded-l px-2 py-1 mr-2 w-auto min-w-8/9"
-        />
-           <label className='font-atma' style={{ fontFamily: 'Atma Bold' }}>Asunto</label>
-        <input
-          type="text"
-          placeholder="Asunto?"
-          value={asunto}
-          onChange={e => setAsunto(e.target.value)}
-          className="border-none bg-yellow-100 text-violet-900 p-1 h-12  m-2 rounded-l px-2 py-1 mr-2  min-w-8/9"
-        />
-       
-        <input
-          type="text"
-          placeholder="Escribe la nota..."
-          value={nota}
-          onChange={e => setNota(e.target.value)}
-          className="border-none bg-yellow-100 text-violet-900 p-1  h-12 m-2  rounded-l px-2 py-1 mr-2 w-auto min-w-8/9"
-        />
-        <button onClick={agregarRecordatorio} className="bg-violet-900 m-4 text-white px-4 py-1 rounded">
-          Agregar
-        </button>
+      {/* ── HEADER MES ── */}
+     
+      <h2 className="text-lg text-center font-bold text-white-900 uppercase tracking-wide">
+          {MESES[month]} {year}
+        </h2>
+      {/* ── CABECERA DÍAS ── */}
+      <div className="grid grid-cols-7 mb-1 bg-violet-200">
+        {DIAS.map((d) => (
+          <div key={d} className="text-center text-xs font-bold text-violet-950 uppercase py-1">
+            {d}
+          </div>
+        ))}
       </div>
- <h5 className='text-xl mb-10 mt-15 bg-violet-900 p-3 rounded-l'>Fechas Importantes!!!</h5>
-      {/* Lista de fechas programadas */}
-      <ul className="space-y-2">
-        {recordatorios.map(r => {
-            const dateObj = new Date(r.fecha);
-            const diaSemana = dateObj.toLocaleDateString('es-AR',{
-              weekday: 'long',
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            });
 
-            return (
-              <li key={r.id} className="flex justify-between items-center text-gray-800 bg-gray-100 px-4 py-2 rounded">
-                <div>
-                 {diaSemana}<br /> <strong className='uppercase text-violet-900'>{r.asunto}</strong> 
-                  <br /> {r.nota}
+      {/* ── GRILLA ── */}
+      <div className="grid grid-cols-7 sm:m-2  gap-1">
+        {celdas.map((dia, idx) => {
+          if (!dia) return <div key={`empty-${idx}`} />;
+
+          const key       = toKey(year, month, dia);
+          const esHoy     = key === hoyKey();
+          const tieneNota = diasConNotas.has(key);
+          const oscuro    = dia % 2 === 1;
+
+          return (
+            <button
+              key={key}
+              onClick={() => handleClickDia(dia)}
+              className="flex flex-col items-center font-extralight text-8xl p-4 justify-center rounded aspect-square transition-transform active:scale-95"
+              style={{
+                backgroundColor: esHoy
+                  ? 'violet'
+                  : oscuro ? '#c4b5fd' : '#ede9fe',
+                color: esHoy || !oscuro ? '#4c1d95' : 'white',
+                fontWeight: esHoy ? 800 : 600,
+                fontSize: esHoy ? "1.2rem" : "0.85rem",
+                boxShadow: esHoy ? '0 0 0 2px #7c3aed' : undefined,
+              }}
+            >
+              {dia}
+              {tieneNota && (<div className='absolute right-0 top-0'>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="purple" className="bi bi-pin-angle-fill" viewBox="0 0 16 16">
+                <path d="M9.828.722a.5.5 0 0 1 .354.146l4.95 4.95a.5.5 0 0 1 0 .707c-.48.48-1.072.588-1.503.588-.177 0-.335-.018-.46-.039l-3.134 3.134a6 6 0 0 1 .16 1.013c.046.702-.032 1.687-.72 2.375a.5.5 0 0 1-.707 0l-2.829-2.828-3.182 3.182c-.195.195-1.219.902-1.414.707s.512-1.22.707-1.414l3.182-3.182-2.828-2.829a.5.5 0 0 1 0-.707c.688-.688 1.673-.767 2.375-.72a6 6 0 0 1 1.013.16l3.134-3.133a3 3 0 0 1-.04-.461c0-.43.108-1.022.589-1.503a.5.5 0 0 1 .353-.146"/>
+              </svg>
+              </div> )}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className='fixed bottom-50 left-0 right-0'>
+      <div className="flex items-center min-w-screen justify-around bg-none ">
+        <button
+          onClick={() => navMes(-1)}
+          className="w-16 h-16 rounded  bg-violet-200 text-violet-950 flex items-center justify-center text-lg hover:bg-violet-800 transition"
+        ><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-caret-left-fill" viewBox="0 0 16 16">
+        <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+      </svg></button>
+        <button
+          onClick={() => navMes(1)}
+          className="w-16 h-16 rounded bg-violet-200 text-violet-950 flex items-center justify-center text-lg hover:bg-violet-800 transition"
+        ><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+        <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+      </svg></button>
+      </div>
+      </div>
+      {/* ── MODAL AGREGAR ── */}
+      {modalAgregar && diaSeleccionado && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-sm">
+            <h3 className="text-base font-bold text-violet-900 mb-1 text-center">📝 Nueva nota</h3>
+            <p className="text-xs text-gray-500 text-center mb-3 capitalize">{formatDia(diaSeleccionado)}</p>
+            <textarea
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              placeholder="Escribí tu nota..."
+              rows={3}
+              className="w-full border border-violet-300 rounded-xl px-3 py-2 text-sm text-black focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+            />
+            <div className="flex gap-2 justify-center mt-3">
+              <button onClick={() => setModalAgregar(false)}
+                className="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm font-medium">
+                Cancelar
+              </button>
+              <button onClick={guardarNota} disabled={guardando || !descripcion.trim()}
+                className="px-4 py-2 rounded-xl bg-violet-600 text-white hover:bg-violet-700 text-sm font-medium disabled:opacity-60">
+                {guardando ? 'Guardando...' : 'Guardar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL VER NOTAS ── */}
+      {modalVer && diaSeleccionado && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-sm">
+            <h3 className="text-base font-bold text-violet-900 mb-1 text-center">📅 Notas</h3>
+            <p className="text-xs text-gray-500 text-center mb-3 capitalize">{formatDia(diaSeleccionado)}</p>
+
+            <div className="flex flex-col gap-2 max-h-52 overflow-y-auto mb-3">
+              {notasDia.map((nota) => (
+                <div key={nota.id} className="flex items-start justify-between bg-violet-50 rounded-xl p-2 gap-2">
+                  <p className="text-sm text-violet-900 flex-1">{nota.descripcion}</p>
+                  <button onClick={() => eliminarNota(nota.id)} disabled={eliminandoId === nota.id}
+                    className="text-red-400 hover:text-red-600 transition shrink-0 text-xs">
+                    {eliminandoId === nota.id ? '...' : '🗑️'}
+                  </button>
                 </div>
-                <button onClick={() => eliminar(r.id)} className="text-red-500 hover:underline">
-                  Eliminar
-                </button>
-              </li>
-            );
-            })}
-      </ul>
+              ))}
+            </div>
+
+            <div className="flex gap-2 justify-center">
+              <button onClick={() => setModalVer(false)}
+                className="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm font-medium">
+                Cerrar
+              </button>
+              <button onClick={() => { setModalVer(false); setDescripcion(''); setModalAgregar(true); }}
+                className="px-4 py-2 rounded-xl bg-violet-600 text-white hover:bg-violet-700 text-sm font-medium">
+                + Agregar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

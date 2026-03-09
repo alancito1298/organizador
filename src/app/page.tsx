@@ -11,6 +11,7 @@ export default function Home() {
       
 <div>
         <a href="/menu-cursos" className="font-bebas text-violet-950 m-4 bg-amber-300 rounded-xl p-2 flex justify-center align-center">Ir a Cursos</a> 
+        <a href="/agenda" className="font-bebas text-violet-950 m-4 bg-amber-300 rounded-xl p-2 flex justify-center align-center">Agenda</a> 
         <p className="p-5 font-bebas">Esta web sirve para que los docentes puedan organizar y gestionar toda su actividad educativa en un solo lugar.
 
 Permite llevar un control ordenado de cursos, alumnos, asistencias, calificaciones y agenda, evitando el uso de cuadernos, planillas en papel o archivos dispersos. Cada docente accede con su cuenta y gestiona únicamente su propia información, de forma segura y desde cualquier dispositivo.

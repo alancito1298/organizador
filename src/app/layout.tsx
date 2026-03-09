@@ -37,7 +37,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.className} ${mono.variable}`}>
+      <body className={`${inter.className} ${mono.variable} min-h-screen  bg-amber-950` }>
         {children}
       </body>
     </html>

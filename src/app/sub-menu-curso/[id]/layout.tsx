@@ -52,7 +52,7 @@ export default function CursoLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-violet-100">
+    <div className="min-w-screen  bg-violet-100">
 
       {/* HEADER */}
       <div className="bg-violet-700 text-white p-6 text-center">
@@ -63,15 +63,15 @@ export default function CursoLayout({
       </div>
 
       {/* NAV */}
-      <nav className="flex flex-wrap justify-center gap-4 p-4 bg-violet-200">
+      <nav className="flex w-full bg-violet-300 font-bebas ">
         {menuItems.map((item) => (
           <Link
             key={item.path}
             href={item.path}
-            className={`px-4 py-2 rounded-lg ${
-              pathname === item.path
-                ? "bg-violet-700 text-white"
-                : "bg-white text-violet-700"
+            className={`flex-1 text-center py-3 w-auto text-sm font-medium shadow-amber-800  transition
+            ${pathname === item.path
+              ? "bg-violet-700 text-white"
+              : "bg-violet-300 text-violet-700 hover:bg-violet-300"
             }`}
           >
             {item.name}

@@ -6,9 +6,7 @@ import { ThumbsUp, ThumbsDown, X, Clock } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
-// =====================
-// TIPOS
-// =====================
+
 type EstadoVisual = 'vacio' | 'presente_buen_concepto' | 'presente_mal_concepto' | 'ausente' | 'justificada';
 
 type AlumnoCurso = {
@@ -23,11 +21,7 @@ type Asistencia = {
   alumnoCursoId: number;
 };
 
-// =====================
-// CONFIGURACIÓN DE ESTADOS
-// =====================
-// 'justificada' se guarda en backend como 'ausente' pero se distingue visualmente
-// por eso usamos un campo extra en la matriz de IDs
+
 
 const ciclo: EstadoVisual[] = [
   'vacio',
@@ -63,7 +57,7 @@ const estadoBackendAVisual = (estado: string): EstadoVisual => {
 
 const estadoVisualABackend = (estado: EstadoVisual): string | null => {
   if (estado === 'vacio') return null;
-  if (estado === 'justificada') return 'ausente'; // backend no tiene justificada, se guarda como ausente
+  if (estado === 'justificada') return 'ausente'; 
   return estado;
 };
 
@@ -72,9 +66,7 @@ const getSiguienteEstado = (estado: EstadoVisual): EstadoVisual => {
   return ciclo[(idx + 1) % ciclo.length];
 };
 
-// =====================
-// COMPONENTE
-// =====================
+
 export default function AsistenciasTabla() {
   const params = useParams();
   const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
