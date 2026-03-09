@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ArrowBigLeft, ArrowBigRight, Pin, Siren } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
@@ -133,8 +134,8 @@ export default function AgendaCalendario() {
 
       {/* ── HEADER MES ── */}
      
-      <h2 className="text-lg text-center font-bold text-white-900 uppercase tracking-wide">
-          {MESES[month]} {year}
+      <h2 className="text-4xl pt-10 text-start font-bold text-violet-200 uppercase tracking-wide">
+          {MESES[month]} <span className='font-extralight text-yellow-200'>{year}</span>
         </h2>
       {/* ── CABECERA DÍAS ── */}
       <div className="grid grid-cols-7 mb-1 bg-violet-200">
@@ -159,7 +160,7 @@ export default function AgendaCalendario() {
             <button
               key={key}
               onClick={() => handleClickDia(dia)}
-              className="flex flex-col items-center font-extralight text-8xl p-4 justify-center rounded aspect-square transition-transform active:scale-95"
+              className="  font-extralight text-8xl   rounded aspect-square transition-transform active:scale-95"
               style={{
                 backgroundColor: esHoy
                   ? 'violet'
@@ -169,13 +170,14 @@ export default function AgendaCalendario() {
                 fontSize: esHoy ? "1.2rem" : "0.85rem",
                 boxShadow: esHoy ? '0 0 0 2px #7c3aed' : undefined,
               }}
-            >
-              {dia}
-              {tieneNota && (<div className='absolute right-0 top-0'>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="purple" className="bi bi-pin-angle-fill" viewBox="0 0 16 16">
-                <path d="M9.828.722a.5.5 0 0 1 .354.146l4.95 4.95a.5.5 0 0 1 0 .707c-.48.48-1.072.588-1.503.588-.177 0-.335-.018-.46-.039l-3.134 3.134a6 6 0 0 1 .16 1.013c.046.702-.032 1.687-.72 2.375a.5.5 0 0 1-.707 0l-2.829-2.828-3.182 3.182c-.195.195-1.219.902-1.414.707s.512-1.22.707-1.414l3.182-3.182-2.828-2.829a.5.5 0 0 1 0-.707c.688-.688 1.673-.767 2.375-.72a6 6 0 0 1 1.013.16l3.134-3.133a3 3 0 0 1-.04-.461c0-.43.108-1.022.589-1.503a.5.5 0 0 1 .353-.146"/>
-              </svg>
+            >  {dia}
+             
+              {tieneNota && (<div className=''>
+              <Siren className='text-red-500'/>
+            
               </div> )}
+            
+              
             </button>
           );
         })}
@@ -185,16 +187,12 @@ export default function AgendaCalendario() {
       <div className="flex items-center min-w-screen justify-around bg-none ">
         <button
           onClick={() => navMes(-1)}
-          className="w-16 h-16 rounded  bg-violet-200 text-violet-950 flex items-center justify-center text-lg hover:bg-violet-800 transition"
-        ><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-caret-left-fill" viewBox="0 0 16 16">
-        <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-      </svg></button>
+          className="w-16 h-16 rounded  bg-yellow-200 text-violet-950 flex items-center justify-center text-lg hover:bg-violet-800 transition"
+        ><ArrowBigLeft /></button>
         <button
           onClick={() => navMes(1)}
-          className="w-16 h-16 rounded bg-violet-200 text-violet-950 flex items-center justify-center text-lg hover:bg-violet-800 transition"
-        ><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-        <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-      </svg></button>
+          className="w-16 h-16 rounded bg-yellow-200 text-violet-950 flex items-center justify-center text-lg hover:bg-violet-800 transition"
+        ><ArrowBigRight/></button>
       </div>
       </div>
       {/* ── MODAL AGREGAR ── */}

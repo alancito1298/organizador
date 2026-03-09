@@ -47,7 +47,7 @@ export default function CursoLayout({
     { name: "Asistencia", path: `/sub-menu-curso/${id}/asistencia` },
     { name: "Alumnos", path: `/sub-menu-curso/${id}/alumnos` },
     { name: "Calificaciones", path: `/sub-menu-curso/${id}/calificaciones` },
-    { name: "Planificaciones", path: `/sub-menu-curso/${id}/planificaciones` },
+    //{ name: "Planificaciones", path: `/sub-menu-curso/${id}/planificaciones` },
     //{ name: "Bibliografía", path: `/sub-menu-curso/${id}/bibliografia` },
   ];
 

@@ -2,10 +2,11 @@
 
 import { useEffect, useState, JSX } from 'react';
 import { useParams } from 'next/navigation';
-import { ThumbsUp, ThumbsDown, X, Clock } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, X, Clock, ListPlus } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
+const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
 type EstadoVisual = 'vacio' | 'presente_buen_concepto' | 'presente_mal_concepto' | 'ausente' | 'justificada';
 
@@ -104,7 +105,10 @@ export default function AsistenciasTabla() {
       for (const a of asistenciasData) {
         fechasSet.add(a.fecha.split('T')[0]);
       }
-      const fechasOrdenadas = [...fechasSet].sort();
+
+
+
+    const fechasOrdenadas = [...fechasSet].sort().reverse();
 
       // 4. Construir matrices
       const matriz:    EstadoVisual[][]    = [];
@@ -144,9 +148,9 @@ export default function AsistenciasTabla() {
     if (fechas.includes(hoy)) {
       alert('Ya existe una columna para hoy. Editá la fecha manualmente.');
     }
-    setFechas((prev) => [...prev, hoy]);
-    setDatos((prev) => prev.map((fila) => [...fila, 'vacio']));
-    setAsistenciaIds((prev) => prev.map((fila) => [...fila, null]));
+    setFechas((prev) => [hoy, ...prev]);
+    setDatos((prev) => prev.map((fila) => ['vacio', ...fila]));
+    setAsistenciaIds((prev) => prev.map((fila) => [null, ...fila]));
   };
 
   const editarFecha = (colIndex: number, valor: string) => {
@@ -288,6 +292,7 @@ export default function AsistenciasTabla() {
       </p>
 
       <div className="overflow-x-auto relative">
+        
         <table className="table-fixed border-collapse">
           <thead>
             <tr>
@@ -315,15 +320,9 @@ export default function AsistenciasTabla() {
   </th>
 ))}
 
-              <th className="p-1">
-                <button
-                  onClick={agregarFecha}
-                  className="bg-yellow-400 text-purple-900 font-bold w-10 h-10 rounded text-lg hover:bg-yellow-300 transition"
-                  title="Agregar fecha"
-                >
-                  +
-                </button>
-              </th>
+            
+              
+            
             </tr>
           </thead>
 
@@ -350,12 +349,20 @@ export default function AsistenciasTabla() {
           </tbody>
         </table>
       </div>
-
+      <button
+onClick={agregarFecha}
+className="fixed bottom-35  right-0 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400
+text-white px-6 py-3 rounded-l-full border-amber-950 border-r-0 border-2 shadow-2xl text-lg font-semibold transition-all"
+title="Agregar fecha"
+>
+<ListPlus />
+</button>
       <button
         onClick={guardarTodo}
         disabled={guardando}
-        className="fixed bottom-20 right-6 bg-green-600 hover:bg-green-700 disabled:bg-gray-400
-                   text-white px-6 py-3 rounded-full shadow-2xl text-lg font-semibold transition-all"
+        className="fixed bottom-20 right-0
+     border-amber-950 border-2 border-r-0 bg-green-600 hover:bg-green-700 disabled:bg-gray-400
+                   text-white px-6 py-3 rounded-l-full shadow-8xl shadow-amber-900 text-lg font-semibold transition-all"
       >
         {guardando ? 'Guardando...' : '💾'}
       </button>
@@ -363,7 +370,8 @@ export default function AsistenciasTabla() {
   <div className="fixed top-30 left-1/2 -translate-x-1/2 z-50 p-6 bg-violet-500 text-center text-white px-6 py-3 rounded-full shadow-2xl text-lg font-semibold animate-bounce">
     ✅ Asistencias guardadas
   </div>
-)}
+
+)} 
     </div>
   );
 }
