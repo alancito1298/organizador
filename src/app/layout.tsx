@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Roboto_Mono, Bebas_Neue, Atma, Poppins } from "next/font/google";
+import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 
 const inter = Inter({
@@ -39,6 +40,7 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${inter.className} ${mono.variable}`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
