@@ -6,7 +6,7 @@ import { ThumbsUp, ThumbsDown, X, Clock, ListPlus } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
-const [mostrarFormulario, setMostrarFormulario] = useState(false);
+
 
 type EstadoVisual = 'vacio' | 'presente_buen_concepto' | 'presente_mal_concepto' | 'ausente' | 'justificada';
 
@@ -73,7 +73,7 @@ export default function AsistenciasTabla() {
   const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
   const cursoId = Number(rawId);
   const [guardadoOk, setGuardadoOk] = useState(false);
-
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [inscripciones, setInscripciones]   = useState<AlumnoCurso[]>([]);
   const [fechas, setFechas]                 = useState<string[]>([]);         // YYYY-MM-DD[]
   const [datos, setDatos]                   = useState<EstadoVisual[][]>([]);  // [alumno][fecha]
@@ -268,12 +268,12 @@ export default function AsistenciasTabla() {
   // RENDER
   // =====================
   return (
-    <div className="p-2 pb-32">
+    <div className="p-2 pb-32 bg-purple-700 min-h-screen">
 
       {/* Leyenda */}
       <div className="flex flex-wrap gap-3 mb-4 justify-center">
         {leyenda.map(({ estado, label }) => (
-          <div key={estado} className="flex items-center gap-1 text-xs text-violet-800">
+          <div key={estado} className="flex items-center gap-1 text-xs text-yellow-50">
             <span className={`w-5 h-5 rounded flex items-center justify-center ${colores[estado]}`}>
               {iconos[estado]}
             </span>
@@ -282,11 +282,11 @@ export default function AsistenciasTabla() {
         ))}
       </div>
 
-      <p className="text-center text-violet-600 font-bold uppercase mb-2">
+      <p className="text-center text-yellow-50 font-bold uppercase mb-2">
         Tocá los casilleros para cambiar el estado
       </p>
-      <p className="text-center text-violet-600 font-bold uppercase mb-2">
-      <p className="text-center text-violet-600 font-bold uppercase mb-2">
+      <p className="text-center text-yellow-50 font-bold uppercase mb-2">
+      <p className="text-center text-yellow-50 font-bold uppercase mb-2">
       no te olvides de 💾 antes de salir
       </p>
       </p>
@@ -296,12 +296,12 @@ export default function AsistenciasTabla() {
         <table className="table-fixed border-collapse">
           <thead>
             <tr>
-              <th className="sticky left-0 bg-violet-200 z-10 text-violet-900 p-2 w-40 text-left">
+              <th className="sticky left-0 bg-purple-700 z-10 text-violet-100 p-2 w-40 text-left">
                 Alumno
               </th>
 
               {fechas.map((fecha, j) => (
-  <th key={j} className="border-2 border-violet-200 p-1 text-violet-900 text-center min-w-[70px]">
+  <th key={j} className="border-2 bg-purple-700 border-violet-200 p-1 text-violet-900 text-center min-w-[70px]">
     <div className="flex flex-col items-center gap-1">
       <span className="text-amber-300 bg-violet-900 rounded px-2 py-1 text-xs font-bold">
         {fecha ? new Date(fecha + 'T00:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' }) : '--/--'}
@@ -329,7 +329,7 @@ export default function AsistenciasTabla() {
           <tbody>
             {inscripciones.map((insc, i) => (
               <tr key={insc.id}>
-                <td className="sticky left-0 bg-violet-200 text-violet-900 z-10 px-2 py-1 font-bold w-40 border-b-2 border-violet-300">
+                <td className="sticky left-0 bg-purple-700 text-violet-50 z-10 px-2 py-1 font-bold w-40 border-b-2 border-violet-300">
                   {insc.alumno.apellido}, {insc.alumno.nombre}
                 </td>
 

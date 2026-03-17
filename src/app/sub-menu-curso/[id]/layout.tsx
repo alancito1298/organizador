@@ -55,7 +55,7 @@ export default function CursoLayout({
     <div className="min-w-screen  bg-violet-100">
 
       {/* HEADER */}
-      <div className="bg-violet-700 text-white p-6 text-center">
+      <div className="bg-violet-950 text-white p-6 text-center">
         <h1 className="text-2xl font-bold">
           {curso.anio}°  - {curso.materia}
         </h1>
@@ -70,8 +70,8 @@ export default function CursoLayout({
             href={item.path}
             className={`flex-1 text-center py-3 w-auto text-sm font-medium shadow-amber-800  transition
             ${pathname === item.path
-              ? "bg-violet-700 text-white"
-              : "bg-violet-300 text-violet-700 hover:bg-violet-300"
+              ? "bg-violet-950 text-white"
+              : "bg-purple-700 text-violet-100 hover:bg-violet-300"
             }`}
           >
             {item.name}

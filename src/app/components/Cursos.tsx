@@ -30,7 +30,9 @@ export default function Cursos() {
       );
 
       const data = await res.json();
-      setCursos(data);
+      if (Array.isArray(data)) {
+        setCursos(data);
+      }
     };
 
     fetchCursos();

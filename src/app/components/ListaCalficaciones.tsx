@@ -236,8 +236,8 @@ export default function ListaCalificaciones() {
   // RENDER
   // ===============================
   return (
-    <div className="overflow-x-auto p-4">
-      <table className="border-collapse w-full text-sm">
+    <div className="overflow-x-auto p-4 min-h-screen bg-purple-700">
+      <table className="border-collapse w-full text-sm ">
         <thead>
           <tr>
             <th className="sticky left-0 z-10 bg-purple-700 text-white p-2 w-48">
@@ -245,12 +245,12 @@ export default function ListaCalificaciones() {
             </th>
 
             {columnas.map((col, i) => (
-              <th key={i} className="bg-purple-900 text-purple-100 p-2 min-w-40">
+              <th key={i} className="bg-purple-700 text-purple-100 p-2 min-w-40">
                 <select
-                  className="bg-violet-800 rounded text-sm w-full mb-1"
-                  value={col.tipo}
-                  onChange={(e) => handleColumnaChange(i, "tipo", e.target.value)}
-                >
+  className={`rounded text-sm w-full mb-1 ${!col.tipo ? 'bg-red-400' : 'bg-violet-800'}`}
+  value={col.tipo}
+  onChange={(e) => handleColumnaChange(i, "tipo", e.target.value)}
+>
                   <option value="">Evaluación</option>
                   <option value="trabajo_practico">Trabajo práctico</option>
                   <option value="Examen">Examen</option>
@@ -258,10 +258,10 @@ export default function ListaCalificaciones() {
                 </select>
 
                 <select
-                  className="bg-yellow-500 text-violet-900 rounded text-sm w-full mb-1"
-                  value={col.trimestre}
-                  onChange={(e) => handleColumnaChange(i, "trimestre", e.target.value)}
-                >
+  className={`rounded text-sm w-full mb-1 ${!col.trimestre ? 'bg-red-400' : 'bg-yellow-500 text-violet-900'}`}
+  value={col.trimestre}
+  onChange={(e) => handleColumnaChange(i, "trimestre", e.target.value)}
+>
                   <option value="">Trimestre</option>
                   <option value="1">1°</option>
                   <option value="2">2°</option>
@@ -269,11 +269,11 @@ export default function ListaCalificaciones() {
                 </select>
 
                 <input
-                  type="date"
-                  className="bg-violet-700 rounded text-sm w-full px-1"
-                  value={col.fecha}
-                  onChange={(e) => handleColumnaChange(i, "fecha", e.target.value)}
-                />
+  type="date"
+  className={`rounded text-sm w-full px-1 ${!col.fecha ? 'bg-red-400' : 'bg-purple-700'}`}
+  value={col.fecha}
+  onChange={(e) => handleColumnaChange(i, "fecha", e.target.value)}
+/>
               </th>
             ))}
 
@@ -298,14 +298,14 @@ export default function ListaCalificaciones() {
         <tbody>
           {inscripciones.map((inscripcion, filaIndex) => (
             <tr key={inscripcion.id} className="hover:bg-purple-50">
-              <td className="sticky left-0 z-10 bg-purple-600 text-white px-2 py-1 font-medium">
+              <td className="sticky left-0 z-10 bg-purple-700 text-white px-2 py-1 font-medium">
                 {inscripcion.alumno.apellido}, {inscripcion.alumno.nombre}
               </td>
 
               {datos[filaIndex]?.map((valor, colIndex) => {
                 const esExistente = !!calificacionIds[filaIndex]?.[colIndex];
                 return (
-                  <td key={colIndex} className="bg-purple-100 p-1 relative">
+                  <td key={colIndex} className="bg-purple-700 p-1 relative">
                     {/* Indicador visual: lápiz si la nota ya existe en BD */}
                     {esExistente && (
                       <span
