@@ -30,7 +30,7 @@ export default function LoginForm() {
 
       setToken(data.access_token);
   
-      window.location.replace("/");
+      window.location.replace("/home");
     } catch (error) {
       alert("Error al iniciar sesión");
       console.error(error);
@@ -114,12 +114,10 @@ export default function LoginForm() {
         <div className="mt-6 text-center text-sm text-yellow-200">
           ¿No tenés cuenta?{" "}
           <span className="text-violet-900 hover:underline cursor-pointer">
-            Registrate
+            <a href="https://wa.link/kueeht">Registrate</a>
           </span>
           <br />
-          <strong className="bg-white text-red-800">
-            Precioná ingresar para testear la prueba
-          </strong>
+         
         </div>
       </div>
     </div>

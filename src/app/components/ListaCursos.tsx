@@ -36,13 +36,13 @@ export default function ListaCursos({ id, anio, escuela, materia, ruta, onElimin
 
   return (
     <>
-      <div className="flex w-100 h-auto mx-2 bg-violet-800 text-violet-100 border-violet-950 border-2 overflow-hidden hover:bg-violet-300 transition relative group">
+      <div className="flex min-h-w-1/3 w-auto h-46 mx-2 bg-violet-800 text-violet-100 border-violet-950 border-2 overflow-hidden hover:bg-violet-300 transition relative group">
       <Analytics />
       
         {/* Tarjeta clickeable */}
         <a href={ruta} className="flex flex-1">
           <div className="flex items-center m-4 justify-center text-8xl font-atma">
-            <h5>{anio}°</h5>
+            <h5>{anio}</h5>
           </div>
           <div className="w-1 bg-violet-950 my-0"></div>
           <div className="flex flex-col justify-center px-4 py-2 leading-tight">
