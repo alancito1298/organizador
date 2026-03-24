@@ -35,7 +35,7 @@ export default function TablaAlumnos() {
   };
 
   return (
-    <div className="overflow-x-auto max-w-full m-4 min-h-200 ">
+    <div className="overflow-x-auto max-w-full m-4 min-h-200  ">
          <h4 className='text-violet-900 text-xl m-2 font-bebas font-bold'>E.E.T n°79</h4>
       <h3 className='text-violet-500 font-light m-2  uppercase text-3xl'>5to Matematica</h3>
    
@@ -44,7 +44,7 @@ export default function TablaAlumnos() {
           <tr className="bg-blue-300 text-white">
             <th className= " bg-violet-900 rounded-tl-xl px-4 py-2">NOMBRE</th>
             <th className=" bg-violet-900   px-4 py-2">APELLIDO</th>
-            <th className=" bg-violet-900 rounded-tr-xl  px-4 py-2">CONTACTO</th>
+            
           </tr>
         </thead>
         <tbody>
@@ -70,7 +70,7 @@ export default function TablaAlumnos() {
     
 
       {mostrarFormulario && (
-        <div className="mt-4 bg-yellow-100 border border-violet-400 p-4 rounded-lg shadow w-full max-w-md mx-auto">
+        <div className="mt-4 bg-yellow-100 pb-10 border border-violet-400 p-4 rounded-lg shadow w-full max-w-md mx-auto">
           <h3 className="text-lg font-semibold mb-3 text-violet-900">Agregar Alumno</h3>
 
           <input

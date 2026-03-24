@@ -59,7 +59,7 @@ export default function Cursos() {
         {/* Botón agregar */}
         <div
           onClick={() => setMostrarFormulario((prev) => !prev)}
-          className="flex w-full md:w-2/3 cursor-pointer bg-violet-200 text-violet-900 rounded-xl overflow-hidden shadow-md hover:bg-violet-300 transition"
+          className="flex mt-10 md:w-2/3 w-8/9 cursor-pointer bg-violet-200 text-violet-900 rounded-xl overflow-hidden shadow-md hover:bg-violet-300 transition"
         >
           <div className="w-full flex flex-row items-center justify-center text-5xl font-light gap-2 py-4">
             <span>+</span>

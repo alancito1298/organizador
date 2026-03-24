@@ -54,10 +54,10 @@ const BottomNav = () => {
       >
         <ArrowLeft size={35} />
       </button>
-        <Link href="/" className="text-amber-300 hover:text-blue-600">
+        <Link href="/home" className="text-amber-300 hover:text-blue-600">
           <Home size={40} />
         </Link>
-        <Link href="/" className="text-amber-300 hover:text-blue-600"> <Bell size={32} /></Link>
+        <Link href="/home" className="text-amber-300 hover:text-blue-600"> <Bell size={32} /></Link>
         <Link href="/agenda" className="text-violet-100 flex flex-col justify-center items-center hover:text-blue-600">
         <CalendarDays size={30} />   <small className="text-xs font-extralight">AGENDA</small>
         </Link>

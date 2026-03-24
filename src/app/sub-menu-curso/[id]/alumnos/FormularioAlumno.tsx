@@ -108,10 +108,10 @@ export default function FormularioAlumno({
   };
 
   return (
-    <div className="bg-violet-950 p-4  shadow m-2">
-      <h2 className="text-center uppercase p-6 text-2xl">Agregar Alumno</h2>
-      <div className="flex flex-col gap-4 m-2 ">
-        <label>Nombre:</label>
+    <div className="  h-screen shadow ">
+      <h2 className="text-center text-violet-900 uppercase p-6 text-3xl">Agregar Alumno</h2>
+      <div className="flex flex-col gap-4 m-4 ">
+        <label className="uppercase font-extralight  text-violet-900">Nombre:</label>
         <input
           type="text"
           placeholder="Nombre/s"
@@ -119,9 +119,9 @@ export default function FormularioAlumno({
           onChange={(e) =>
             setForm({ ...form, nombre: e.target.value })
           }
-          className="border p-2 rounded"
+          className="border p-2 rounded text-violet-600 bg-amber-50"
         />
-         <label>Apellido:</label>
+         <label className="uppercase font-extralight  text-violet-900">Apellido:</label>
         <input
           type="text"
           placeholder="Ingresa Apellido/s"
@@ -129,9 +129,9 @@ export default function FormularioAlumno({
           onChange={(e) =>
             setForm({ ...form, apellido: e.target.value })
           }
-          className="border p-2 rounded"
+          className="border p-2 rounded text-violet-600 bg-amber-50"
         />
-        <label>DNI:</label>
+        {/* <label>DNI:</label>
         <input
           type="text"
           placeholder="DNI (opcional)"
@@ -139,7 +139,7 @@ export default function FormularioAlumno({
           onChange={(e) =>
             setForm({ ...form, dni: e.target.value })
           }
-          className="border p-2 rounded"
+          className="border p-2 rounded text-violet-600 bg-amber-50"
         />
         <label>Contacto:</label>
         <input
@@ -149,10 +149,10 @@ export default function FormularioAlumno({
           onChange={(e) =>
             setForm({ ...form, contacto: e.target.value })
           }
-          className="border p-2 rounded"
-        />
+          className="border p-2 rounded text-violet-600 bg-amber-50"
+        />*/}
       </div>
-
+<div className="w-8/9 h-10 flex items-center justify-end">
       <button
         onClick={agregarAlumno}
         disabled={loading}
@@ -164,6 +164,7 @@ export default function FormularioAlumno({
       >
         {loading ? "Creando..." : "Agregar Alumno"}
       </button>
+      </div>
     </div>
   );
 }

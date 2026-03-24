@@ -109,8 +109,8 @@ export default function CursoPage() {
   if (!cursoId) return <p>Cargando...</p>;
 
   return (
-    <>
-      <h3 className="text-black text-2xl text-center font-bebas">Alumnos listados de este curso</h3>
+    <div className="">
+      <h3 className="text-black text-2xl text-center font-bebas ">Alumnos listados de este curso</h3>
 
       {alumnos.length === 0 ? (
         <p className="text-center text-gray-500 mt-4">No hay alumnos</p>
@@ -120,7 +120,6 @@ export default function CursoPage() {
             <tr className="bg-violet-300">
               <th className="border-violet-900 border-1 w-1/3 p-2">Apellido</th>
               <th className="border-violet-900 border-1 w-1/3 p-2">Nombre</th>
-              <th className="border-violet-900 border-1 w-1/5 p-2">Contacto</th>
               <th className="w-1/8 border-violet-900 border-1"></th>
             </tr>
           </thead>
@@ -129,7 +128,7 @@ export default function CursoPage() {
               <tr key={alumno.id} className="border-b border-violet-200">
                 <td className="text-center p-1 text-2xl font-semibold uppercase">{alumno.apellido}</td>
                 <td className="text-center p-1 text-2xl font-semibold uppercase">{alumno.nombre}</td>
-                <td className="text-center p-1 text-2xl font-semibold uppercase">{alumno.contacto}</td>
+                
                 <td className="flex items-center justify-evenly py-2">
                   {/* ELIMINAR */}
                   <button
@@ -249,6 +248,6 @@ export default function CursoPage() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

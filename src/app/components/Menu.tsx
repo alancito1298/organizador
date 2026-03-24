@@ -205,7 +205,7 @@ c-678 -1 -1243 0 -1255 3 l-23 5 0 915 0 915 2075 0 2075 0 0 360 0 360 -2459
                         <BtnMenu ruta="/agenda" icono={<CalendarPlus size={60} />} nombre="Agenda" />
                         <BtnMenu ruta="/menu-cursos" icono={<Users size={60}  />} nombre="Mis cursos" />
                         <BtnMenu ruta="/planificaciones" icono={<SquareChartGantt size={60} />} nombre="Planificaciones" />
-                        <BtnMenu ruta="/horarios" icono={<Clock8 size={60} />} nombre="Horarios" />
+                        <BtnMenu ruta="/horario" icono={<Clock8 size={60} />} nombre="Horarios" />
                 
                 </div>
                 <button onClick={cerrarSesion} className="font-bebas  bg-violet-900 m-4 text-violet-200  lg:max-w-1/3  w-full py-4 flex justify-center align-center uppercase text-3xl"><LogOut className="m-1" />Cerrar Sesión </button>    

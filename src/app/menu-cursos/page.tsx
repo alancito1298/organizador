@@ -1,4 +1,4 @@
-import BottomNav from "@/app/components/BottomNav";
+
 import Navbar from "@/app/components/Navbar";
 import ListaCursos from "@/app/components/Cursos";
 
@@ -6,7 +6,7 @@ import ListaCursos from "@/app/components/Cursos";
     return (
       <><Navbar titulo="Tus Cursos" data=""></Navbar>
         <ListaCursos></ListaCursos>
-      <BottomNav></BottomNav>
+   
       </>
     );
   }
