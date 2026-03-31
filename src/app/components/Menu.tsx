@@ -1,5 +1,5 @@
 'use client';
-import {Users,CalendarPlus,SquareChartGantt,Clock8,DoorOpen,LogOut,} from 'lucide-react'
+import {Users,CalendarPlus,SquareChartGantt,Clock8,DoorOpen,Bug,Banknote,LogOut,} from 'lucide-react'
 import BottomNav from './BottomNav';
 
 import BtnMenu from './BtnMenu';
@@ -202,11 +202,12 @@ c-678 -1 -1243 0 -1255 3 l-23 5 0 915 0 915 2075 0 2075 0 0 360 0 360 -2459
 
        
                 <div className='grid grid-cols-2 items-center gap-3 justify-center p-2'>
-                        <BtnMenu ruta="/agenda" icono={<CalendarPlus size={60} />} nombre="Agenda" />
-                        <BtnMenu ruta="/menu-cursos" icono={<Users size={60}  />} nombre="Mis cursos" />
-                        <BtnMenu ruta="/planificaciones" icono={<SquareChartGantt size={60} />} nombre="Planificaciones" />
-                        <BtnMenu ruta="/horario" icono={<Clock8 size={60} />} nombre="Horarios" />
-                
+                        <BtnMenu ruta="/agenda" icono={<CalendarPlus size={50} />} nombre="Agenda" />
+                        <BtnMenu ruta="/menu-cursos" icono={<Users size={50}  />} nombre="Mis cursos" />
+                        <BtnMenu ruta="/planificaciones" icono={<SquareChartGantt size={50} />} nombre="Planificaciones" />
+                        <BtnMenu ruta="/horario" icono={<Clock8 size={50} />} nombre="Horarios" />
+                        <BtnMenu ruta="/horario" icono={<Banknote size={50} />} nombre="Pagos" />
+                        <BtnMenu ruta="/horario" icono={<Bug size={50} />} nombre="ayuda" />
                 </div>
                 <button onClick={cerrarSesion} className="font-bebas  bg-violet-900 m-4 text-violet-200  lg:max-w-1/3  w-full py-4 flex justify-center align-center uppercase text-3xl"><LogOut className="m-1" />Cerrar Sesión </button>    
         <p className="p-5 font-bebas">Esta web sirve para que los docentes puedan organizar y gestionar toda su actividad educativa en un solo lugar.

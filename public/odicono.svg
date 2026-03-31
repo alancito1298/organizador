@@ -1,26 +1,14 @@
-"use client";
-
-import { UserRound} from "lucide-react";
-
-
-export default function Navbar() {
- 
-
-
-  
-
-  return (
-    <nav className="w-full text-yellow-100 uppercase font-mono bg-violet-950 border-b shadow-sm px-2 py-1 flex justify-between items-center">
-      
-      {/* LOGO */}
-      <div className="flex items-center gap-1">
-        <div className="bg-violet-950 font-bold rounded-lg w-auto h-12 flex items-center justify-center">
-        <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="auto" height="auto" viewBox="0 0 4000.000000 4092.000000"
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="4000.000000pt" height="4092.000000pt" viewBox="0 0 4000.000000 4092.000000"
  preserveAspectRatio="xMidYMid meet">
-
+<metadata>
+Created by potrace 1.16, written by Peter Selinger 2001-2019
+</metadata>
 <g transform="translate(0.000000,4092.000000) scale(0.100000,-0.100000)"
-fill="currentColor" stroke="none">
+fill="#000000" stroke="none">
 <path d="M13758 37876 l-217 -186 -13 -58 c-7 -31 -13 -100 -12 -152 1 -83 5
 -107 37 -192 29 -79 63 -136 183 -315 161 -237 317 -461 549 -788 551 -778
 819 -1252 1070 -1900 543 -1400 721 -2763 565 -4340 -86 -877 -261 -1772 -634
@@ -113,26 +101,3 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
 43 -142 45 -221 16z"/>
 </g>
 </svg>
-
-
-
-        </div>
-        <span className="font-semibold 1 text-sm">
-          Organizador Docente
-        </span>
-      </div>
-
-      {/* ACCIONES */}
-      <div className="flex items-center gap-6">
-
-      
-        {/* USUARIO */}
-        <div className="text-sm font-extralight font-mono">Nombre</div>
-        <div className="w-9 h-9 rounded-full bg-yellow-100 flex flex-col text-violet-950 items-center justify-center">
-          <UserRound/>
-        </div>
-   
-      </div>
-    </nav>
-  );
-}

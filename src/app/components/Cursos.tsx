@@ -40,8 +40,8 @@ export default function Cursos() {
 
   return (
     <div className="p-3 bg-violet-100 min-h-screen">
-      <h2 className="text-2xl font-bold text-violet-700 text-center py-6 uppercase font-atma">
-        Cursos
+      <h2 className="text-3xl font-light bg-violet-950 mb-10  text-violet-100 text-center py-6 uppercase ">
+        tus Cursos
       </h2>
 
       <div className="flex flex-col px-4 w-full gap-4 items-center">

@@ -36,19 +36,19 @@ export default function ListaCursos({ id, anio, escuela, materia, ruta, onElimin
 
   return (
     <>
-      <div className="flex min-h-w-1/3 w-8/9 h-auto mx-2 p-10 bg-violet-300 text-violet-800 border-0 overflow-hidden hover:bg-violet-300 transition relative group rounded-br-3xl">
+      <div className="flex min-h-w-1/3 w-8/9 h-auto sm:w-screen sm:m-0 md:max-w-96 md:mx-2 p-10 bg-violet-300 text-violet-800 border-0 overflow-hidden hover:bg-violet-300 transition relative group rounded-br-3xl">
       <Analytics />
       
         {/* Tarjeta clickeable */}
-        <a href={ruta} className="flex flex-1 p-0  border-b-2 border-violet-300">
-          <div className="flex items-start m-4 justify-start text-8xl font-extralight ">
-            <h5>{anio}</h5>
+        <a href={ruta} className="flex flex-1 p-0  border-2 border-violet-300">
+          <div className="flex items-center justify-center m-0 p-6 w-1/3 bg-violet-100 text-8xl font-extralight ">
+            <h5 className=''>{anio}</h5>
           </div>
-          <div className="w-1 bg-white my-0"></div>
+        
           <div className="flex flex-col items-start justify-start px-8 mt-3 py-2 leading-tight">
         
-            <p className="pl-4  text-2xl font- uppercase font-bold">{escuela}</p>
-            <p className="text-3xl text-purple-950 font-extralight tracking-wider pl-4 uppercase font-">{materia}</p>
+            <p className="pl-4  text-1xl  sm:text-2xl font- uppercase font-bold">{escuela}</p>
+            <p className="text-2xl sm:text-3xl text-purple-950 font-extralight tracking-wider pl-4 uppercase font-">{materia}</p>
           </div>
         </a>
 

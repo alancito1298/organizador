@@ -38,9 +38,9 @@ const BottomNav = () => {
 
   return (
     <nav
-      className={`fixed bottom-0 left-0 right-0 z-50 bg-violet-900  shadow-sm transition-transform duration-300 ${
+      className={`fixed  bottom-0 left-0 right-0 z-50 bg-violet-900  shadow-sm transition-transform duration-300 ${
         visible ? "translate-y-0" : "translate-y-full"
-      }`}
+      } md:translate-y-0`}
     >
       <div className="max-w-md mx-auto flex justify-around items-center gap-1 h-16">
      

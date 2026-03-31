@@ -57,12 +57,11 @@ export default function CursoLayout({
       {/* HEADER */}
       <div className="bg-violet-950 text-white p-6 text-center">
         <h1 className="text-2xl font-bold">
-          {curso.anio}°  - {curso.materia}
+          {curso.anio}  - {curso.materia}
         </h1>
         <p className="uppercase font-sans font-bold">{curso.escuela}</p>
       </div>
 
-      {/* NAV */}
       <nav className="flex w-full bg-violet-300 font-bebas ">
         {menuItems.map((item) => (
           <Link

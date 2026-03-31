@@ -114,7 +114,7 @@ export default function LoginForm() {
         <div className="mt-6 text-center text-sm text-yellow-200">
           ¿No tenés cuenta?{" "}
           <span className="text-violet-900 hover:underline cursor-pointer">
-            <a href="https://wa.link/kueeht">Registrate</a>
+            <a href="/registro">Registrate</a>
           </span>
           <br />
          

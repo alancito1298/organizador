@@ -293,17 +293,17 @@ export default function AsistenciasTabla() {
 
       <div className="overflow-x-auto relative">
         
-        <table className="table-fixed border-collapse">
+        <table className="table-fixed border-collapse mb-40">
           <thead>
             <tr>
-              <th className="sticky left-0 bg-purple-700 z-10 text-violet-100 p-2 w-40 text-left">
+              <th className="sticky left-0 bg-violet-950 z-10 text-violet-100 p-2 w-40 text-left">
                 Alumno
               </th>
 
               {fechas.map((fecha, j) => (
-  <th key={j} className="border-2 bg-purple-700 border-violet-200 p-1 text-violet-900 text-center min-w-[70px]">
+  <th key={j} className="border-2 bg-violet-950 border-violet-200 p-1 text-violet-900 text-center min-w-[70px]">
     <div className="flex flex-col items-center gap-1">
-      <span className="text-amber-300 bg-violet-900 rounded px-2 py-1 text-xs font-bold">
+      <span className="text-violet-950 bg-amber-100 rounded px-2 py-1 text-xs font-bold">
         {fecha ? new Date(fecha + 'T00:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' }) : '--/--'}
       </span>
       <button
@@ -311,10 +311,10 @@ export default function AsistenciasTabla() {
           const nueva = prompt('Nueva fecha (YYYY-MM-DD):', fecha);
           if (nueva) editarFecha(j, nueva);
         }}
-        className="text-violet-400 text-xs hover:text-violet-700 transition"
+        className="text-violet-400 text-xs font hover:text-violet-700 transition"
         title="Editar fecha"
       >
-        ✏️
+       editar ✏️
       </button>
     </div>
   </th>
@@ -329,7 +329,7 @@ export default function AsistenciasTabla() {
           <tbody>
             {inscripciones.map((insc, i) => (
               <tr key={insc.id}>
-                <td className="sticky left-0 bg-purple-700 text-violet-50 z-10 px-2 py-1 font-bold w-40 border-b-2 border-violet-300">
+                <td className="sticky left-0 bg-purple-700 text-violet-50 z-10 p-1 gap-0 font-mono w-46 font-light border-b-2 border-violet-300">
                   {insc.alumno.apellido}, {insc.alumno.nombre}
                 </td>
 
