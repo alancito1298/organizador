@@ -41,7 +41,7 @@ export default function ListaCursos({ id, anio, escuela, materia, ruta, onElimin
       
         {/* Tarjeta clickeable */}
         <a href={ruta} className="flex flex-1 p-0  border-2 border-violet-300">
-          <div className="flex items-center justify-center m-0 p-6 w-1/3 bg-violet-100 text-8xl font-extralight ">
+          <div className="flex items-center justify-center m-0 p-6 min-w-1/3 bg-violet-100 text-8xl font-extralight ">
             <h5 className=''>{anio}</h5>
           </div>
         

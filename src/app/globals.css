@@ -14,7 +14,9 @@
 }
 
 
-
+html, body {
+  overflow-x: hidden;
+}
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #cd8be7;
@@ -22,16 +24,19 @@
   }
 }
 
-body {
-  background: var(--background);
+body, main, section  {
+
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   min-height: 1vh;
+  margin: 0;
+  padding: 0;
 }
 
 
-
-
+div[style*="position: fixed"] {
+  display: none !important;
+}
 
 div{
   padding: 0
@@ -74,4 +79,9 @@ div{
 
 .color{
 background-color: #8baae7;
+}
+
+header{
+  margin:0;
+  padding: 0;
 }

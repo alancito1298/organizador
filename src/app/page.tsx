@@ -1,6 +1,6 @@
 
-import BottomNav from "./components/BottomNav";
-import LoginForm from "./components/FormInicio";
+
+import Inicio from "./components/Inicio"
 
 export default function Home() {
   return (
@@ -9,10 +9,9 @@ export default function Home() {
     
       
 
+<Inicio></Inicio>
 
-<LoginForm></LoginForm>
 
-<BottomNav></BottomNav>
     </div>
   );
 }
