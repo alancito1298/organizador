@@ -4,8 +4,8 @@ import Image from "next/image";
 
 export default function Features({ items }: any) {
   return (
-    <section className="container px-6 py-8 mx-auto lg:py-16">
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-2">
+    <section className="container  px-6 py-8 mx-auto lg:w-7/9 lg:py-16">
+      <div className=" m-0 grid grid-cols-1 gap-8 w-full  md:grid-cols-2 xl:grid-cols-2  items-center justify-center">
      
         {items.map((item: any, i: number) => (
           <div
