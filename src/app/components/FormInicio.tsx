@@ -40,20 +40,21 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-96 flex items-center justify-center px-4">
-      <div className="w-full max-w-md rounded-xl p-8">
-        <h1 className="text-2xl font-semibold text-yellow-200 text-center">
+    <div className="w-8/9  flex  items-center justify-center bg-none mt-20 ">
+      
+        
+
+        <form onSubmit={handleSubmit} className="mt-6 p-8  border-2 bg-violet-100 border-violet-300 space-y-5">
+          {/* EMAIL */}
+          <h1 className="text-4xl uppercase font-extralight mt-8 text-violet-950 text-center">
           Iniciar sesión
         </h1>
 
-        <p className="text-sm text-white-500 text-center mt-2">
+        <p className="text-sm font-semibold text-white-500 text-center mt-2 text-violet-800 ">
           Accedé a tu organizador
         </p>
-
-        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
-          {/* EMAIL */}
           <div>
-            <label className="block text-sm text-white font-bold">
+            <label className="block text-sm text-violet-800 font-bold">
               Email
             </label>
             <input
@@ -74,7 +75,7 @@ export default function LoginForm() {
 
           {/* PASSWORD */}
           <div>
-            <label className="block text-sm text-white font-bold">
+            <label className="block text-sm text-violet-800 font-bold">
               Contraseña
             </label>
             <input
@@ -100,7 +101,7 @@ export default function LoginForm() {
             disabled={loading}
             className="
               w-full flex justify-center items-center
-              rounded-lg bg-blue-600 text-white
+              rounded-lg bg-violet-950 text-white
               py-2 text-sm font-medium
               hover:bg-blue-700 transition
               disabled:opacity-60 disabled:cursor-not-allowed
@@ -108,18 +109,19 @@ export default function LoginForm() {
           >
             {loading ? "Ingresando..." : "Ingresar"}
           </button>
-        </form>
-
-        {/* FOOTER */}
-        <div className="mt-6 text-center text-sm text-yellow-200">
+          <div className="mt-6 text-center text-sm text-gray-500">
           ¿No tenés cuenta?{" "}
-          <span className="text-violet-900 hover:underline cursor-pointer">
+          <span className="text-violet-900 hover:underline font-bold cursor-pointer">
             <a href="/registro">Registrate</a>
           </span>
           <br />
          
         </div>
+        </form>
+
+  
+        
       </div>
-    </div>
+   
   );
 }
