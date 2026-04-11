@@ -340,11 +340,11 @@ export default function ListaCalificaciones() {
       <button
         onClick={guardarTodo}
         disabled={guardando}
-        className="fixed bottom-14 right-6 bg-green-600 hover:bg-green-700 disabled:bg-gray-400
-                   text-white px-6 py-3 rounded-full shadow-2xl
-                   text-lg font-semibold transition-all"
+       className="fixed bottom-20 right-0
+     border-amber-950 border-2 border-r-0 bg-green-600 hover:bg-green-700 disabled:bg-gray-400
+                   text-white px-6 py-3 rounded-l-full shadow-8xl shadow-amber-900 text-lg font-semibold transition-all"
       >
-        {guardando ? "Guardando..." : "💾 Guardar Calificaciones"}
+        {guardando ? 'Guardando...' : '💾'}
       </button>
     </div>
   );

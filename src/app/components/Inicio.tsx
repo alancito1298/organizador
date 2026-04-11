@@ -5,6 +5,7 @@ import { Book, Users } from "lucide-react";
 import Features from "./Features";
 import PlanesPage from "./planes";
 import Header from "./Header";
+import Footer from "./Footer";
 
 export default function Inicio() {
  
