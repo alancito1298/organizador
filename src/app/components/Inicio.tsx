@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { Book } from "lucide-react";
-import Features from "./Features";
-import Planes from "./Planes";
+import Features from "@/app/components/Features";
+import Planes from "@/app/components/Planes";
 import Header from "./Header";
 import Footer from "./Footer";
 import InfoDispotivos from "./InfoDispositivos";
