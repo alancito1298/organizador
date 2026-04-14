@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Book } from "lucide-react";
 import Features from "./Features";
-import Planes from "./Planes";
+import Planes from "./PlanesPrecios";
 import Header from "./Header";
 import Footer from "./Footer";
 import InfoDispotivos from "./InfoDispositivos";
