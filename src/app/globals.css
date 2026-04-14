@@ -1,7 +1,10 @@
 @import "tailwindcss";
 
 
-
+section{
+  margin: 0;
+  padding: 0;
+}
 
 :root {
   --background: #ffffff;

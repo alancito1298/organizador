@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { ListPlus } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "https://backend-organizador.vercel.app";
 
@@ -237,7 +238,7 @@ export default function ListaCalificaciones() {
   // ===============================
   return (
     <div className="overflow-x-auto p-4 min-h-screen bg-purple-700">
-      <table className="border-collapse w-full text-sm ">
+      <table className="border-collapse w-full text-sm mb-30 ">
         <thead>
           <tr>
             <th className="sticky left-0 z-10 bg-purple-700 text-white p-2 w-48">
@@ -278,18 +279,7 @@ export default function ListaCalificaciones() {
             ))}
 
             <th className="p-2 ">
-              <button
-                onClick={agregarColumna}
-                className="bg-yellow-400 font-sans flex pt-2 flex-col aling-center  justify-center text-5xl h-20 w-20 text-purple-900 font-extrabold px-3 py-1 rounded  hover:bg-yellow-300 transition"
-                title="Agregar columna"
-              >
-                
-                <svg xmlns="http://www.w3.org/2000/svg" width="%100" height="auto" fill="currentColor" className="bi bi-plus-circle" viewBox="0 0 16 16">
-  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-</svg>
-<small className="uppercase pt-1 font-mono text-violet-90 text-sm">Agregar</small>
-              </button>
+             
              
             </th>
           </tr>
@@ -346,6 +336,14 @@ export default function ListaCalificaciones() {
       >
         {guardando ? 'Guardando...' : '💾'}
       </button>
+      <button
+                onClick={agregarColumna}
+                className="fixed bottom-35  right-0 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400
+                text-white px-6 py-3 rounded-l-full border-amber-950 border-r-0 border-2 shadow-2xl text-lg font-semibold transition-all"
+                title="Agregar fecha"
+                >
+                <ListPlus />
+              </button>
     </div>
   );
 }

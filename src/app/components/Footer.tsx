@@ -1,7 +1,7 @@
 'use client'
 export default function Footer() {
 
-return (<footer className="flex flex-col gap-5 lg:flex-row lg:justify-around items-center w-full py-20 px-auto mt-20 mb-0 text-white bg-violet-950">
+return (<footer className="flex flex-col gap-5 lg:flex-row lg:justify-around items-center w-full py-20 px-auto  mb-0 text-white bg-violet-950">
 <div className=" w-full lg:w-1/3">
 <a href="#" className="  flex justify-center items-center h-14 lg:h-20 ">
     <div className="bg-violet-950 font-bold display-  rounded-lg w-auto h-full flex items-center justify-center">

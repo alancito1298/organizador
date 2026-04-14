@@ -209,12 +209,8 @@ c-678 -1 -1243 0 -1255 3 l-23 5 0 915 0 915 2075 0 2075 0 0 360 0 360 -2459
                         <BtnMenu ruta="/horario" icono={<Banknote size={50} />} nombre="Pagos" />
                         <BtnMenu ruta="/horario" icono={<Bug size={50} />} nombre="ayuda" />
                 </div>
-                <button onClick={cerrarSesion} className="font-bebas  bg-violet-900 m-4 text-violet-200  lg:max-w-1/3  w-full py-4 flex justify-center align-center uppercase text-3xl"><LogOut className="m-1" />Cerrar Sesión </button>    
-        <p className="p-5 font-bebas">Esta web sirve para que los docentes puedan organizar y gestionar toda su actividad educativa en un solo lugar.
-
-Permite llevar un control ordenado de cursos, alumnos, asistencias, calificaciones y agenda, evitando el uso de cuadernos, planillas en papel o archivos dispersos. Cada docente accede con su cuenta y gestiona únicamente su propia información, de forma segura y desde cualquier dispositivo.
-
-El objetivo principal es simplificar la tarea diaria del docente, ahorrar tiempo administrativo y facilitar el seguimiento del trabajo pedagógico a lo largo del ciclo lectivo.</p>   
+                <button onClick={cerrarSesion} className="font-bebas  bg-violet-900 m-4 mb-15 text-violet-200  lg:max-w-1/3  w-full py-4 flex justify-center align-center uppercase text-3xl"><LogOut className="m-1" />Cerrar Sesión </button>    
+          
 </div>
 <BottomNav></BottomNav>
 </div>)

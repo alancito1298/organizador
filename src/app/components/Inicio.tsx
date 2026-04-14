@@ -1,11 +1,12 @@
 "use client";
-import { useState } from "react";
+
 import Image from "next/image";
-import { Book, Users } from "lucide-react";
+import { Book } from "lucide-react";
 import Features from "./Features";
-import PlanesPage from "./planes";
+import Planes from "./Planes";
 import Header from "./Header";
 import Footer from "./Footer";
+import InfoDispotivos from "./InfoDispositivos";
 
 export default function Inicio() {
  
@@ -22,32 +23,32 @@ const items = [
     titulo: " ✔ Crear y gestionar cursos fácilmente ",
     descripcion: "Organizá todas tus materias en seggundos, separando cursos, años y contenido sin complicaciones",
     icono: Book,
-    imagen:"/cursos-img.png"
+    imagen:"/cursos-img.jpeg"
   },
   {
     titulo: " ✔ Registrar asistencia y concepto en segundos ",
     descripcion: "Marcá el registro de tus clases con tan solo un click",
     icono: Book,
-    imagen:"/asistencias-img.png"
+    imagen:"/asistencias-img.jpeg"
   },
 
   {
     titulo: "✔ Tener toda tu información en un solo lugar",
     descripcion: "Vas a tener todo en un solo lugar: Agenda, Planificaciones, Calificaciones, Horarios, Asistencia, Conceptos y Recordatorios",
     icono: Book,
-    imagen:"/agenda-img.png"
+    imagen:"/agenda-img.jpeg"
   },
 
   {
     titulo: "✔ Seguimiento organizado de calificaciónes",
     descripcion: "Agrega, ordena, consulta y edita calificaciónes facilmente",
     icono: Book,
-    imagen:"/calificaciones-img.png"
+    imagen:"/calificaciones-img.jpeg"
   },
 ];
   return (
-    <body className="bg-white flex flex-col items-center h-full">
-      {/* HEADER */}
+    <body className="bg-white text-white flex flex-col items-center p-0 h-full">
+      
      <Header></Header>
 
       <main className="w-full flex items-center flex-col">
@@ -75,18 +76,18 @@ const items = [
         <section className="container flex flex-col items-center justify-center  px-6 py-8 mx-auto lg:py-16">
           <div className="lg:flex lg:items-center mt-30 px-6 py-8 lg:-mx-4">
             <div className="lg:w-1/2 lg:px-6">
-              <h3 className="text-2xl mt-10 font-medium text-violet-950 font-sans  text-center md:text-2xl lg:text-3xl">
+              <h3 className="text-2xl mt-5 uppercase font-medium text-violet-950 font-sans  text-center md:text-2xl lg:text-3xl">
               Organizá tus clases sin perder tiempo
               </h3>
 
-              <p className="mt-6 text-gray-500">
+              <p className="m-6 text-gray-500">
               Gestioná cursos, alumnos, asistencia y notas desde un solo lugar.
 Diseñado para docentes reales.
               </p> </div>
      
 
  
-
+            
 
            
 
@@ -105,12 +106,12 @@ Diseñado para docentes reales.
         {/* FEATURES */}
         <Features items={items} />
 
-        
+<span className="h-50 bg-white"></span>
+<InfoDispotivos></InfoDispotivos>
 
-       
-<section>
-<PlanesPage></PlanesPage>
-</section>
+
+<Planes></Planes>
+
       </main>
 
  <Footer></Footer>

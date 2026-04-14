@@ -1,27 +1,53 @@
 "use client";
 
-import { UserRound} from "lucide-react";
+import { UserRound } from "lucide-react";
+import { useState, useEffect } from "react";
 
+interface Usuario {
+  nombre: string;
+  apellido: string;
+}
 
 export default function Navbar() {
- 
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const API = process.env.NEXT_PUBLIC_API_URL ?? "https://backend-organizador.vercel.app";
 
+  useEffect(() => {
+    const fetchUsuario = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-  
+      try {
+        const res = await fetch(`${API}/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        setUsuario(data);
+      } catch (error) {
+        console.error("Error al obtener usuario:", error);
+      }
+    };
+
+    fetchUsuario();
+  }, []);
 
   return (
     <nav className="w-full text-yellow-100 uppercase font-mono bg-violet-950 border-b shadow-sm px-2 py-1 flex justify-between items-center">
-      
+
       {/* LOGO */}
       <div className="flex items-center gap-1">
         <div className="bg-violet-950 font-bold rounded-lg w-auto h-12 flex items-center justify-center">
-        <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="auto" height="auto" viewBox="0 0 4000.000000 4092.000000"
- preserveAspectRatio="xMidYMid meet">
-
-<g transform="translate(0.000000,4092.000000) scale(0.100000,-0.100000)"
-fill="currentColor" stroke="none">
-<path d="M13758 37876 l-217 -186 -13 -58 c-7 -31 -13 -100 -12 -152 1 -83 5
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            width="auto" height="auto" viewBox="0 0 4000.000000 4092.000000"
+            preserveAspectRatio="xMidYMid meet">
+            <g transform="translate(0.000000,4092.000000) scale(0.100000,-0.100000)"
+              fill="currentColor" stroke="none">
+              <path d="M13758 37876 l-217 -186 -13 -58 c-7 -31 -13 -100 -12 -152 1 -83 5
 -107 37 -192 29 -79 63 -136 183 -315 161 -237 317 -461 549 -788 551 -778
 819 -1252 1070 -1900 543 -1400 721 -2763 565 -4340 -86 -877 -261 -1772 -634
 -3250 -69 -269 -141 -571 -161 -670 -20 -99 -54 -232 -75 -296 -22 -64 -67
@@ -85,7 +111,7 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
 242 -10 437 -16 485 -14 601 -19 850 -37 271 -20 588 -14 730 15 238 48 405
 141 493 273 33 51 36 61 70 303 20 138 66 452 102 698 36 247 65 453 65 458 0
 23 25 1 138 -121z"/>
-<path d="M13088 35356 c-80 -28 -207 -96 -338 -179 -224 -142 -736 -517 -1055
+              <path d="M13088 35356 c-80 -28 -207 -96 -338 -179 -224 -142 -736 -517 -1055
 -771 -55 -44 -165 -132 -245 -195 -460 -366 -1361 -1120 -2299 -1926 -295
 -253 -456 -391 -1251 -1079 -1399 -1210 -1967 -1690 -2383 -2015 l-158 -123
 -347 339 -347 340 -95 38 c-117 47 -184 53 -312 30 l-96 -17 -113 -105 c-106
@@ -111,13 +137,10 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
 500 792 661 1424 1174 126 102 267 217 315 255 199 162 565 468 859 720 691
 590 1124 1014 1208 1180 43 85 54 208 28 310 -46 175 -184 313 -396 395 -111
 43 -142 45 -221 16z"/>
-</g>
-</svg>
-
-
-
+            </g>
+          </svg>
         </div>
-        <span className="font-semibold 1 text-sm">
+        <span className="font-semibold text-sm">
           Organizador Docente
         </span>
       </div>
@@ -125,13 +148,14 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
       {/* ACCIONES */}
       <div className="flex items-center gap-6">
 
-      
         {/* USUARIO */}
-        <div className="text-sm font-extralight font-mono">Nombre</div>
-        <div className="w-9 h-9 rounded-full bg-yellow-100 flex flex-col text-violet-950 items-center justify-center">
-          <UserRound/>
+        <div className="text-sm font-extralight font-mono normal-case">
+          {usuario ? ` ${usuario.nombre} ` : ""}
         </div>
-   
+        <div className="w-9 h-9 rounded-full bg-yellow-100 flex flex-col text-violet-950 items-center justify-center">
+          <UserRound />
+        </div>
+
       </div>
     </nav>
   );

@@ -1,26 +1,27 @@
 "use client";
 
-import { UserRound} from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Header() {
-    const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  
+  return (
+    <div className="bg-violet-950 w-full" suppressHydrationWarning>
+      <nav className="container relative flex items-center justify-between px-6 py-8 mx-auto text-white">
 
-  return ( <header className="bg-violet-950 w-full">
-  <nav className="container relative flex items-center justify-between px-6 py-8 mx-auto text-white">
-    
-    <a href="#" className="flex items-center h-14 lg:h-20 ">
-    <div className="bg-violet-950 font-bold rounded-lg w-auto h-full flex items-center justify-center">
-  <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-width="auto" height="auto" viewBox="0 0 4000.000000 4092.000000"
-preserveAspectRatio="xMidYMid meet">
-
-<g transform="translate(0.000000,4092.000000) scale(0.100000,-0.100000)"
-fill="currentColor" stroke="none">
-<path d="M13758 37876 l-217 -186 -13 -58 c-7 -31 -13 -100 -12 -152 1 -83 5
+        <a href="#" className="flex items-center h-14 lg:h-20">
+          <div className="bg-violet-950 font-bold rounded-lg w-auto h-full flex items-center justify-center">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+              width="auto" height="auto" viewBox="0 0 4000.000000 4092.000000"
+              preserveAspectRatio="xMidYMid meet">
+              <g transform="translate(0.000000,4092.000000) scale(0.100000,-0.100000)"
+                fill="currentColor" stroke="none">
+                <path d="M13758 37876 l-217 -186 -13 -58 c-7 -31 -13 -100 -12 -152 1 -83 5
 -107 37 -192 29 -79 63 -136 183 -315 161 -237 317 -461 549 -788 551 -778
 819 -1252 1070 -1900 543 -1400 721 -2763 565 -4340 -86 -877 -261 -1772 -634
 -3250 -69 -269 -141 -571 -161 -670 -20 -99 -54 -232 -75 -296 -22 -64 -67
@@ -84,7 +85,7 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
 242 -10 437 -16 485 -14 601 -19 850 -37 271 -20 588 -14 730 15 238 48 405
 141 493 273 33 51 36 61 70 303 20 138 66 452 102 698 36 247 65 453 65 458 0
 23 25 1 138 -121z"/>
-<path d="M13088 35356 c-80 -28 -207 -96 -338 -179 -224 -142 -736 -517 -1055
+                <path d="M13088 35356 c-80 -28 -207 -96 -338 -179 -224 -142 -736 -517 -1055
 -771 -55 -44 -165 -132 -245 -195 -460 -366 -1361 -1120 -2299 -1926 -295
 -253 -456 -391 -1251 -1079 -1399 -1210 -1967 -1690 -2383 -2015 l-158 -123
 -347 339 -347 340 -95 38 c-117 47 -184 53 -312 30 l-96 -17 -113 -105 c-106
@@ -110,47 +111,48 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
 500 792 661 1424 1174 126 102 267 217 315 255 199 162 565 468 859 720 691
 590 1124 1014 1208 1180 43 85 54 208 28 310 -46 175 -184 313 -396 395 -111
 43 -142 45 -221 16z"/>
-</g>
-</svg>
+              </g>
+            </svg>
+          </div>
+          <span className="font-extralight uppercase text-sm">
+            Organizador Docente
+          </span>
+        </a>
 
+        {/* BOTÓN MOBILE */}
+        {mounted && (
+          <button onClick={() => setOpen(!open)} className="md:hidden">
+            {!open ? (
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M4 6h16M4 12h16m-7 6h7"
+                />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+          </button>
+        )}
 
-
-  </div>
-  <span className="font-extralight 1 uppercase text-sm">
-    Organizador Docente
-  </span>
-    </a>
-
-    {/* BOTÓN MOBILE */}
-    <button onClick={() => setOpen(!open)} className="md:hidden">
-      {!open ? (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-            d="M4 6h16M4 12h16m-7 6h7"
-          />
-        </svg>
-      ) : (
-        <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd"
-            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414z"
-            clipRule="evenodd"
-          />
-        </svg>
-      )}
-    </button>
-
-    {/* MENÚ */}
-    <div
-      className={`absolute inset-x-0 z-30 w-2/3 sm:px-10 sm:py-10 mt-8 text-sm space-y-6 h-46  justify-center transition-all duration-300 ease-in-out bg-violet-900 top-16 md:mt-0 md:p-0 md:top-0 md:relative md:bg-transparent md:w-auto md:opacity-100 md:translate-x-0 md:space-y-0 md:-mx-6 md:flex md:items-center ${
-        open ? "translate-x-0 opacity-100" : "opacity-0 -translate-x-full"
-      }`}
-    >
-     <div className="h-full uppercase text-violet-100 flex flex-col items-center justify-around sm:flex-row"> 
-      <a href="#" className=" md:px-6 hover:text-indigo-300">Nosotros</a>
-      <a href="#" className=" md:px-6 hover:text-indigo-300">Portfolio</a>
-      <a href="#" className=" md:px-6 hover:text-indigo-300">Contactos</a>
-      <a href="#" className=" md:px-6 hover:text-indigo-300">Iniciar Sesión</a>
-      </div>
+        {/* MENÚ */}
+        <div
+          className={`absolute inset-x-0 z-30 w-2/3 sm:px-10 sm:py-10 mt-8 text-sm space-y-6 h-46 justify-center transition-all duration-300 ease-in-out bg-violet-900 top-16 md:mt-0 md:p-0 md:top-0 md:relative md:bg-transparent md:w-auto md:opacity-100 md:translate-x-0 md:space-y-0 md:-mx-6 md:flex md:items-center ${
+            mounted && open ? "translate-x-0 opacity-100" : "opacity-0 -translate-x-full"
+          }`}
+        >
+          <div className="h-full uppercase text-violet-100 flex flex-col items-center justify-around sm:flex-row">
+            <a href="#" className="md:px-6 hover:text-indigo-300">Nosotros</a>
+            <a href="#" className="md:px-6 hover:text-indigo-300">Portfolio</a>
+            <a href="#" className="md:px-6 hover:text-indigo-300">Contactos</a>
+            <a href="#" className="md:px-6 hover:text-indigo-300">Iniciar Sesión</a>
+          </div>
+        </div>
+      </nav>
     </div>
-  </nav>
-</header>)}
+  );
+}
