@@ -49,7 +49,7 @@ const PLANES = [
     features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios', 'Planificaciones', 'Bibliografía', 'Generación de Excel', 'Recordatorios'],
     accent: '#ffffff',
     bg: 'bg-black',
-    badge: { text: 'Ahorrás $19.989', color: 'bg-green-400 text-green-950' },
+    badge: { text: 'Ahorrás $19.999', color: 'bg-green-400 text-green-950' },
   },
 ];
 
@@ -78,11 +78,9 @@ export default function PlanesPage() {
   };
 
   const handleSuscribirse = async (planMpId: string) => {
-    setError(null);
     const token = localStorage.getItem('token');
-    if (!token) { router.replace('/login'); return; }
-
-    setCargando(planMpId);
+    if (!token) return;
+  
     try {
       const res = await fetch(`${API}/suscripciones/checkout`, {
         method: 'POST',
@@ -92,15 +90,14 @@ export default function PlanesPage() {
         },
         body: JSON.stringify({ planMpId }),
       });
-
-      if (!res.ok) throw new Error();
-
+  
       const data = await res.json();
+  
+      // REDIRECCIÓN
       window.location.href = data.checkoutUrl;
-    } catch {
-      setError('No se pudo generar el link de pago. Intentá de nuevo.');
-    } finally {
-      setCargando(null);
+  
+    } catch (err) {
+      console.error(err);
     }
   };
 
