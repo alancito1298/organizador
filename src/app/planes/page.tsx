@@ -122,18 +122,11 @@ export default function PlanesPage() {
     }
   };
 
-  // 🔥 FUNCIÓN CLAVE (CORREGIDA)
+  
   const handleSuscribirse = async (planMpId: string) => {
     const token = localStorage.getItem('token');
-
-    if (!token) {
-      router.replace('/login');
-      return;
-    }
-
-    setError(null);
-    setCargando(planMpId);
-
+    if (!token) return;
+  
     try {
       const res = await fetch(`${API}/suscripciones/checkout`, {
         method: 'POST',
@@ -143,27 +136,25 @@ export default function PlanesPage() {
         },
         body: JSON.stringify({ planMpId }),
       });
-
+  
       if (!res.ok) {
-        const text = await res.text();
-        console.error('Error backend:', text);
-        throw new Error('Error al crear checkout');
+        const errorText = await res.text();
+        console.error('ERROR BACKEND:', errorText);
+        throw new Error('Error en backend');
       }
-
+  
       const data = await res.json();
-
+  
       if (!data.checkoutUrl) {
-        throw new Error('No se recibió URL de pago');
+        throw new Error('No vino checkoutUrl');
       }
-
-      // 🚀 REDIRECCIÓN A PAGO
+  
+    
       window.location.href = data.checkoutUrl;
-
+  
     } catch (err) {
-      console.error(err);
-      setError('No se pudo iniciar el pago. Intentá nuevamente.');
-    } finally {
-      setCargando(null);
+      console.error('ERROR FRONT:', err);
+      alert('No se pudo iniciar el pago');
     }
   };
 
