@@ -6,7 +6,7 @@ import Navbar from '../components/Navbar';
 
 const API =
   process.env.NEXT_PUBLIC_API_URL ??
-  'https://backend-organizador.vercel.app';
+  "https://backend-organizador.vercel.app";
 
 const PLANES = [
   {
