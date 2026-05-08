@@ -44,7 +44,7 @@ export default function LoginForm() {
       
         
 
-        <form onSubmit={handleSubmit} className="mt-6 p-8  border-2 bg-violet-100 border-violet-300 space-y-5">
+        <form onSubmit={handleSubmit} className="mt-6 p-8  mb-25 border-2 bg-violet-100 border-violet-300 space-y-5">
           {/* EMAIL */}
           <h1 className="text-4xl uppercase font-extralight mt-8 text-violet-950 text-center">
           Iniciar sesión

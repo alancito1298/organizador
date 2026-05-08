@@ -12,7 +12,7 @@ export default function PagoExitoso() {
       setSegundos((s) => {
         if (s <= 1) {
           clearInterval(interval);
-          router.replace('/');
+          router.replace('/home');
         }
         return s - 1;
       });

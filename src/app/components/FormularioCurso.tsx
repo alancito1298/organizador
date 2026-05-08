@@ -30,7 +30,7 @@ export default function FormularioCurso({ onCursoCreado }: Props) {
           },
           body: JSON.stringify({
             ...nuevoCurso,
-            docenteId: 1, // ⚠️ temporal
+      
           }),
         }
       );

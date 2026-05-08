@@ -42,7 +42,7 @@ export default function RootLayout({
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Organizador" /></head>
-      <body className={`${inter.className} ${mono.variable} min-h-screen  bg-amber-950` }>
+      <body className={`${inter.className} ${mono.variable} min-h-screen` }>
         {children}
       </body>
     </html>

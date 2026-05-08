@@ -105,18 +105,16 @@ export default function PlanesPage() {
     fetchSuscripcion();
   }, []);
 
-  // 🔹 Obtener estado de suscripción
+  // Obtener estado de suscripción
   const fetchSuscripcion = async () => {
     const token = localStorage.getItem('token');
     if (!token) return;
-
     try {
       const res = await fetch(`${API}/suscripciones/estado`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      const data = await res.json();
-      setSuscripcion(data);
+      const text = await res.text();
+      if (text) setSuscripcion(JSON.parse(text));
     } catch (err) {
       console.error('Error obteniendo suscripción', err);
     }
@@ -150,7 +148,7 @@ export default function PlanesPage() {
       }
   
     
-      window.location.href = data.checkoutUrl;
+      window.open(data.checkoutUrl, '_blank');
   
     } catch (err) {
       console.error('ERROR FRONT:', err);

@@ -14,7 +14,7 @@ export default function Header() {
     <div className="bg-violet-950 w-full" suppressHydrationWarning>
       <nav className="container relative flex items-center justify-between px-6 py-8 mx-auto text-white">
 
-        <a href="#" className="flex items-center h-14 lg:h-20">
+        <a href="/home" className="flex items-center h-14 lg:h-20">
           <div className="bg-violet-950 font-bold rounded-lg w-auto h-full flex items-center justify-center">
             <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
               width="auto" height="auto" viewBox="0 0 4000.000000 4092.000000"
