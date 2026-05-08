@@ -29,7 +29,7 @@ const PLANES = [
   {
     nombre: 'Básico',
     periodo: 'Anual',
-    precio: '$24.999',
+    precio: '$29.999',
     frecuencia: 'por año',
     planMpId: 'f597ba1d700440b7b40139c8060f78dc',
     features: [
@@ -39,6 +39,7 @@ const PLANES = [
       'Calificaciones',
       'Agenda',
       'Horarios',
+      'ahorra $19.000'
     ],
     accent: '#fbbf24',
     bg: 'bg-violet-900',
@@ -81,6 +82,7 @@ const PLANES = [
       'Bibliografía',
       'Generación de Excel',
       'Recordatorios',
+      'ahorra $20.000'
     ],
     accent: '#ffffff',
     bg: 'bg-black',
@@ -157,26 +159,24 @@ export default function PlanesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-violet-100">
+    <div className="min-h-screen h-180 mb-55">
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 py-12 ">
 
         {/* HEADER */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-violet-900 uppercase">
+        <div className="text-center mb-25">
+          <h1 className="text-4xl font-bold text-violet-900 uppercase mt-12">
             Elegí tu plan
           </h1>
-          <p className="text-violet-500 text-sm">
-            30 días de prueba gratis · Cancelá cuando quieras
-          </p>
+          
         </div>
 
         {/* ESTADO ACTUAL */}
         {suscripcion && (
           <div className="max-w-sm mx-auto mb-8 bg-white rounded-xl p-4 text-center shadow">
             <p className="text-sm text-violet-500">Tu plan actual</p>
-            <p className="text-xl font-bold capitalize">
+            <p className="text-xl font-bold text-red-500 uppercase">
               {suscripcion.estado}
             </p>
 
@@ -199,24 +199,24 @@ export default function PlanesPage() {
         )}
 
         {/* PLANES */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+        <div className=" grid grid-cols-1 m-4 md:grid-cols-2 xl:grid-cols-4 gap-5">
           {PLANES.map((plan) => (
             <div
               key={plan.planMpId}
-              className={`rounded-2xl p-6 text-white shadow-lg flex flex-col ${plan.bg}`}
+              className={`rounded-xl  text-white shadow-lg flex flex-col ${plan.bg}`}
             >
-              <h2 className="text-2xl font-bold">{plan.nombre}</h2>
-              <p className="text-sm opacity-70">{plan.periodo}</p>
+              <h2 className="text-5xl font-extralight text-center uppercase m-5 mb-0 ">{plan.nombre}</h2>
+              <p className="text-lg text-center font-bold uppercase text-yellow-400">{plan.periodo}</p>
 
-              <p className="text-4xl mt-4">{plan.precio}</p>
-              <p className="text-xs opacity-60 mb-4">
+              <p className="text-4xl mt-4 text-center">{plan.precio}</p>
+              <p className="text-sm  text-black mb-4 text-center mt-2 bg-amber-400">
                 /{plan.frecuencia}
               </p>
 
-              <ul className="flex-1 space-y-2 mb-4">
+              <ul className="flex-1 space-y-2 text-center mb-4">
                 {plan.features.map((f) => (
                   <li key={f} className="text-sm">
-                    ✓ {f}
+                    <strong className='text-yellow-400 text-xl'>✓</strong> {f}
                   </li>
                 ))}
               </ul>

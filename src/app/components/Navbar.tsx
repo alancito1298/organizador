@@ -40,7 +40,7 @@ export default function Navbar() {
     <nav className="w-full text-yellow-100 uppercase font-mono bg-violet-950 border-b shadow-sm px-2 py-1 flex justify-between items-center">
 
       {/* LOGO */}
-      <div className="flex items-center gap-1">
+      <a href="/home"><div className="flex items-center gap-1">
         <div className="bg-violet-950 font-bold rounded-lg w-auto h-12 flex items-center justify-center">
           <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
             width="auto" height="auto" viewBox="0 0 4000.000000 4092.000000"
@@ -143,7 +143,7 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
         <span className="font-semibold text-sm">
           Organizador Docente
         </span>
-      </div>
+      </div></a>
 
       {/* ACCIONES */}
       <div className="flex items-center gap-6">
