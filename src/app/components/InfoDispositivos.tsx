@@ -38,7 +38,7 @@ export default function InfoDispotivos() {
           Accedé desde cualquier dispositivo
         </h2>
         <p className="mt-3 text-2xl p-20 text-gray-100">
-          Nuestra plataforma es totalmente multiplataforma, lo que significa que
+          Es totalmente multiplataforma, lo que significa que
           podés usarla desde cualquier dispositivo sin perder funcionalidad ni
           información.
         </p>

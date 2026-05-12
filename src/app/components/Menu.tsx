@@ -206,7 +206,7 @@ c-678 -1 -1243 0 -1255 3 l-23 5 0 915 0 915 2075 0 2075 0 0 360 0 360 -2459
                         <BtnMenu ruta="/menu-cursos" icono={<Users size={50}  />} nombre="Mis cursos" />
                         <BtnMenu ruta="/planificaciones" icono={<SquareChartGantt size={50} />} nombre="Planificaciones" />
                         <BtnMenu ruta="/horario" icono={<Clock8 size={50} />} nombre="Horarios" />
-                        <BtnMenu ruta="/horario" icono={<Banknote size={50} />} nombre="Pagos" />
+                        <BtnMenu ruta="/planes" icono={<Banknote size={50} />} nombre="Pagos" />
                         <BtnMenu ruta="/horario" icono={<Bug size={50} />} nombre="ayuda" />
                 </div>
                 <button onClick={cerrarSesion} className="font-bebas  bg-violet-900 m-4 mb-15 text-violet-200  lg:max-w-1/3  w-full py-4 flex justify-center align-center uppercase text-3xl"><LogOut className="m-1" />Cerrar Sesión </button>    
