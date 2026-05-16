@@ -3,13 +3,16 @@
 import React from "react"
 import BottomNav from "../components/BottomNav"
 import Horario from "../components/Horario"
-
+import Footer from "../components/Footer"
+import Navbar from "../components/Navbar"
 
 export default function Horarios() {
   return (
-    <div className=" bg-fuchsia-200 h-full">
+    <div >
+    <Navbar></Navbar>
      <Horario></Horario>
      <BottomNav></BottomNav>
+     <Footer></Footer>
     </div>
   );
 }

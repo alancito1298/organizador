@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import Cargando from './Cargando';
+import {ListPlus } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
  
@@ -152,7 +153,7 @@ export default function Horario() {
   if (cargando) return <Cargando texto="Cargando horarios..." />;
   return (
     <div className="min-h-screen bg-[#f6f4ff] p-4 md:p-8 mb-30">
-      <Navbar></Navbar>
+   
       <div className="max-w-7xl mx-auto mt-10">
  
         {/* HEADER */}
@@ -184,32 +185,38 @@ export default function Horario() {
         {/* MOBILE */}
         <div className="flex flex-col gap-5 md:hidden">
         {DIAS.map((dia) => {
-  const filasConDatos = filas.filter(fila => fila.celdas[dia].descripcion.trim() !== '');
-  if (filasConDatos.length === 0) return null; // ← no mostrar si no hay datos
-
+  const filasConDatos = filas.filter(fila => 
+    fila.celdas[dia].descripcion.trim() !== '' || 
+    Object.values(fila.celdas).every(c => c.id === null)
+  );
+  
   return (
     <div key={dia} className="bg-white border border-violet-100 shadow-sm p-5 mb-25">
-      <h2 className="text-xl font-semibold p-5 bg-violet-950 text-violet-100 mb-4">
+      <h2 className="text-2xl font-light uppercase p-5 bg-violet-900 text-violet-100 mb-4">
         {dia}
       </h2>
-      <div className="flex flex-row items-center w-full justify-center gap-3">
-        {filasConDatos.map((fila, filaIndex) => ( // ← usar filasConDatos
-          <div key={filaIndex} className="border-violet-100 flex gap-4 flex-row items-center bg-amber-50 ">
-            <input
-              type="text"
-              placeholder="08:00"
-              value={fila.hora}
-              onChange={(e) => actualizarHora(filas.indexOf(fila), e.target.value)}
-              className="w-2/6 h-15 m-2 bg-white border border-violet-200 rounded-xl px-3 py-2 text-violet-900 font-semibold"
-            />
-            <textarea
-              placeholder="Materia / Nota"
-              value={fila.celdas[dia].descripcion}
-              onChange={(e) => actualizarCelda(filas.indexOf(fila), dia, e.target.value)}
-              className="w-4/6 h-15 m-2 bg-white border border-violet-200 rounded-xl text-sm text-violet-900 resize-none"
-            />
-          </div>
-        ))}
+      <div className="flex flex-col gap-3">
+        {filasConDatos.length === 0 ? (
+          <p className="text-violet-300 text-sm text-center py-4">Sin horarios cargados</p>
+        ) : (
+          filasConDatos.map((fila, filaIndex) => (
+            <div key={filaIndex} className="flex gap-2 items-center border border-violet-300 bg-violet-200">
+              <textarea
+                
+                placeholder="08:00"
+                value={fila.hora}
+                onChange={(e) => actualizarHora(filas.indexOf(fila), e.target.value)}
+                className="w-2/6 h-15 m-2  border text-sm border-violet-200 rounded-xl px-3 py-2 bg-violet-600 text-white resize-none font-bold"
+              />
+              <textarea
+                placeholder="Materia / Nota"
+                value={fila.celdas[dia].descripcion}
+                onChange={(e) => actualizarCelda(filas.indexOf(fila), dia, e.target.value)}
+                className="w-4/6 h-15 m-2 bg-violet-100 p-2 border-violet-200 rounded-xl resize-none text-lg text-violet-950"
+              />
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
@@ -259,7 +266,24 @@ export default function Horario() {
             ))}
           </div>
         </div>
- 
+       
+      <button
+        onClick={guardarTodo}
+        disabled={guardando}
+        className="fixed bottom-20 right-0
+     border-amber-950 border-2 border-r-0 bg-green-600 hover:bg-green-700 disabled:bg-gray-400
+                   text-white px-6 py-3 rounded-l-full shadow-8xl shadow-amber-900 text-lg font-semibold transition-all"
+      >
+        {guardando ? 'Guardando...' : '💾'}
+      </button>
+      <button
+onClick={agregarFila}
+className="fixed bottom-35  right-0 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400
+text-white px-6 py-3 rounded-l-full border-amber-950 border-r-0 border-2 shadow-2xl text-lg font-semibold transition-all"
+title="Agregar fecha"
+>
+<ListPlus />
+</button>
         {/* Toast */}
         {ok && (
           <div className="fixed top-6 left-1/2 -translate-x-1/2 bg-violet-900 text-white px-6 py-3 rounded-full shadow-xl z-50">
