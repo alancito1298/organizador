@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from 'lucide-react';
+
 
 type Curso = {
   id: number;
@@ -55,13 +57,21 @@ export default function CursoLayout({
     <div className="min-w-screen  bg-violet-100">
 
       {/* HEADER */}
-      <div className="bg-violet-950 text-white p-6 text-center">
-        <h1 className="text-2xl font-bold">
+     
+      <div className="bg-violet-950 flex flex-row  items-starts items-center gap-3 text-white  text-center">
+     <div className=""> <button
+        onClick={() => router.back()}
+        className="flex flex-row justify-start items-center h-full w-20 text-white"
+      >
+        <ArrowLeft size={35} className="ml-5"/>
+      </button></div>
+        <div>
+          <h1 className="text-3xl mt-1 ml-1">
           {curso.anio}  - {curso.materia}
         </h1>
-        <p className="uppercase font-sans font-bold">{curso.escuela}</p>
+        <p className="uppercase ml-2 mb-4 font-sans font-light">{curso.escuela}</p>
       </div>
-
+      </div>
       <nav className="flex w-full bg-violet-300 font-bebas ">
         {menuItems.map((item) => (
           <Link
@@ -69,8 +79,8 @@ export default function CursoLayout({
             href={item.path}
             className={`flex-1 text-center py-3 w-auto text-sm font-medium shadow-amber-800  transition
             ${pathname === item.path
-              ? "bg-violet-950 text-white"
-              : "bg-purple-700 text-violet-100 hover:bg-violet-300"
+              ? "bg-violet-700 text-xl border-b-4 border-0 text-white"
+              : "bg-violet-800 border-b border-violet-300 text-violet-100 text-center hover:bg-violet-300"
             }`}
           >
             {item.name}

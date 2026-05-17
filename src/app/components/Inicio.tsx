@@ -21,7 +21,7 @@ const items = [
   {
    
     titulo: " ✔ Crear y gestionar cursos fácilmente ",
-    descripcion: "Organizá todas tus materias en seggundos, separando cursos, años y contenido sin complicaciones",
+    descripcion: "Organizá todas tus materias en segundos, separando cursos, años y contenido sin complicaciones",
     icono: Book,
     imagen:"/cursos-img.jpeg"
   },
@@ -61,7 +61,7 @@ const items = [
               <p className="mt-6 text-lg font-extralight font-mono  text-white">Diseñados por docentes.</p>
             </div>
             <div className=" flex justify-center uppercase font-sans gap-5 text-sm items-center h-20"> 
-              <a href="/login" className=" border-violet-600 border p-3 rounded-xl"> Iniciar Sesión</a>
+              <a href="/login" className=" border-violet-600 text-white border p-3 rounded-xl"> Iniciar Sesión</a>
               <a href="/registro"className="text-violet-600 bg-white p-3 border rounded-xl">Registrarme</a>              
             </div>
 

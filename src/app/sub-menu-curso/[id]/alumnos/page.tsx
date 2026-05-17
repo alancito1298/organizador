@@ -47,12 +47,7 @@ export default function CursoPage() {
     }
   };
 
-  // =====================
-  // ELIMINAR
-  // =====================
-  const handleEliminar = async (alumno: Alumno) => {
-    setEliminandoId(alumno.id);
-  };
+  const handleEliminar = (alumno: Alumno) => setEliminandoId(alumno.id);
 
   const confirmarEliminar = async () => {
     if (!eliminandoId) return;
@@ -65,15 +60,12 @@ export default function CursoPage() {
       if (!res.ok) throw new Error();
       setAlumnos((prev) => prev.filter((a) => a.id !== eliminandoId));
     } catch {
-      alert(" Error al eliminar el alumno");
+      alert("Error al eliminar el alumno");
     } finally {
       setEliminandoId(null);
     }
   };
 
-  // =====================
-  // EDITAR
-  // =====================
   const handleEditar = (alumno: Alumno) => {
     setEditandoAlumno(alumno);
     setFormEdit({
@@ -109,53 +101,51 @@ export default function CursoPage() {
   if (!cursoId) return <p>Cargando...</p>;
 
   return (
-    <div className="">
-      <h3 className="text-black text-2xl text-center font-bebas ">Alumnos listados de este curso</h3>
-
+    <div className="p-4 bg-violet-800 mb-8">
+    <h2 className="h-25 text-5xl text-center pt-8 font-extralight">ALUMNOS</h2>
       {alumnos.length === 0 ? (
-        <p className="text-center text-gray-500 mt-4">No hay alumnos</p>
+        <p className="text-center text-gray-500 ">No hay alumnos</p>
       ) : (
-        <table className="text-black mt-6" style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead>
-            <tr className="bg-violet-300">
-              <th className="border-violet-900 border-1 w-1/3 p-2">Apellido</th>
-              <th className="border-violet-900 border-1 w-1/3 p-2">Nombre</th>
-              <th className="w-1/8 border-violet-900 border-1"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {alumnos.map((alumno) => (
-              <tr key={alumno.id} className="border-b border-violet-200">
-                <td className="text-center p-1 text-2xl font-semibold uppercase">{alumno.apellido}</td>
-                <td className="text-center p-1 text-2xl font-semibold uppercase">{alumno.nombre}</td>
-                
-                <td className="flex items-center justify-evenly py-2">
-                  {/* ELIMINAR */}
-                  <button
-                    onClick={() => handleEliminar(alumno)}
-                    className="text-red-500 hover:text-red-700 transition p-1"
-                    title="Eliminar alumno"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                      <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-                    </svg>
-                  </button>
-                  {/* EDITAR */}
-                  <button
-                    onClick={() => handleEditar(alumno)}
-                    className="text-yellow-500 hover:text-yellow-700 transition p-1"
-                    title="Editar alumno"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                      <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
-                    </svg>
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="flex flex-col gap-2  ">
+          {alumnos.map((alumno) => (
+            <div
+              key={alumno.id}
+              className="flex items-center justify-between bg-violet-100 border border-violet-90 m-2 rounded-xl h-20 px- py-3 shadow-sm"
+            >
+              <div className="flex-1">
+                <p className="text-xl font-semibold uppercase m-2 mt-0 text-black">
+                  {alumno.apellido}, {alumno.nombre}
+                </p>
+               
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* EDITAR */}
+                <button
+                  onClick={() => handleEditar(alumno)}
+                  className="text-yellow-500 hover:text-yellow-700 transition p-1"
+                  title="Editar alumno"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                    <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                  </svg>
+                </button>
+
+                {/* ELIMINAR */}
+                <button
+                  onClick={() => handleEliminar(alumno)}
+                  className="text-red-500 hover:text-red-700 transition p-1"
+                  title="Eliminar alumno"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       <FormularioAlumno
@@ -165,9 +155,7 @@ export default function CursoPage() {
 
       <BottomNav />
 
-      {/* ===================== */}
-      {/* MODAL ELIMINAR        */}
-      {/* ===================== */}
+      {/* MODAL ELIMINAR */}
       {eliminandoId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
@@ -200,9 +188,7 @@ export default function CursoPage() {
         </div>
       )}
 
-      {/* ===================== */}
-      {/* MODAL EDITAR          */}
-      {/* ===================== */}
+      {/* MODAL EDITAR */}
       {editandoAlumno && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">

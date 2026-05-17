@@ -39,35 +39,76 @@ export default function Horario() {
  
   const fetchHorarios = async () => {
     setCargando(true);
-    const token = localStorage.getItem('token');
-    const res   = await fetch(`${API}/horarios`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data: Horario[] = await res.json();
-    if (!Array.isArray(data) || data.length === 0) return;
- 
-    const horasSet = new Set(data.map((h) => h.hora));
-    const filasMap  = new Map<string, Fila>();
- 
-    for (const hora of horasSet) {
-      filasMap.set(hora, nuevaFila(hora));
-    }
- 
-    for (const h of data) {
-      const fila = filasMap.get(h.hora);
-      if (fila) {
-        fila.celdas[h.dia] = { id: h.id, descripcion: h.descripcion ?? '' };
+  
+    try {
+      const token = localStorage.getItem('token');
+  
+      const res = await fetch(`${API}/horarios`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data: Horario[] = await res.json();
+  
+      
+      if (!Array.isArray(data) || data.length === 0) {
+        setFilas([nuevaFila()]);
+        setCargando(false);
+        return;
       }
+  
+      const horasSet = new Set(
+        data.map((h) => h.hora)
+      );
+  
+      const filasMap = new Map<string, Fila>();
+  
+      for (const hora of horasSet) {
+        filasMap.set(
+          hora,
+          nuevaFila(hora)
+        );
+      }
+  
+      for (const h of data) {
+        const fila = filasMap.get(h.hora);
+  
+        if (fila) {
+          fila.celdas[h.dia] = {
+            id: h.id,
+            descripcion:
+              h.descripcion ?? '',
+          };
+        }
+      }
+  
+      const filasOrdenadas =
+        [...filasMap.values()].sort(
+          (a, b) => {
+            const numA = parseFloat(
+              a.hora.replace(':', '.')
+            );
+  
+            const numB = parseFloat(
+              b.hora.replace(':', '.')
+            );
+  
+            return numA - numB;
+          }
+        );
+  
+      setFilas(filasOrdenadas);
+  
+    } catch (err) {
+      console.error(err);
+  
+      
+      setFilas([nuevaFila()]);
+  
+    } finally {
+      setCargando(false);
     }
- 
-    const filasOrdenadas = [...filasMap.values()].sort((a, b) => {
-      const numA = parseFloat(a.hora.replace(':', '.'));
-      const numB = parseFloat(b.hora.replace(':', '.'));
-      return numA - numB;
-    });
- 
-    setFilas(filasOrdenadas);
-    setCargando(false);
   };
  
   const agregarFila = () => setFilas((prev) => [...prev, nuevaFila()]);

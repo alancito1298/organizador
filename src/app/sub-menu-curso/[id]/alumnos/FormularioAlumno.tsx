@@ -108,7 +108,8 @@ export default function FormularioAlumno({
   };
 
   return (
-    <div className="  h-screen shadow ">
+    <div className="bg-violet-800 h-screen m-0">
+      <div className="  h-120 shadow bg-violet-300 border-2 border-violet-400 mx-3 mt-15 mb-10 rounded-4xl">
       <h2 className="text-center text-violet-900 uppercase p-6 text-3xl">Agregar Alumno</h2>
       <div className="flex flex-col gap-4 m-4 ">
         <label className="uppercase font-extralight  text-violet-900">Nombre:</label>
@@ -156,7 +157,7 @@ export default function FormularioAlumno({
       <button
         onClick={agregarAlumno}
         disabled={loading}
-        className={`px-6 py-2 rounded mt-4 text-white ${
+        className={`px-6 py-2 rounded mt-4 mb-10 text-white ${
           loading
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-violet-700 hover:bg-violet-800"
@@ -165,6 +166,7 @@ export default function FormularioAlumno({
         {loading ? "Creando..." : "Agregar Alumno"}
       </button>
       </div>
+    </div>
     </div>
   );
 }

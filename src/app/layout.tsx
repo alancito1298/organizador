@@ -26,8 +26,8 @@ const mono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Organizador",
-  description: "App de organización",
+  title: 'Organizador Docente',
+  description: 'Gestión académica para docentes'
 };
 
 export default function RootLayout({

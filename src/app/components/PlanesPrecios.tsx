@@ -62,10 +62,10 @@ export default function Planes() {
       <h1 className="text-3xl  lg:mt-20 lg:text-6xl font-mono text-violet-950 text-center mb-2 m-20 uppercase">
         Elegí el <strong className="text-4xl lg:text-7xl">plan</strong> que mas se adapte a tus necesidades
       </h1>
-      <p className="text-center bg-amber-200 p-2 rounded text-violet-950 mb-8 text-sm">
+   {/*   <p className="text-center bg-amber-200 p-2 rounded text-violet-950 mb-8 text-sm">
         Todos los planes incluyen <strong className="text-lg">30</strong> días de prueba gratis
       </p>
-
+*/}
      
 
       <div className="grid w-7/8 lg:w-full lg:m-1 grid-cols-1 justify-center sm:grid-cols-2 lg:gap-8 pt-2 gap-4 lg:flex lg:flex-row lg:justify-arround lg:w-min-full lg:m-0  ">

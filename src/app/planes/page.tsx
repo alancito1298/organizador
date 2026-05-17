@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
+import BottomNav from '../components/BottomNav';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
@@ -204,6 +205,8 @@ export default function PlanesPage() {
           </div>
         </div>
       )}
+
+      <BottomNav></BottomNav>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState, JSX } from 'react';
 import { useParams } from 'next/navigation';
 import { ThumbsUp, ThumbsDown, X, Clock, ListPlus } from 'lucide-react';
-
+import Cargando from './Cargando';
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
 
@@ -56,10 +56,31 @@ const estadoBackendAVisual = (estado: string): EstadoVisual => {
   return 'vacio';
 };
 
-const estadoVisualABackend = (estado: EstadoVisual): string | null => {
-  if (estado === 'vacio') return null;
-  if (estado === 'justificada') return 'ausente'; 
-  return estado;
+const estadoVisualABackend = (
+  estado: EstadoVisual
+): string | null => {
+
+  switch (estado) {
+
+    case 'vacio':
+      return null;
+
+    case 'presente_buen_concepto':
+      return 'presente_buen_concepto';
+
+    case 'presente_mal_concepto':
+      return 'presente_mal_concepto';
+
+    case 'ausente':
+      return 'ausente';
+
+    case 'justificada':
+      return 'justificada';
+
+    default:
+      return null;
+  }
+
 };
 
 const getSiguienteEstado = (estado: EstadoVisual): EstadoVisual => {
@@ -79,66 +100,164 @@ export default function AsistenciasTabla() {
   const [datos, setDatos]                   = useState<EstadoVisual[][]>([]);  // [alumno][fecha]
   const [asistenciaIds, setAsistenciaIds]   = useState<(number | null)[][]>([]); // id en BD o null
   const [guardando, setGuardando]           = useState(false);
-
+  const [cargando, setCargando] = useState(true);
   // =====================
   // CARGA INICIAL
   // =====================
   useEffect(() => {
-    if (!cursoId) return;
 
+    if (!cursoId) {
+      setCargando(false);
+      return;
+    }
+  
     const fetchData = async () => {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-
-      // 1. Alumnos
-      const resAlumnos = await fetch(`${API}/inscripciones/curso/${rawId}`, { headers });
-      const alumnosData: AlumnoCurso[] = await resAlumnos.json();
-      alumnosData.sort((a, b) => a.alumno.apellido.localeCompare(b.alumno.apellido));
-
-      // 2. Asistencias existentes
-      const resAsistencias = await fetch(`${API}/asistencias/curso/${rawId}`, { headers });
-
-      const asistenciasData: Asistencia[] = await resAsistencias.json();
-
-      // 3. Fechas únicas ordenadas
-      const fechasSet = new Set<string>();
-      for (const a of asistenciasData) {
-        fechasSet.add(a.fecha.split('T')[0]);
-      }
-
-
-
-    const fechasOrdenadas = [...fechasSet].sort().reverse();
-
-      // 4. Construir matrices
-      const matriz:    EstadoVisual[][]    = [];
-      const idsMatriz: (number | null)[][] = [];
-
-      for (const insc of alumnosData) {
-        const filaEstados: EstadoVisual[]    = [];
-        const filaIds:     (number | null)[] = [];
-
-        for (const fecha of fechasOrdenadas) {
-          const asist = asistenciasData.find(
-            (a) => a.alumnoCursoId === insc.id && a.fecha.split('T')[0] === fecha
+  
+      setCargando(true);
+  
+      try {
+  
+        const token = localStorage.getItem('token');
+  
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+  
+        // alumnos
+        const resAlumnos = await fetch(
+          `${API}/inscripciones/curso/${rawId}`,
+          { headers }
+        );
+  
+        const alumnosData: AlumnoCurso[] =
+          await resAlumnos.json();
+  
+        alumnosData.sort(
+          (a, b) =>
+            a.alumno.apellido.localeCompare(
+              b.alumno.apellido
+            )
+        );
+  
+        // asistencias
+        const resAsistencias = await fetch(
+          `${API}/asistencias/curso/${rawId}`,
+          { headers }
+        );
+  
+        const asistenciasData: Asistencia[] =
+          await resAsistencias.json();
+  
+        const fechasSet =
+          new Set<string>();
+  
+        for (const a of asistenciasData) {
+  
+          fechasSet.add(
+            a.fecha.split('T')[0]
           );
-          filaEstados.push(asist ? estadoBackendAVisual(asist.estado) : 'vacio');
-          filaIds.push(asist ? asist.id : null);
+  
         }
-
-        matriz.push(filaEstados);
-        idsMatriz.push(filaIds);
+  
+        const fechasOrdenadas =
+          [...fechasSet]
+          .sort()
+          .reverse();
+  
+        const matriz:
+        EstadoVisual[][] = [];
+  
+        const idsMatriz:
+        (number | null)[][] = [];
+  
+        for (const insc of alumnosData) {
+  
+          const filaEstados:
+          EstadoVisual[] = [];
+  
+          const filaIds:
+          (number | null)[] = [];
+  
+          for (
+            const fecha
+            of fechasOrdenadas
+          ) {
+  
+            const asist =
+            asistenciasData.find(
+              (a) =>
+                a.alumnoCursoId ===
+                insc.id &&
+                a.fecha.split(
+                  'T'
+                )[0] === fecha
+            );
+  
+            filaEstados.push(
+              asist
+                ? estadoBackendAVisual(
+                    asist.estado
+                  )
+                : 'vacio'
+            );
+  
+            filaIds.push(
+              asist
+                ? asist.id
+                : null
+            );
+  
+          }
+  
+          matriz.push(
+            filaEstados
+          );
+  
+          idsMatriz.push(
+            filaIds
+          );
+  
+        }
+  
+        setInscripciones(
+          alumnosData
+        );
+  
+        setFechas(
+          fechasOrdenadas
+        );
+  
+        setDatos(
+          matriz
+        );
+  
+        setAsistenciaIds(
+          idsMatriz
+        );
+  
+      } catch (err) {
+  
+        console.error(
+          'Error cargando asistencias:',
+          err
+        );
+  
+        setInscripciones([]);
+        setFechas([]);
+        setDatos([]);
+        setAsistenciaIds([]);
+  
+      } finally {
+  
+        setCargando(false);
+  
       }
-
-      setInscripciones(alumnosData);
-      setFechas(fechasOrdenadas);
-      setDatos(matriz);
-      setAsistenciaIds(idsMatriz);
+  
     };
-
+  
     fetchData();
+  
   }, [cursoId]);
-
   // =====================
   // AGREGAR FECHA
   // =====================
@@ -267,11 +386,21 @@ export default function AsistenciasTabla() {
   // =====================
   // RENDER
   // =====================
-  return (
+  if (cargando) {
+
+    return (
+      <Cargando
+        texto="
+Cargando asistencias..."
+      />
+    );
+
+  }
+return (
     <div className="p-2 pb-32 bg-purple-700 min-h-screen">
 
       {/* Leyenda */}
-      <div className="flex flex-wrap gap-3 mb-4 justify-center">
+      <div className="flex flex-wrap gap-3 mb-4 items-end h-20 p-8 justify-center">
         {leyenda.map(({ estado, label }) => (
           <div key={estado} className="flex items-center gap-1 text-xs text-yellow-50">
             <span className={`w-5 h-5 rounded flex items-center justify-center ${colores[estado]}`}>
@@ -327,6 +456,20 @@ export default function AsistenciasTabla() {
           </thead>
 
           <tbody>
+            {inscripciones.length === 0 && (
+<tr>
+<td
+colSpan={fechas.length + 1}
+className="
+text-center
+text-violet-100
+py-10
+"
+>
+No hay alumnos cargados
+</td>
+</tr>
+)}
             {inscripciones.map((insc, i) => (
               <tr key={insc.id}>
                 <td className="sticky left-0 bg-purple-700 text-violet-50 z-10 p-1 gap-0 font-mono w-46 font-light border-b-2 border-violet-300">
