@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from 'lucide-react';
+
 
 
 type Curso = {
@@ -21,6 +22,7 @@ export default function CursoLayout({
   const { id } = useParams();
   const pathname = usePathname();
   const [curso, setCurso] = useState<Curso | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCurso = async () => {

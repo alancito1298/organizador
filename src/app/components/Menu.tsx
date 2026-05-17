@@ -17,9 +17,11 @@ export default function Menu() {
 return (<div>
 
 
-<div className='min-h-screen flex flex-col justify-around items-center'>
-<h2 className='font-extralight text-3xl uppercase'>Bienvenido!</h2>
-<svg className='w-96 h-auto text-amber-100' version="1.0" xmlns="http://www.w3.org/2000/svg"
+<div className='min-h-screen w-screen flex flex-col justify-around lg:justify-start lg:gap-8 items-center  bg-violet-100 '>
+
+<div className='h-56 lg:h-40 w-full lg:mt-10 lg:bg-violet-100   bg-violet-950 flex flex-col items-center justify-end lg:justify-center '>
+        <h3 className='font-extralight w-full text-lg uppercase text-center   lg:text-violet-950'>Bienvenido!</h3>
+<svg className='w-96 h-auto text-violet-100 lg:text-violet-950' version="1.0" xmlns="http://www.w3.org/2000/svg"
  width="6501.000000pt" height="2163.000000pt" color="white"viewBox="0 0 6501.000000 2163.000000"
  preserveAspectRatio="xMidYMid meet">
 <metadata>
@@ -199,19 +201,21 @@ c-678 -1 -1243 0 -1255 3 l-23 5 0 915 0 915 2075 0 2075 0 0 360 0 360 -2459
 7 0 913 0 914 2073 2 2072 3 3 358 2 357 -2465 0 -2465 0 0 -3130z"/>
 </g>
 </svg>
-
-       
-                <div className='grid grid-cols-2 items-center gap-3 justify-center p-2'>
-                        <BtnMenu ruta="/agenda" icono={<CalendarPlus size={50} />} nombre="Agenda" />
-                        <BtnMenu ruta="/menu-cursos" icono={<Users size={50}  />} nombre="Mis cursos" />
+</div>
+<span className='h-20 bg-violet-950 lg:h-0 w-full mb-10 lg:m-0 rounded-b-full'></span>
+                <div className='grid grid-cols-2 items-center gap-3 justify-center p-2 lg:grid-cols-3 flex-row'>
+                        <BtnMenu ruta="/agenda"  icono={<CalendarPlus size={50} />} nombre="Agenda" />
+                        <BtnMenu ruta="/menu-cursos" icono={<Users size={50}  />} nombre="Cursos" />
                         <BtnMenu ruta="/planificaciones" icono={<SquareChartGantt size={50} />} nombre="Planificaciones" />
                         <BtnMenu ruta="/horario" icono={<Clock8 size={50} />} nombre="Horarios" />
                         <BtnMenu ruta="/planes" icono={<Banknote size={50} />} nombre="Pagos" />
                         <BtnMenu ruta="/horario" icono={<Bug size={50} />} nombre="ayuda" />
+                        <button onClick={cerrarSesion} className="font-bebas rounded-xl col-span-2 border-violet-900 border w-full lg:col-span-3 lg:w-full mb-25 text-violet-900    py-4 flex justify-center align-center uppercase text-xl m-0"><LogOut className="m-1" />Cerrar Sesión </button>    
                 </div>
-                <button onClick={cerrarSesion} className="font-bebas  bg-violet-900 m-4 mb-15 text-violet-200  lg:max-w-1/3  w-full py-4 flex justify-center align-center uppercase text-3xl"><LogOut className="m-1" />Cerrar Sesión </button>    
+              
           
 </div>
+
 <BottomNav></BottomNav>
 </div>)
 }

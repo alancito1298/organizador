@@ -12,10 +12,10 @@ export default function BtnMenu({ ruta, icono, nombre }: Props) {
     <div >
       <Link
         href={ruta}
-        className="flex flex-col items-center justify-center gap-4 w-auto bg-violet-600 p-8 h-auto border-violet-700 border-1 text-amber-100 hover:text-violet-900 transition   max-w-96 40"
+        className="flex flex-col items-center justify-center rounded-2xl gap-4 w-30 bg-white p-8 h-30 border-violet-700 border-1 text-amber-100 hover:text-violet-900 transition   max-w-96 40"
       >
-        <span className="text-8xl ">{icono}</span>
-        <span className="text-lg font-medium uppercase">{nombre}</span>
+        <span className="text-8xl bg-violet-100 p-2 rounded-2xl text-violet-900 ">{icono}</span>
+        <span className="text-sm font-poppins font text-violet-900">{nombre}</span>
       </Link>
     </div>
   );

@@ -400,7 +400,7 @@ return (
     <div className="p-2 pb-32 bg-purple-700 min-h-screen">
 
       {/* Leyenda */}
-      <div className="flex flex-wrap gap-3 mb-4 items-end h-20 p-8 justify-center">
+      <div className="flex flex-wrap gap-3 mb-4 items- h-20 p-8 justify-center">
         {leyenda.map(({ estado, label }) => (
           <div key={estado} className="flex items-center gap-1 text-xs text-yellow-50">
             <span className={`w-5 h-5 rounded flex items-center justify-center ${colores[estado]}`}>
