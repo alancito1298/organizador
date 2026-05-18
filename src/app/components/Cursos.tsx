@@ -122,7 +122,8 @@ export default function Cursos() {
           md:w-2/3
           w-8/9
           cursor-pointer
-          bg-violet-200
+          border
+          border-violet-950
           text-violet-900
           rounded-xl
           overflow-hidden
@@ -148,6 +149,7 @@ export default function Cursos() {
             text-xs
             font-light
             uppercase
+            
             ">
               Agregar curso
             </small>

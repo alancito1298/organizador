@@ -47,7 +47,7 @@ export default function FormularioCurso({ onCursoCreado }: Props) {
   };
 
   return (
-    <div className="w-full md:w-2/3 bg-gray-100 border border-violet-200 p-4 rounded-xl shadow-md">
+    <div className="w-full md:w-2/3 bg-gray-100 border border-violet-200 p-4 mb-25 rounded-xl shadow-md">
       <h3 className="text-lg font-medium text-violet-700 mb-4">
         Nuevo Curso
       </h3>
