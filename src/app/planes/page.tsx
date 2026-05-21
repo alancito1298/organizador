@@ -117,7 +117,10 @@ export default function PlanesPage() {
             Elegí tu plan
           </h1>
           <p className="text-violet-500 text-sm mt-2">
-            Renovación automática · Cancelá cuando quieras
+           
+          </p>
+          <p className="text-violet-500 text-sm mt-2">
+        30 Diás gratis · Cancelá cuando quieras · Renovación automática 
           </p>
         </div>
 

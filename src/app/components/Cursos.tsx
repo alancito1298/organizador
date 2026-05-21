@@ -122,7 +122,7 @@ export default function Cursos() {
           md:w-2/3
           w-8/9
           cursor-pointer
-          border
+        border
           border-violet-950
           text-violet-900
           rounded-xl
@@ -130,6 +130,7 @@ export default function Cursos() {
           shadow-md
           hover:bg-violet-300
           transition
+          mb-20
           "
         >
           <div className="

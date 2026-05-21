@@ -29,7 +29,7 @@ const PLANES = [
     precio: '$24.999',
     frecuencia: 'por año',
     cursos: 2,
-    ahorro: 'Ahorrás $22.989',
+    ahorro: 'Ahorrás $22.999',
     features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios'],
     link: 'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=f597ba1d700440b7b40139c8060f78dc',
     color: 'bg-violet-900 border-yellow-300',
@@ -41,7 +41,7 @@ const PLANES = [
     precio: '$39.999',
     frecuencia: 'por año',
     cursos: 999,
-    ahorro: 'Ahorrás $19.989',
+    ahorro: 'Ahorrás $19.999',
     destacado: true,
     features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios', 'Planificaciones', 'Bibliografía','Generacion de excel','Recordatorios'],
     link: 'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=055a8d3ffb0f403eb1376ed38adde4ba',
@@ -59,13 +59,11 @@ export default function Planes() {
  
   return (
     <div className="flex flex-col p-8 min-h-screen items-center m-0 w-full bg-gradient-to-t from-violet-950 ">
-      <h1 className="text-3xl  lg:mt-20 lg:text-6xl font-mono text-violet-950 text-center mb-2 m-20 uppercase">
-        Elegí el <strong className="text-4xl lg:text-7xl">plan</strong> que mas se adapte a tus necesidades
+      <h1 className="text-5xl  lg:mt-20 lg:text-6xl mb-20 font-mono text-violet-950 text-center mb-2 m-20 uppercase">
+        Elegí el <strong className="text-6xl lg:text-7xl">plan</strong> que mas se adapte a tus necesidades
       </h1>
-   {/*   <p className="text-center bg-amber-200 p-2 rounded text-violet-950 mb-8 text-sm">
-        Todos los planes incluyen <strong className="text-lg">30</strong> días de prueba gratis
-      </p>
-*/}
+      
+
      
 
       <div className="grid w-7/8 lg:w-full lg:m-1 grid-cols-1 justify-center sm:grid-cols-2 lg:gap-8 pt-2 gap-4 lg:flex lg:flex-row lg:justify-arround lg:w-min-full lg:m-0  ">
@@ -75,6 +73,9 @@ export default function Planes() {
             key={plan.nombre}
             className={`rounded-2xl p-10 lg:m-5 lg:h-150 flex flex-col lg:w-80  items-center shadow-md ${plan.color}`}
           >
+          <div className="flex items-start justify-items-start w-full">
+            <p className="h-auto text-start w-auto  p-1 rounded-full border animate-vibrar border-green-900 px-3 bg-red-600 font-bold text-xl">¡30 días gratis!</p>
+          </div>    
               <div className="w-full h-full flex flex-col items-center justify-between">
               {plan.inicial && (
               <span className="text-sm font-bold uppercase mt-3 text-cyan-400 bg-black border-cyan-400 border-2 rounded-full px-10 py-1 self-start ">
@@ -110,7 +111,7 @@ export default function Planes() {
               rel="noopener noreferrer"
               className={`text-center py-3  rounded-xl font-bold text-sm transition mb-8 uppercase ${plan.btnColor}`}
             >
-             Registrarme
+             Probar Gratis!
             </a>
           </div>
           </div>
