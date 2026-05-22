@@ -58,7 +58,7 @@ export default function Planes() {
 
  
   return (
-    <div className="flex flex-col p-8 min-h-screen items-center m-0 w-full bg-gradient-to-t from-violet-950 ">
+    <div className="flex flex-col mx-4 p-8 min-h-screen items-center m-0 w-full bg-gradient-to-t from-violet-950 ">
       <h1 className="text-5xl  lg:mt-20 lg:text-6xl mb-20 font-mono text-violet-950 text-center mb-2 m-20 uppercase">
         Elegí el <strong className="text-6xl lg:text-7xl">plan</strong> que mas se adapte a tus necesidades
       </h1>

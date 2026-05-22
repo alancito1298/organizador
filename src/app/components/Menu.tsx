@@ -1,5 +1,5 @@
 'use client';
-import {Users,CalendarPlus,SquareChartGantt,Clock8,DoorOpen,Bug,Banknote,LogOut,} from 'lucide-react'
+import {Users,CalendarPlus,SquareChartGantt,Clock8,CircleUserRound,Bug,Banknote,LogOut, } from 'lucide-react'
 import BottomNav from './BottomNav';
 
 import BtnMenu from './BtnMenu';
@@ -202,14 +202,16 @@ c-678 -1 -1243 0 -1255 3 l-23 5 0 915 0 915 2075 0 2075 0 0 360 0 360 -2459
 </g>
 </svg>
 </div>
-<span className='h-20 bg-violet-950 lg:h-0 w-full mb-10 lg:m-0 rounded-b-full'></span>
+<span className='h-20 bg-violet-950 lg:h-0 w-full mb-10 mx-3 lg:m-0 rounded-b-full'></span>
                 <div className='grid grid-cols-2 items-center gap-3 justify-center p-2 lg:grid-cols-3 flex-row'>
                         <BtnMenu ruta="/agenda"  icono={<CalendarPlus size={50} />} nombre="Agenda" />
                         <BtnMenu ruta="/menu-cursos" icono={<Users size={50}  />} nombre="Cursos" />
                         <BtnMenu ruta="/planificaciones" icono={<SquareChartGantt size={50} />} nombre="Planificaciones" />
                         <BtnMenu ruta="/horario" icono={<Clock8 size={50} />} nombre="Horarios" />
                         <BtnMenu ruta="/planes" icono={<Banknote size={50} />} nombre="Pagos" />
-                        <BtnMenu ruta="/horario" icono={<Bug size={50} />} nombre="ayuda" />
+                        <BtnMenu ruta="/horario" icono={<Bug size={50} />} nombre="Ayuda" />
+                        <BtnMenu ruta="/perfil" icono={<CircleUserRound size={50} />} nombre="Perfil" />
+
                         <button onClick={cerrarSesion} className="font-bebas rounded-xl col-span-2 border-violet-900 border w-full lg:col-span-3 lg:w-full mb-25 text-violet-900    py-4 flex justify-center align-center uppercase text-xl m-0"><LogOut className="m-1" />Cerrar Sesión </button>    
                 </div>
               
