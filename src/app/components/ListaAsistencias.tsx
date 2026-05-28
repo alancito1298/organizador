@@ -2,14 +2,17 @@
 
 import { useEffect, useState, JSX } from 'react';
 import { useParams } from 'next/navigation';
-import ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
+import {
+  exportarExcelAsistencias
+} from '../utils/exportarExcelAsitencias';
 import {
   ThumbsUp,
   ThumbsDown,
   X,
   Clock,
-  ListPlus
+  ListPlus,
+  Sheet,
+  Download
 } from 'lucide-react';
 
 import Cargando from './Cargando';
@@ -826,462 +829,18 @@ Cargando asistencias..."
 
 
 
-  const descargarExcel = async () => {
+  const descargarExcel =
+  async () => {
 
-    // CREAR LIBRO
-    const workbook =
-      new ExcelJS.Workbook();
-  
-    for (
-      let t = 1;
-      t <= 3;
-      t++
-    ) {
-  
-      // =====================
-      // NUEVA HOJA
-      // =====================
-  
-      const worksheet =
-        workbook.addWorksheet(
-          `${t}° Trimestre`
-        );
-  
-      // =====================
-      // TRAER ASISTENCIAS
-      // DEL TRIMESTRE
-      // =====================
-  
-      const token =
-        localStorage.getItem(
-          'token'
-        );
-  
-      const headers = {
-        Authorization:
-          `Bearer ${token}`,
-      };
-  
-      const resAsistencias =
-        await fetch(
-          `${API}/asistencias/curso/${rawId}?trimestre=${t}`,
-          { headers }
-        );
-  
-      const asistenciasData:
-        Asistencia[] =
-          await resAsistencias.json();
-  
-      // =====================
-      // FECHAS
-      // =====================
-  
-      const fechasSet =
-        new Set<string>();
-  
-      for (
-        const a
-        of asistenciasData
-      ) {
-  
-        fechasSet.add(
-          a.fecha.split(
-            'T'
-          )[0]
-        );
-  
-      }
-  
-      const fechasExcel =
-        [...fechasSet]
-          .sort()
-          .reverse();
-  
-      // =====================
-      // TITULO
-      // =====================
-  
-      worksheet.mergeCells(
-        'A1:F1'
-      );
-  
-      const titulo =
-        worksheet.getCell(
-          'A1'
-        );
-  
-      titulo.value =
-        `Asistencias - ${t}° Trimestre
-       `;
-  
-      titulo.font = {
-        bold: true,
-        size: 18,
-        color: {
-          argb:
-            'FFFFFFFF'
-        }
-      };
-  
-      titulo.alignment = {
-        vertical:
-          'middle',
-        horizontal:
-          'center'
-      };
-  
-      titulo.fill = {
-        type:
-          'pattern',
-        pattern:
-          'solid',
-        fgColor: {
-          argb:
-            '6D28D9'
-        }
-      };
-  
-      worksheet.getRow(
-        1
-      ).height = 30;
-  
-      // =====================
-      // ENCABEZADOS
-      // =====================
-  
-      const encabezados = [
-  
-        'Alumno',
-  
-        ...fechasExcel.map(
-          (fecha) =>
-  
-            new Date(
-              fecha +
-              'T00:00:00'
-            ).toLocaleDateString(
-              'es-AR'
-            )
-  
-        )
-  
-      ];
-  
-      const headerRow =
-        worksheet.addRow(
-          encabezados
-        );
-  
-      // =====================
-      // ESTILOS HEADERS
-      // =====================
-  
-      headerRow.eachCell(
-        (cell) => {
-  
-          cell.font = {
-            bold: true,
-            color: {
-              argb:
-                'FFFFFFFF'
-            }
-          };
-  
-          cell.fill = {
-            type:
-              'pattern',
-            pattern:
-              'solid',
-            fgColor: {
-              argb:
-                '7C3AED'
-            }
-          };
-  
-          cell.alignment = {
-            horizontal:
-              'center',
-            vertical:
-              'middle'
-          };
-  
-          cell.border = {
-            top: {
-              style:
-                'thin'
-            },
-            left: {
-              style:
-                'thin'
-            },
-            bottom: {
-              style:
-                'thin'
-            },
-            right: {
-              style:
-                'thin'
-            }
-          };
-  
-        }
-      );
-  
-      // =====================
-      // FILAS
-      // =====================
-  
-      inscripciones.forEach(
-        (
-          insc
-        ) => {
-  
-          const fila = [
-  
-            `${insc.alumno.apellido}, ${insc.alumno.nombre}`,
-  
-            ...fechasExcel.map(
-              (
-                fecha
-              ) => {
-  
-                const asist =
-                  asistenciasData.find(
-                    (a) =>
-                      a.alumnoCursoId ===
-                        insc.id &&
-                      a.fecha.split(
-                        'T'
-                      )[0] ===
-                        fecha
-                  );
-  
-                if (
-                  !asist
-                ) {
-                  return '-';
-                }
-  
-                switch (
-                  asist.estado
-                ) {
-  
-                  case 'presente_buen_concepto':
-                    return 'P';
-  
-                  case 'presente_mal_concepto':
-                    return 'PMC';
-  
-                  case 'ausente':
-                    return 'A';
-  
-                  case 'justificada':
-                    return 'J';
-  
-                  default:
-                    return '-';
-  
-                }
-  
-              }
-            )
-  
-          ];
-  
-          worksheet.addRow(
-            fila
-          );
-  
-          const row =
-            worksheet.lastRow;
-  
-          if (row) {
-  
-            row.eachCell(
-              (
-                cell,
-                colNumber
-              ) => {
-  
-                if (
-                  colNumber ===
-                  1
-                ) {
-  
-                  cell.font = {
-                    bold: true
-                  };
-  
-                  return;
-  
-                }
-  
-                const valor =
-                  String(
-                    cell.value
-                  );
-  
-                let color =
-                  'FFFFFF';
-  
-                switch (
-                  valor
-                ) {
-  
-                  case 'P':
-                    color =
-                      '22C55E';
-                    break;
-  
-                  case 'PMC':
-                    color =
-                      'FB923C';
-                    break;
-  
-                  case 'A':
-                    color =
-                      'EF4444';
-                    break;
-  
-                  case 'J':
-                    color =
-                      '38BDF8';
-                    break;
-  
-                  default:
-                    color =
-                      'FCD34D';
-                    break;
-  
-                }
-  
-                cell.fill = {
-                  type:
-                    'pattern',
-                  pattern:
-                    'solid',
-                  fgColor: {
-                    argb:
-                      color
-                  }
-                };
-  
-                cell.font = {
-                  bold: true,
-                  color: {
-                    argb:
-                      'FFFFFF'
-                  }
-                };
-  
-                cell.alignment = {
-                  horizontal:
-                    'center',
-                  vertical:
-                    'middle'
-                };
-  
-                cell.border = {
-                  top: {
-                    style:
-                      'thin'
-                  },
-                  left: {
-                    style:
-                      'thin'
-                  },
-                  bottom: {
-                    style:
-                      'thin'
-                  },
-                  right: {
-                    style:
-                      'thin'
-                  }
-                };
-  
-              }
-            );
-  
-          }
-  
-        }
-      );
-  // =====================
-// TEXTO FINAL
-// =====================
+    await exportarExcelAsistencias({
 
-worksheet.addRow([]);
+      curso,
+      rawId,
+      inscripciones,
 
-const mensajeFinal =
-  worksheet.addRow([
-    'Para ver asistencias de otro trimestre busca en las pestañas de abajo 👇'
-  ]);
+    });
 
-worksheet.mergeCells(
-  `A${mensajeFinal.number}:F${mensajeFinal.number}`
-);
-
-mensajeFinal.font = {
-  bold: true,
-  italic: true,
-};
-
-mensajeFinal.alignment = {
-  horizontal: 'center',
-  vertical: 'middle',
-};
-
-mensajeFinal.height = 30;
-      // =====================
-      // ANCHO COLUMNAS
-      // =====================
-  
-      worksheet.columns.forEach(
-        (
-          column
-        ) => {
-  
-          column.width =
-            18;
-  
-        }
-      );
-  
-    }
-  
-    // =====================
-    // GENERAR ARCHIVO
-    // =====================
-  
-    const nombreCurso =
-  String(
-    curso?.anio || 'curso'
-  ).replace(/\s/g, '_');
-
-const nombreMateria =
-  String(
-    curso?.materia || 'materia'
-  ).replace(/\s/g, '_');
-
-  const nombreEscuela =
-  String(
-    curso?.escuela || 'escuela'
-  ).replace(/\s/g, '_');
-
-const buffer =
-  await workbook.xlsx.writeBuffer();
-
-saveAs(
-
-  new Blob([buffer]),
-
-  `asistencias_${nombreCurso}°_${nombreMateria}_${nombreEscuela}.xlsx`
-
-);
-  
   };
-  
 
   
   
@@ -1294,11 +853,11 @@ saveAs(
 
     <div className="
     p-1
-    pb-32
     bg-violet-100
     min-h-screen
-    w-400
+  
     m-0
+  
     
     ">
 
@@ -1347,99 +906,8 @@ saveAs(
         )}
 
       </div>
-{/* REFERENCIAS */}
-<div className="
-flex
-flex-wrap
-justify-center
-items-center
-gap-1
-bg-violet-300
-h-35
-shadow-xl
-">
 
-  <div className="
-  flex
-  items-center
-  
-  gap-2
-  bg-green-500
-  text-white
-  px-4
- 
-  rounded-2xl
-  text-sm
-  font-semibold
-  shadow-md
-  h-10 py-10
-  ">
-    <ThumbsUp size={18} />
-    Presente (Buen concepto)
-  </div>
-
-  <div className="
-  flex
-  items-center
-  gap-2
-  bg-red-800
-  text-white
-  h-10 py-10      
-  rounded-2xl
-  text-sm
-  font-semibold
-  shadow-md
-  ">
-    <ThumbsDown size={18} />
-    Presente (Mal concepto)
-  </div>
-
-  <div className="
-  flex
-  items-center
-  justify-center
-  gap-2
-  bg-white
-  text-red-800
-  border
-  border-red-800
-  px-4
-  py-2
-  rounded-2xl
-  text-sm
-  font-semibold
-  shadow-md
-  h-10
-  w-1/3
-  ">
-    <X size={18} />
-    Ausente
-  </div>
-
-  <div className="
-  flex
-  items-center
-  justify-center
-  gap-2
-  bg-cyan-300
-  text-blue-800
-  px-4
-  py-2
-  rounded-2xl
-  text-sm
-  font-semibold
-  shadow-md
-  h-10
-  w-1/3
-  ">
-    <Clock size={18} />
-    Justificada
-  </div>
-
-
-
-</div>
-      <p className="
+     <div> <p className="
       text-center
       text-violet-800
       mb-4
@@ -1453,50 +921,53 @@ shadow-xl
       w-full
       h-auto
       text-lg
+      font-bold
       
       ">
 
         Mostrando asistencias
-        del <strong className='fonto-bold text-violet-950'>{trimestre}°
+        del <strong className='font-extralight border-l pl-2 text-4xl text-violet-950'>{trimestre}°
         trimestre</strong>
 
       </p>
-
+      </div>
       {/* TABLA */}
 
       <div className="
-      overflow-x-auto
-      relative
-      ">
+w-screen
+max-w-screen
+overflow-x-scroll
+overflow-y-hidden
+">
 
-        <table className="
-        table-fixed
-        border-collapse
-        mb-40
-        ">
+<table className="
+border-collapse
+
+"
+style={{
+  width: 'max-content'
+}}
+>
 
           <thead>
 
             <tr>
 
-              <th className="
-              sticky
-              left-0
-              bg-violet-400
-              border
-              border-violet-400
-              z-10
-              text-violet-900
-              p-2
-              w-40
-              text-left
-              font-mono
-              font-medium
-              flex
-              flex-col
-              items-center
-              ">
-  <small className='text-xs font-medium text-violet-950  border-b w-full text-end m-0'>Fecha:</small>
+            <th className="
+sticky
+left-0
+bg-violet-400
+
+border-violet-400
+z-10
+text-violet-900
+p-2
+border
+w-[100px]
+font-mono
+font-medium
+">
+  <small className='text-xs flex justify-end-end font-medium text-violet-950  border-b w-full text-end m-0'>Fecha:</small>
                 Alumno/a
 
               </th>
@@ -1636,17 +1107,16 @@ shadow-xl
                 >
 
                   <td className="
-                  w-16
-                  h-16
+                  pl-1
                   sticky
                   left-0
                   bg-violet-200
                   text-violet-900
                   z-10
-                  p-1
+                  p-0
                   font-mono
-                  border-b
-                  border-violet-300
+                  border
+                  border-violet-400
                   ">
 
                     {
@@ -1666,26 +1136,23 @@ shadow-xl
                     ) => (
 
                       <td
-                        key={j}
-                        onClick={() =>
-                          cambiarEstado(
-                            i,
-                            j
-                          )
-                        }
-                        className={`
-                        
-                       
-                        border
-                        border-violet-200
-                        
-                        
-                        
-                       
-                        text-center
-                        }
-                        `}
-                      >
+  key={j}
+  onClick={() =>
+    cambiarEstado(
+      i,
+      j
+    )
+  }
+  className={`
+ 
+  h-16
+  border
+  border-violet-200
+  text-center
+ 
+  `}
+>
+                      
 
                         {
                           iconos[estado]
@@ -1704,9 +1171,139 @@ shadow-xl
           </tbody>
 
         </table>
-
+        
       </div>
+      <div className='w-full h-auto flex flex-col items-start justify-center'>{/* REFERENCIAS */}
+<div className="
+flex
+flex-wrap
+justify-center
+items-center
+gap-1
+flex-row
+h-full
+mt-3
+">
 
+  <div className="
+  flex
+
+  items-center
+  gap-2
+  bg-green-500
+  text-white
+  border-4
+  border-green-500
+  text-xs
+  px-4
+  rounded-2xl
+  p-8
+  shadow-md
+  h-8 py-10
+
+  ">
+    <ThumbsUp size={18} />
+    Presente (Buen concepto)
+  </div>
+
+  <div className="
+  flex
+  items-center
+  gap-2
+  bg-red-500
+  text-white
+  border-4
+  border-red-500
+  text-xs
+  h-8 py-10      
+  rounded-2xl
+
+  font-semibold
+  shadow-md
+  ">
+    <ThumbsDown size={18} />
+    Presente (Mal concepto)
+  </div>
+
+  <div className="
+  flex
+  items-center
+  justify-center
+  gap-2
+  bg-white
+  text-red-800
+  border-4
+  border-white
+  px-4
+  py-2
+  rounded-2xl
+  text-xs
+  font-semibold
+  shadow-md
+  h-8
+  w-1/3
+  ">
+    <X size={18} />
+    Ausente
+  </div>
+
+  <div className="
+  flex
+  items-center
+  justify-center
+  gap-2
+  bg-cyan-300
+  text-blue-800
+  border-4
+  border-cyan-300
+  px-4
+  py-2
+  rounded-2xl
+  text-xs
+  font-semibold
+  shadow-md
+  h-8
+  w-1/3
+  ">
+    <Clock size={18} />
+    Justificada
+  </div>
+
+
+
+</div><button
+  onClick={descargarExcel}
+  className="
+  w-full 
+  max-w-90
+  m-auto
+  right-0
+  hover:bg-emerald-700
+  text-green-800
+  px-6
+  py-3
+  border-2
+border-green-500
+  mt-2
+  rounded-xl
+  shadow-2xl
+  text-sm
+  transition-all
+  flex
+  items-center
+  justify-center
+  gap-1
+  mb-40
+  font-bold
+
+  "
+  title="Descargar Excel"
+>
+
+Planilla Excel
+<Download />
+</button>
+</div>
       {/* BOTONES */}
 
       <button
@@ -1729,32 +1326,7 @@ shadow-xl
 
       </button>
 
-      <button
-  onClick={descargarExcel}
-  className="
-  fixed
-  bottom-50
-  right-0
-  bg-emerald-600
-  hover:bg-emerald-700
-  text-white
-  px-6
-  py-3
-  rounded-l-full
-  border-amber-950
-  border-r-0
-  border-2
-  shadow-2xl
-  text-lg
-  font-semibold
-  transition-all
-  "
-  title="Descargar Excel"
->
-
-  📊
-
-</button>
+    
       <button
         onClick={
           guardarTodo
