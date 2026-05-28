@@ -91,7 +91,7 @@ export default function CursoLayout({
       </nav>
 
       {/* CONTENIDO */}
-      <div className="p-6 max-w-5xl mx-auto">
+      <div className="w-full flex justify-center ">
         {children}
       </div>
 

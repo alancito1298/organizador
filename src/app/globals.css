@@ -34,6 +34,7 @@ body, main, section  {
   min-height: 1vh;
   margin: 0;
   padding: 0;
+  width: 100%;
 }
 
 

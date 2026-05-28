@@ -26,9 +26,9 @@ export default function AlumnoCard({ alumno, onDelete }: Props) {
   };
 
   return (
-    <div className="bg-violet-200 p-4 rounded-lg flex justify-between items-center">
+    <div className="bg-violet-900 p-4 w-full rounded-lg flex justify-between items-center">
 
-      <div>
+      <div className="">
         {alumno.apellido}, {alumno.nombre}
       </div>
 

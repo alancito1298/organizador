@@ -101,7 +101,7 @@ export default function CursoPage() {
   if (!cursoId) return <p>Cargando...</p>;
 
   return (
-    <div className="p-4 bg-violet-800 mb-8">
+    <div className="p-4  w-full lg:max-w-2/3 mb-8">
     <h2 className="h-25 text-5xl text-center pt-8 font-extralight">ALUMNOS</h2>
       {alumnos.length === 0 ? (
         <p className="text-center text-gray-500 ">No hay alumnos</p>
@@ -110,7 +110,7 @@ export default function CursoPage() {
           {alumnos.map((alumno) => (
             <div
               key={alumno.id}
-              className="flex items-center justify-between bg-violet-100 border border-violet-90 m-2 rounded-xl h-20 px- py-3 shadow-sm"
+              className="flex items-center justify-between bg-violet-100 border border-violet-300 m-2 rounded-xl h-20 px- py-3 shadow-sm"
             >
               <div className="flex-1">
                 <p className="text-xl font-semibold uppercase m-2 mt-0 text-black">
