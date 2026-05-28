@@ -76,7 +76,7 @@ const iconos: Record<
   EstadoVisual,
   JSX.Element | null
 > = {
-  vacio: null,
+  vacio: <p className='text-gray-800'>-</p>,
 
   presente_buen_concepto:
     <ThumbsUp
@@ -84,10 +84,10 @@ const iconos: Record<
       className="
       text-white
       bg-green-600
-      w-2/3
-      h-2/3
+      w-10
+      h-10
       rounded-full
-      p-3
+      p-1
       mx-auto
     
       "
@@ -95,14 +95,14 @@ const iconos: Record<
 
   presente_mal_concepto:
     <ThumbsDown
-      size={15}
+      size={5}
       className="
       text-white
       bg-red-800
-      w-2/3
-      h-2/3
+      w-10
+      h-10
       rounded-full
-      p-3
+      p-1
       mx-auto
       "
     />,
@@ -112,14 +112,16 @@ const iconos: Record<
       size={20}
       className="
     
-      w-2/3
-      h-2/3
+      w-10
+      h-10
       rounded-full
-      p-3
+      p-1
+      
       mx-auto
       text-red-900
       border
       border-red-900
+
       "
     />,
 
@@ -128,11 +130,12 @@ const iconos: Record<
       size={20}
       className="
       bg-blue-300
-      w-2/3
-      h-2/3
+      w-10
+      h-10
       rounded-full
-      p-3
+      p-1
       mx-auto
+    
       text-blue-800
       "
     />,
