@@ -202,16 +202,20 @@ export default function ListaCalificaciones() {
   if (cargando) return <Cargando texto="Cargando calificaciones..." />;
 
   return (
-    <div className="p-1 bg-purple-700 min-h-screen m-0">
+    <div className="p-1
+    bg-violet-100
+    min-h-screen
+    m-0
+  ">
 
       {/* TABLA — mismo patrón que AsistenciasTabla */}
-      <div className="w-screen max-w-screen overflow-x-scroll overflow-y-hidden">
+      <div className="w-screen max-w-screen overflow-x-scroll overflow-y-hidden ">
         <table className="border-collapse" style={{ width: 'max-content' }}>
           <thead>
             <tr>
 
               {/* COLUMNA FIJA ALUMNO */}
-              <th className="sticky left-0 bg-purple-900 border border-purple-400 z-10 text-white p-2 w-[140px] min-w-[140px] text-left font-mono font-medium">
+              <th className="sticky left-0 text-violet-950 bg-violet-400 border border--400 z-10  p-2 w-[140px] min-w-[140px] text-left font-mono font-medium">
                 Alumno/a
               </th>
 
@@ -219,7 +223,7 @@ export default function ListaCalificaciones() {
               {columnas.map((col, i) => (
                 <th
                   key={i}
-                  className="border border-purple-400 bg-purple-800 text-purple-100 p-1 text-center min-w-[160px]"
+                  className="border border-violet-400 bg-violet-300 text-purple-100 p-1 text-center min-w-[160px]"
                 >
                   <div className="flex flex-col items-center gap-1">
 
@@ -272,7 +276,7 @@ export default function ListaCalificaciones() {
               <tr key={insc.id}>
 
                 {/* NOMBRE FIJO */}
-                <td className="pl-1 sticky left-0 bg-purple-900 text-white z-10 p-1 font-mono border border-purple-400 w-[140px] min-w-[140px] text-sm">
+                <td className="pl-1 sticky left-0 bg-violet-300 text-violet-950 z-10 p-1 font-mono border border-purple-400 w-[140px] min-w-[140px] text-sm">
                   {insc.alumno.apellido}, {insc.alumno.nombre}
                 </td>
 
@@ -282,7 +286,7 @@ export default function ListaCalificaciones() {
                   return (
                     <td
                       key={colIndex}
-                      className="bg-purple-700 p-1 relative border border-purple-400 min-w-[160px] h-14"
+                      className="bg-purple-200 p-1 relative border border-purple-400 min-w-[160px] h-14"
                     >
                       {esExistente && (
                         <span className="absolute top-1 right-1 text-xs text-purple-300">✏️</span>
@@ -312,7 +316,7 @@ export default function ListaCalificaciones() {
       {/* BOTÓN EXCEL */}
       <button
         onClick={() => exportarExcelCalificaciones({ columnas, datos, inscripciones, curso })}
-        className="w-full max-w-90 m-auto mt-4 mb-40 hover:bg-emerald-700 text-green-800 px-6 py-3 bg-white border-2 border-green-500 rounded-xl shadow-2xl text-sm transition-all flex items-center justify-center gap-1 font-bold"
+        className="w-full max-w-90 m-auto mt-14 mb-40 hover:bg-emerald-700 text-green-800 px-6 py-3 bg-white border-2 border-green-500 rounded-xl shadow-2xl text-sm transition-all flex items-center justify-center gap-1 font-bold"
       >
         Planilla Excel <Download />
       </button>
