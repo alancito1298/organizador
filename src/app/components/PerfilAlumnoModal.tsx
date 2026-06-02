@@ -37,12 +37,12 @@ export default function PerfilAlumnoModal({ perfil, onCerrar }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-y-auto max-h-[90vh]">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-y-auto h-7/9">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center p-5 pb-0">
+        <div className="flex justify-between items-center p-5 pb-0 my-4 mx-4 ">
           <div>
-            <h3 className="text-lg font-bold text-violet-900">
+            <h3 className="text-xl uppercase font-light text-violet-900">
               {alumno.apellido}, {alumno.nombre}
             </h3>
             {alumno.contacto && (
@@ -51,22 +51,22 @@ export default function PerfilAlumnoModal({ perfil, onCerrar }: Props) {
           </div>
           <button
             onClick={onCerrar}
-            className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+            className="text-red-400 font-bold hover:text-red-600 text-2xl leading-none"
           >
             ✕
           </button>
         </div>
 
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 m-4">
 
           {/* PORCENTAJE ASISTENCIA */}
-          <div className="bg-violet-50 rounded-xl p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold text-violet-700 uppercase">Asistencia</p>
-              <p className="text-4xl font-bold text-violet-900">{estadisticas.porcentajeAsistencia}%</p>
-              <p className="text-xs text-gray-400">{estadisticas.totalPresentes} presentes de {estadisticas.totalAsistencias}</p>
+          <div className="bg-violet-100 rounded-xl  flex items-center justify-between">
+            <div className='m-1'>
+              <p className="text-lg font-bold text-violet-700 uppercase">Asistencia</p>
+              <p className="text-6xl font-extralight text-violet-900">{estadisticas.porcentajeAsistencia}%</p>
+              <p className="text-xs text-violet-400">{estadisticas.totalPresentes} presentes de {estadisticas.totalAsistencias}</p>
             </div>
-            <div className="text-right text-xs text-gray-500 space-y-1">
+            <div className="text-right text-xs m-1 text-violet-500 space-y-1">
               <p>❌ Ausentes: <strong>{estadisticas.ausentes}</strong></p>
               <p>🕐 Justificadas: <strong>{estadisticas.justificadas}</strong></p>
             </div>
@@ -74,9 +74,10 @@ export default function PerfilAlumnoModal({ perfil, onCerrar }: Props) {
 
           {/* GRÁFICO ASISTENCIA — Donut */}
           {datosAsistencia.length > 0 && (
-            <div className="bg-violet-50 rounded-xl p-4">
+            <div className="bg-violet-50 rounded-xl h-auto ">
               <p className="text-xs font-bold text-violet-700 uppercase mb-2">Distribución de asistencias</p>
-              <ResponsiveContainer width="100%" height={180}>
+              <div className='m-2'>
+                <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
                     data={datosAsistencia}
@@ -92,6 +93,8 @@ export default function PerfilAlumnoModal({ perfil, onCerrar }: Props) {
                 </PieChart>
               </ResponsiveContainer>
             </div>
+            </div>
+
           )}
 
           {/* GRÁFICO PROMEDIOS — Bar */}

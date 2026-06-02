@@ -6,6 +6,7 @@ import FormularioAlumno from "./FormularioAlumno";
 import BottomNav from "@/app/components/BottomNav";
 import type PerfilAlumno from "../../../types/perfilAlumno";
 import { usePerfilAlumno } from "@/app/hooks/usePerfilAlumno";
+import PerfilAlumnoModal from "@/app/components/PerfilAlumnoModal";
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 export type Alumno = {
   id: number;
@@ -172,11 +173,11 @@ export default function CursoPage() {
 
   return (
     <div className="p-4  w-full lg:max-w-2/3 mb-8">
-    <h2 className="h-25 text-5xl text-center pt-8 font-extralight">ALUMNOS</h2>
+    <h2 className="h-25 text-5xl text-center text-violet-950 mt-8 font-extralight">ALUMNOS</h2>
       {alumnos.length === 0 ? (
         <p className="text-center text-gray-500 ">No hay alumnos</p>
       ) : (
-        <div className="flex flex-col gap-2  ">
+        <div className="flex flex-col gap-2 max-w-200 m-auto ">
           {alumnos.map((alumno) => (
            <div
            key={alumno.id}
@@ -201,7 +202,7 @@ export default function CursoPage() {
            cursor-pointer
            "
          >
-              <div className="flex-1">
+              <div className="flex-1  ">
                 <p className="text-xl font-semibold uppercase m-2 mt-0 text-black">
                   {alumno.apellido}, {alumno.nombre}
                 </p>
@@ -243,47 +244,10 @@ export default function CursoPage() {
       />
 {/* MODAL PERFIL ALUMNO */}
 {perfilAbierto && perfil && (
-  <div className="fixed inset-0 z-50 flex items-center  justify-center bg-black/80 ">
-    <div className="bg-white rounded-2xl shadow-2xl m-4 w-full max-w-sm overflow-y-auto max-h-[90vh] border-8 p-4">
-      
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold text-violet-900">
-          {perfil.alumno.apellido}, {perfil.alumno.nombre}
-        </h3>
-        <button onClick={() => setPerfilAbierto(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
-      </div>
-
-      {/* ASISTENCIA */}
-      <div className="bg-violet-50 rounded-xl p-4 mb-3">
-        <p className="text-xs font-bold text-violet-700 uppercase mb-2">Asistencia</p>
-        <p className="text-2xl font-bold text-violet-900">{perfil.estadisticas.porcentajeAsistencia}%</p>
-        <div className="grid grid-cols-2 gap-1 mt-2 text-xs text-gray-600">
-          <span>✅ Presentes: {perfil.estadisticas.totalPresentes}</span>
-          <span>❌ Ausentes: {perfil.estadisticas.ausentes}</span>
-          <span>👍 Buen concepto: {perfil.estadisticas.presentesBuenConcepto}</span>
-          <span>🕐 Justificadas: {perfil.estadisticas.justificadas}</span>
-        </div>
-      </div>
-
-      {/* PROMEDIOS */}
-      <div className="bg-violet-50 rounded-xl p-4 mb-3">
-        <p className="text-xs font-bold text-violet-700 uppercase mb-2">Promedios</p>
-        <p className="text-2xl font-bold text-violet-900">{perfil.promedios.general}</p>
-        <div className="grid grid-cols-3 gap-1 mt-2 text-xs text-gray-600">
-          <span>1°T: {perfil.promedios.primerTrimestre}</span>
-          <span>2°T: {perfil.promedios.segundoTrimestre}</span>
-          <span>3°T: {perfil.promedios.tercerTrimestre}</span>
-        </div>
-      </div>
-
-      <button
-        onClick={() => setPerfilAbierto(false)}
-        className="w-full py-2 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition font-medium mt-2"
-      >
-        Cerrar
-      </button>
-    </div>
-  </div>
+  <PerfilAlumnoModal
+    perfil={perfil}
+    onCerrar={() => setPerfilAbierto(false)}
+  />
 )}
       <BottomNav />
 

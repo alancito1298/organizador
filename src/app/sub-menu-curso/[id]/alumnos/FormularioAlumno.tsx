@@ -108,7 +108,7 @@ export default function FormularioAlumno({
   };
 
   return (
-    <div className=" w-full h-screen m-0">
+    <div className=" w-full max-w-200 m-auto h-screen ">
       <div className="  h-120 shadow bg-violet-300 border-2 border-violet-400 mx-3 mt-15 mb-10 rounded-4xl">
       <h2 className="text-center text-violet-900 uppercase p-6 text-3xl">Agregar Alumno</h2>
       <div className="flex flex-col gap-4 m-4 ">

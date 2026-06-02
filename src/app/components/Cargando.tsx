@@ -4,7 +4,7 @@ type Props = {
   
   export default function Cargando({ texto = 'Cargando...' }: Props) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 h-200 py-12">
+      <div className="flex flex-col bg-violet-100 items-center justify-center w-full gap-3 h-200 py-12">
       <div className="h-20 text-violet-900 mb-4"> 
       <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
             className="animate-spin " 
@@ -104,7 +104,7 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
 43 -142 45 -221 16z"/>
             </g>
           </svg>
-        <p className="text-violet-200 text-sm font-medium">{texto}</p>
+        <p className="text-violet-800 text-sm font-medium">{texto}</p>
      
       
         </div>
