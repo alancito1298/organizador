@@ -119,8 +119,8 @@ Diseñado para docentes reales.
         <Features items={items} />
         
         
-        <section className="py-20 px-6  border-t borde-4  mt-100">
-  <div className="max-w-4xl mx-4 mt-25   ">
+        <section className="py-20 px-6  border-t lg:flex flex-col lg:items-center borde-4  mt-100">
+  <div className="max-w-4xl mx-4 mt-25  m-auto">
 
     {/* Header */}
     <div className="flex items-center gap-3 mb-3 mt-25">
@@ -204,12 +204,12 @@ Diseñado para docentes reales.
 
     {/* CTA */}
     <div className="flex items-center gap-4 flex-wrap">
-      <button className="flex items-center gap-2 bg-[#1D6F42] text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-green-800 transition">
+      <a  href="/"   download="asitencias_Escuela_n°22_5_TIC.xlsx" className="flex items-center gap-2 bg-[#1D6F42] text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-green-800 transition">
         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
         Descargar planilla de ejemplo
-      </button>
+      </a>
       <p className="text-xs text-gray-400">Compatible con Excel, Google Sheets y LibreOffice</p>
     </div>
 

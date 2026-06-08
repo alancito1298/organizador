@@ -3,12 +3,40 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+const PROVINCIAS = [
+  "Buenos Aires",
+  "Catamarca",
+  "Chaco",
+  "Chubut",
+  "Ciudad Autónoma de Buenos Aires",
+  "Córdoba",
+  "Corrientes",
+  "Entre Ríos",
+  "Formosa",
+  "Jujuy",
+  "La Pampa",
+  "La Rioja",
+  "Mendoza",
+  "Misiones",
+  "Neuquén",
+  "Río Negro",
+  "Salta",
+  "San Juan",
+  "San Luis",
+  "Santa Cruz",
+  "Santa Fe",
+  "Santiago del Estero",
+  "Tierra del Fuego",
+  "Tucumán",
+];
+
 export default function FormRegistro() {
   const [form, setForm] = useState({
     nombre: "",
     apellido: "",
     email: "",
     password: "",
+    repetirPassword: "",
     telefono: "",
     provincia: "",
     localidad: "",
@@ -24,53 +52,51 @@ export default function FormRegistro() {
 
   const router = useRouter();
 
- 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setMensaje("");
-  
+
+    if (form.password !== form.repetirPassword) {
+      setMensaje("❌ Las contraseñas no coinciden");
+      return;
+    }
+
+    setLoading(true);
+
     try {
+      const { repetirPassword, ...body } = form;
+
       const res = await fetch(`${API}/auth/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
-  
-      const data = await res.json();
-  
-      if (!res.ok) {
-        throw new Error(data.message || "Error al registrarse");
-      }
-  
-      const token = localStorage.getItem("token");
 
-      await fetch(`${API}/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "Error al registrarse");
+
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+      }
+
       setMensaje("✅ Cuenta creada correctamente");
-  
       router.push("/planes");
-  
     } catch (error: any) {
       setMensaje(error.message || "❌ Error al crear la cuenta");
     } finally {
       setLoading(false);
     }
   };
+
+  const inputClass = "w-full mb-3 p-3 bg-white rounded-lg text-violet-950 focus:outline-none focus:ring-2 focus:ring-violet-400";
+  const labelClass = "text-sm font-medium text-violet-900 mb-1 block";
 
   return (
     <div className="flex flex-col items-center w-full bg-violet-50">
@@ -82,90 +108,111 @@ export default function FormRegistro() {
           Crear tu cuenta
         </h2>
 
-        <label>Nombre</label>
+        <label className={labelClass}>Nombre</label>
         <input
           type="text"
           name="nombre"
           value={form.nombre}
           onChange={handleChange}
-          className="w-full mb-3 p-3 bg-white rounded-lg"
+          className={inputClass}
           required
         />
 
-        <label>Apellido</label>
+        <label className={labelClass}>Apellido</label>
         <input
           type="text"
           name="apellido"
           value={form.apellido}
           onChange={handleChange}
-          className="w-full mb-3 p-3 bg-white rounded-lg"
+          className={inputClass}
           required
         />
 
-        <label>Email</label>
+        <label className={labelClass}>Email</label>
         <input
           type="email"
           name="email"
           value={form.email}
           onChange={handleChange}
-          className="w-full mb-3 p-3 bg-white rounded-lg"
+          className={inputClass}
           required
         />
 
-        <label>Contraseña</label>
+        <label className={labelClass}>Contraseña</label>
         <input
           type="password"
           name="password"
           value={form.password}
           onChange={handleChange}
-          className="w-full mb-3 p-3 bg-white rounded-lg"
+          className={inputClass}
           required
         />
 
-        <label>Teléfono</label>
+        <label className={labelClass}>Repetir contraseña</label>
+        <input
+          type="password"
+          name="repetirPassword"
+          value={form.repetirPassword}
+          onChange={handleChange}
+          className={`${inputClass} ${
+            form.repetirPassword && form.password !== form.repetirPassword
+              ? "ring-2 ring-red-400"
+              : ""
+          }`}
+          required
+        />
+        {form.repetirPassword && form.password !== form.repetirPassword && (
+          <p className="text-red-500 text-xs -mt-2 mb-3">Las contraseñas no coinciden</p>
+        )}
+
+        <label className={labelClass}>Teléfono</label>
         <input
           type="tel"
           name="telefono"
           value={form.telefono}
           onChange={handleChange}
-          className="w-full mb-3 p-3 bg-white rounded-lg"
+          className={inputClass}
           required
         />
 
-        <label>Provincia</label>
-        <input
-          type="text"
+        <label className={labelClass}>Provincia</label>
+        <select
           name="provincia"
           value={form.provincia}
           onChange={handleChange}
-          className="w-full mb-3 p-3 bg-white rounded-lg"
+          className={inputClass}
           required
-        />
+        >
+          <option value="">Seleccioná tu provincia</option>
+          {PROVINCIAS.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
 
-        <label>Localidad</label>
+        <label className={labelClass}>Localidad</label>
         <input
           type="text"
           name="localidad"
           value={form.localidad}
           onChange={handleChange}
-          className="w-full mb-3 p-3 bg-white rounded-lg"
+          className={inputClass}
           required
         />
 
-        <label>Fecha de nacimiento</label>
+        <label className={labelClass}>Fecha de nacimiento</label>
         <input
           type="date"
           name="fechaNacimiento"
           value={form.fechaNacimiento}
           onChange={handleChange}
-          className="w-full mb-5 p-3 bg-white rounded-lg"
+          className={inputClass}
           required
         />
 
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-violet-600 my-10 text-white p-3 rounded-lg hover:bg-blue-700 transition"
+          disabled={loading || form.password !== form.repetirPassword}
+          className="w-full bg-violet-600 my-10 text-white p-3 rounded-lg hover:bg-violet-700 transition disabled:opacity-60"
         >
           {loading ? "Creando..." : "Registrarse"}
         </button>
