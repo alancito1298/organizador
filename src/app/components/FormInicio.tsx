@@ -94,7 +94,7 @@ export default function LoginForm() {
           </div>
 
           <GoogleButton />
-
+ 
           {/* BOTÓN */}
           <button
             type="submit"
@@ -114,8 +114,11 @@ export default function LoginForm() {
           <span className="text-violet-900 hover:underline font-bold cursor-pointer">
             <a href="/registro">Registrate</a>
           </span>
-          <br />
          
+          <br />
+          <span className="text-violet-950 underline font-light cursor-pointer">
+            <a href="/forgotpassword">Olvide mi contraseña</a>
+          </span>
         </div>
         </form>
 
