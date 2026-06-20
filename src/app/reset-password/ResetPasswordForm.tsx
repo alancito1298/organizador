@@ -207,6 +207,7 @@ export default function ResetPasswordForm() {
             flex
             flex-col
             gap-4
+            text-violet-950
             "
           >
 
