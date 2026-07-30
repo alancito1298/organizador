@@ -156,6 +156,7 @@ export default function ResetPasswordForm() {
     items-center
     justify-center
     p-4
+
     ">
 
       <div className="
@@ -180,7 +181,7 @@ export default function ResetPasswordForm() {
         <p className="
         text-center
         text-gray-500
-        mb-6
+        mb-6 
         ">
           Ingresá una nueva contraseña
         </p>

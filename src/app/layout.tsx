@@ -25,9 +25,66 @@ const mono = Roboto_Mono({
   variable: "--font-mono", // opcional
 });
 
+const SITE_URL = "https://www.organizadordocente.com";
+
 export const metadata: Metadata = {
-  title: 'Organizador Docente',
-  description: 'Gestión académica para docentes'
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Organizador Docente | Planificaciones, agenda y gestión de cursos",
+    template: "%s | Organizador Docente",
+  },
+  description:
+    "App para docentes: organizá tu agenda y planificaciones de clase, cursos, asistencia y calificaciones en un solo lugar. Exportá todo a Excel con un click.",
+  keywords: [
+    "organizador docente",
+    "planificaciones docentes",
+    "agenda docente",
+    "agenda de clases",
+    "gestión de cursos",
+    "asistencia escolar",
+    "calificaciones online",
+    "app para docentes",
+  ],
+  authors: [{ name: "Organizador Docente" }],
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_AR",
+    url: SITE_URL,
+    siteName: "Organizador Docente",
+    title: "Organizador Docente | Planificaciones, agenda y gestión de cursos",
+    description:
+      "Organizá tu agenda y planificaciones de clase, cursos, asistencia y calificaciones en un solo lugar. Diseñado por docentes.",
+    images: [
+      {
+        url: "/agenda-img.jpeg",
+        width: 1200,
+        height: 630,
+        alt: "Agenda y planificaciones docentes en Organizador Docente",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Organizador Docente | Planificaciones, agenda y gestión de cursos",
+    description:
+      "Organizá tu agenda y planificaciones de clase, cursos, asistencia y calificaciones en un solo lugar.",
+    images: ["/agenda-img.jpeg"],
+  },
+  // TODO: pegar acá el meta tag de verificación que te da Google Search Console
+  // una vez que des de alta https://www.organizadordocente.com en search.google.com/search-console
+  // verification: { google: "TU_CODIGO_DE_VERIFICACION" },
 };
 
 export default function RootLayout({

@@ -59,8 +59,8 @@ const items = [
   },
 ];
   return (
-    <body className="bg-white text-white flex flex-col items-center p-0 h-full">
-      
+    <div className="bg-white text-white flex flex-col items-center p-0 h-full">
+
      <Header></Header>
 
       <main className="w-full flex items-center flex-col">
@@ -88,9 +88,9 @@ const items = [
         <section className="container flex flex-col items-center justify-center  px-6 py-8 mx-auto lg:py-16">
           <div className="lg:flex lg:items-center mt-30 px-6 py-8 lg:-mx-4">
             <div className="lg:w-1/2 lg:px-6">
-              <h3 className="text-2xl mt-5 uppercase font-medium text-violet-950 font-sans  text-center md:text-2xl lg:text-3xl">
+              <h2 className="text-2xl mt-5 uppercase font-medium text-violet-950 font-sans  text-center md:text-2xl lg:text-3xl">
               Organizá tus clases sin perder tiempo
-              </h3>
+              </h2>
 
               <p className="m-6 text-gray-500">
               Gestioná cursos, alumnos, asistencia y notas desde un solo lugar.
@@ -107,14 +107,14 @@ Diseñado para docentes reales.
               <Image
                 className="object-cover w-full rounded-xl h-96 "
                 src="/img-profe.jpg"
-                alt="imagen joven profesora"
+                alt="Docente organizando su agenda y planificaciones de clase con Organizador Docente"
                 width={1200}
                 height={400}
               />
             </div>
           </div>
         </section>
-        <h3 className="bg-violet-950 w-full text-center p-3 font-mono uppercase font-extralight text-6xl mt-20 mb-10">¿Cómo funciona?</h3>
+        <h2 className="bg-violet-950 w-full text-center p-3 font-mono uppercase font-extralight text-6xl mt-20 mb-10">¿Cómo funciona?</h2>
         {/* FEATURES */}
         <Features items={items} />
         
@@ -224,7 +224,7 @@ Diseñado para docentes reales.
       </main>
 
  <Footer></Footer>
-    
-    </body>
+
+    </div>
   );
 }
