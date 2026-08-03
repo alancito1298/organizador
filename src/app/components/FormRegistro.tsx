@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import GoogleButton from "./GoogleBoton";
 
 const PROVINCIAS = [
   "Buenos Aires",
@@ -212,10 +213,12 @@ export default function FormRegistro() {
         <button
           type="submit"
           disabled={loading || form.password !== form.repetirPassword}
-          className="w-full bg-violet-600 my-10 text-white p-3 rounded-lg hover:bg-violet-700 transition disabled:opacity-60"
+          className="w-full bg-violet-600 mt-10 mb-4 text-white p-3 rounded-lg hover:bg-violet-700 transition disabled:opacity-60"
         >
           {loading ? "Creando..." : "Registrarse"}
         </button>
+
+        <GoogleButton />
 
         {mensaje && (
           <p className="mt-4 text-center text-sm">{mensaje}</p>
