@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { Analytics } from "@vercel/analytics/next"
 import { Curso } from './Cursos';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
@@ -37,8 +36,6 @@ export default function ListaCursos({ id, anio, escuela, materia, ruta, onElimin
   return (
     <>
       <div className="flex min-h-w-1/3 w-8/9 h-35  sm:w-screen sm:m-0 md:max-w-96 md:mx-2 p-10 text-violet-800 border-0 overflow-hidden hover:bg-violet-300 transition relative group ">
-      <Analytics />
-      
         {/* Tarjeta clickeable */}
         <a href={ruta} className="flex flex-1 p-0   border-l-4 border rounded-2xl border-violet-950 ">
           <div className="flex items-center justify-center m-0 p-6 min-w-1/3 bg-violet-700 rounded-l-xl  text-8xl font-extralight ">
