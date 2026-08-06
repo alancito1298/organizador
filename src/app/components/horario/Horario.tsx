@@ -1,8 +1,8 @@
 'use client';
  
 import { useEffect, useState } from 'react';
-import Navbar from './Navbar';
-import Cargando from './Cargando';
+import Navbar from '../shared/Navbar';
+import Cargando from '../shared/Cargando';
 import {ListPlus } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';

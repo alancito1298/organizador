@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ListPlus, Download } from "lucide-react";
-import Cargando from "./Cargando";
-import { exportarExcelCalificaciones } from '../utils/exportarExcelCalificaciones';
+import Cargando from "../shared/Cargando";
+import { exportarExcelCalificaciones } from '../../utils/exportarExcelCalificaciones';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "https://backend-organizador.vercel.app";
 

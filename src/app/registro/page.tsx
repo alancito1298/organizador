@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Header from "../components/Header";
-import FormRegistro from "../components/FormRegistro";
-import Footer from "../components/Footer";
+import Header from "../components/shared/Header";
+import FormRegistro from "../components/auth/FormRegistro";
+import Footer from "../components/shared/Footer";
 
 export const metadata: Metadata = {
   title: "Creá tu cuenta gratis",

@@ -1,10 +1,10 @@
 'use client'
 
 import React from "react"
-import BottomNav from "../components/BottomNav"
-import Horario from "../components/Horario"
-import Footer from "../components/Footer"
-import Navbar from "../components/Navbar"
+import BottomNav from "../components/shared/BottomNav"
+import Horario from "../components/horario/Horario"
+import Footer from "../components/shared/Footer"
+import Navbar from "../components/shared/Navbar"
 
 export default function Horarios() {
   return (

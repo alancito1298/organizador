@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Inter, Roboto_Mono, Bebas_Neue, Atma, Poppins } from "next/font/google";
 import Script from "next/script";
-import GoogleAnalytics from "./components/GoogleAnalytics";
+import GoogleAnalytics from "./components/shared/GoogleAnalytics";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;

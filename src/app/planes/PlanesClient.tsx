@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '../components/Navbar';
-import BottomNav from '../components/BottomNav';
+import Navbar from '../components/shared/Navbar';
+import BottomNav from '../components/shared/BottomNav';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 

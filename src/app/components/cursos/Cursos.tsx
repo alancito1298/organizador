@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import ListaCursos from './ListaCursos';
 import FormularioCurso from './FormularioCurso';
-import Cargando from './Cargando';
-import Navbar from './Navbar';
+import Cargando from '../shared/Cargando';
+import Navbar from '../shared/Navbar';
 export type Curso = {
   id: number;
   escuela: string;

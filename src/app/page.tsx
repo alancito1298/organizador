@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Inicio from "./components/Inicio";
+import Inicio from "./components/landing/Inicio";
 
 export const metadata: Metadata = {
   title: "Planificaciones, agenda y gestión de cursos para docentes",

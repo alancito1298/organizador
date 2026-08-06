@@ -4,7 +4,7 @@ import { useEffect, useState, JSX } from 'react';
 import { useParams } from 'next/navigation';
 import {
   exportarExcelAsistencias
-} from '../utils/exportarExcelAsitencias';
+} from '../../utils/exportarExcelAsitencias';
 import {
   ThumbsUp,
   ThumbsDown,
@@ -15,7 +15,7 @@ import {
   Download
 } from 'lucide-react';
 
-import Cargando from './Cargando';
+import Cargando from '../shared/Cargando';
 
 const API =
   process.env.NEXT_PUBLIC_API_URL ??

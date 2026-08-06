@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import LoginForm from "../components/FormInicio";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import LoginForm from "../components/auth/FormInicio";
+import Header from "../components/shared/Header";
+import Footer from "../components/shared/Footer";
 
 export const metadata: Metadata = {
   title: "Iniciar sesión",

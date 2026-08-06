@@ -2,8 +2,8 @@
 
 import React from "react"
 
-import BottomNav from "../../../components/BottomNav"
-import ListaAsistencias from "../../../components/ListaAsistencias"
+import BottomNav from "../../../components/shared/BottomNav"
+import ListaAsistencias from "../../../components/asistencias/ListaAsistencias"
 
 
 

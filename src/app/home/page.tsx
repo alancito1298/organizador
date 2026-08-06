@@ -1,5 +1,5 @@
-import Menu from "../components/Menu";
-import Navbar from "../components/Navbar";
+import Menu from "../components/shared/Menu";
+import Navbar from "../components/shared/Navbar";
 export default function Home() {
     return (
       

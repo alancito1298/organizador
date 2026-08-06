@@ -1,7 +1,7 @@
 'use client';
 
-import ListaPlanificaciones from "../components/ListaPlanificacion";
-import BottomNav from "../components/BottomNav";
+import ListaPlanificaciones from "../components/planificaciones/ListaPlanificacion";
+import BottomNav from "../components/shared/BottomNav";
 
 export default function Planificaciones() {
   return (

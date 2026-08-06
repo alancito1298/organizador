@@ -4,8 +4,8 @@ import Image from "next/image";
 import { Book } from "lucide-react";
 import Features from "./Features";
 import Planes from "./PlanesPrecios";
-import Header from "./Header";
-import Footer from "./Footer";
+import Header from "../shared/Header";
+import Footer from "../shared/Footer";
 import InfoDispotivos from "./InfoDispositivos";
 
 export default function Inicio() {

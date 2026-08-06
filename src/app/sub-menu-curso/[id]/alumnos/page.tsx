@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import FormularioAlumno from "./FormularioAlumno";
-import BottomNav from "@/app/components/BottomNav";
+import BottomNav from "@/app/components/shared/BottomNav";
 import type PerfilAlumno from "../../../types/perfilAlumno";
 import { usePerfilAlumno } from "@/app/hooks/usePerfilAlumno";
-import PerfilAlumnoModal from "@/app/components/PerfilAlumnoModal";
+import PerfilAlumnoModal from "@/app/components/alumnos/PerfilAlumnoModal";
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 export type Alumno = {
   id: number;

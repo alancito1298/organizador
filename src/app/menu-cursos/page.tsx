@@ -1,8 +1,8 @@
 
 
-import ListaCursos from "@/app/components/Cursos";
+import ListaCursos from "@/app/components/cursos/Cursos";
 
-import BottomNav from "../components/BottomNav";
+import BottomNav from "../components/shared/BottomNav";
 
   export default function MenuCursos() {
     return (

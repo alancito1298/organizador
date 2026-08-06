@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { setToken } from "../../lib/token";
+import { setToken } from "../../../lib/token";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "https://backend-organizador.vercel.app";
 
