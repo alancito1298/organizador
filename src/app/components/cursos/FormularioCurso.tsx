@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Curso } from "./Cursos";
 
+const API = process.env.NEXT_PUBLIC_API_URL ?? "https://backend-organizador.vercel.app";
+
 type Props = {
   onCursoCreado: (curso: Curso) => void;
 };
@@ -21,7 +23,7 @@ export default function FormularioCurso({ onCursoCreado }: Props) {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        "https://backend-organizador.vercel.app/cursos",
+        `${API}/cursos`,
         {
           method: "POST",
           headers: {
@@ -30,19 +32,24 @@ export default function FormularioCurso({ onCursoCreado }: Props) {
           },
           body: JSON.stringify({
             ...nuevoCurso,
-      
+
           }),
         }
       );
 
       const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error(data.message || "No se pudo crear el curso");
+      }
+
       onCursoCreado(data);
 
       setNuevoCurso({ escuela: "", anio: "", materia: "" });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al crear curso", error);
+      alert(`❌ ${error.message || "No se pudo crear el curso"}`);
     }
   };
 
