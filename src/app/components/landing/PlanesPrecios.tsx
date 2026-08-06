@@ -2,6 +2,17 @@
 
 const PLANES = [
   {
+    nombre: 'Gratis',
+    precio: '$0',
+    frecuencia: 'para siempre',
+    cursos: 2,
+    gratis: true,
+    features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios'],
+    link: '/registro',
+    color: 'bg-green-700 border-green-300',
+    btnColor: 'bg-yellow-400 w-8/9 hover:bg-yellow-300 text-violet-900',
+  },
+  {
     nombre: 'Básico Mensual',
     precio: '$3.999',
     frecuencia: 'por mes',
@@ -74,8 +85,10 @@ export default function Planes() {
             className={`rounded-2xl p-10 lg:m-5 lg:h-150 flex flex-col lg:w-80  items-center shadow-md ${plan.color}`}
           >
           <div className="flex items-start justify-items-start w-full">
-            <p className="h-auto text-start w-auto  p-1 rounded-full border animate-vibrar border-green-900 px-3 bg-red-600 font-bold text-xl">¡30 días gratis!</p>
-          </div>    
+            {!plan.gratis && (
+              <p className="h-auto text-start w-auto  p-1 rounded-full border animate-vibrar border-green-900 px-3 bg-red-600 font-bold text-xl">¡30 días gratis!</p>
+            )}
+          </div>
               <div className="w-full h-full flex flex-col items-center justify-between">
               {plan.inicial && (
               <span className="text-sm font-bold uppercase mt-3 text-cyan-400 bg-black border-cyan-400 border-2 rounded-full px-10 py-1 self-start ">

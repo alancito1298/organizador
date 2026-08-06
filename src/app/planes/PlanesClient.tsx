@@ -9,11 +9,22 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.verc
 
 const PLANES = [
   {
+    nombre: 'Gratis',
+    periodo: '',
+    precio: '$0',
+    frecuencia: 'para siempre',
+    planMpId: 'gratis',
+    gratis: true,
+    features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios'],
+    bg: 'bg-green-700',
+  },
+  {
     nombre: 'Básico',
     periodo: 'Mensual',
     precio: '$3.999',
     frecuencia: 'por mes',
     planMpId: 'd9333165a97b4e60a9b87f27b13c6676',
+    gratis: false,
     features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios'],
     bg: 'bg-violet-800',
   },
@@ -23,6 +34,7 @@ const PLANES = [
     precio: '$29.999',
     frecuencia: 'por año',
     planMpId: 'f597ba1d700440b7b40139c8060f78dc',
+    gratis: false,
     features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios', 'Ahorrás $18.000'],
     bg: 'bg-violet-900',
   },
@@ -32,6 +44,7 @@ const PLANES = [
     precio: '$4.999',
     frecuencia: 'por mes',
     planMpId: '00418792d857442da35980be23928b2a',
+    gratis: false,
     features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios', 'Planificaciones', 'Bibliografía', 'Generación de Excel', 'Recordatorios'],
     bg: 'bg-violet-950',
   },
@@ -41,6 +54,7 @@ const PLANES = [
     precio: '$39.999',
     frecuencia: 'por año',
     planMpId: '055a8d3ffb0f403eb1376ed38adde4ba',
+    gratis: false,
     features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios', 'Planificaciones', 'Bibliografía', 'Generación de Excel', 'Recordatorios', 'Ahorrás $20.000'],
     bg: 'bg-black',
   },
@@ -79,6 +93,24 @@ export default function PlanesClient() {
 
     setCargando(planSeleccionado.planMpId);
     setPlanSeleccionado(null);
+
+    if (planSeleccionado.gratis) {
+      try {
+        const res = await fetch(`${API}/suscripciones/activar-gratis`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) throw new Error('Error en backend');
+
+        router.push('/home');
+      } catch (err) {
+        console.error('ERROR FRONT:', err);
+        alert('No se pudo activar el plan gratis');
+        setCargando(null);
+      }
+      return;
+    }
 
     try {
       const res = await fetch(`${API}/suscripciones/checkout`, {
@@ -138,7 +170,7 @@ export default function PlanesClient() {
         )}
 
         {/* PLANES */}
-        <div className="grid grid-cols-1 m-4 md:grid-cols-2 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 m-4 md:grid-cols-2 xl:grid-cols-5 gap-5">
           {PLANES.map((plan) => (
             <div key={plan.planMpId} className={`rounded-xl text-white shadow-lg flex flex-col ${plan.bg}`}>
               <h2 className="text-5xl font-extralight text-center uppercase m-5 mb-0">{plan.nombre}</h2>
@@ -174,18 +206,27 @@ export default function PlanesClient() {
               Antes de continuar
             </h2>
 
-            <div className="bg-violet-50 rounded-xl p-4 mb-4 text-sm text-violet-800 space-y-2">
-              <p>Serás redirigido a <strong>MercadoPago</strong> para completar tu suscripción.</p>
-              <p>Para que la renovación sea <strong>automática</strong> necesitás:</p>
-              <ol className="list-decimal list-inside space-y-1 pl-2">
-                <li>Tener una cuenta en MercadoPago (o crear una gratis)</li>
-                <li>Agregar una tarjeta de crédito o débito</li>
-                <li>Confirmar la suscripción</li>
-              </ol>
-              <p className="text-violet-500 text-xs mt-2">
-                Solo necesitás hacerlo una vez. Después MercadoPago cobra automáticamente cada {planSeleccionado.periodo === 'Anual' ? 'año' : 'mes'}.
-              </p>
-            </div>
+            {planSeleccionado.gratis ? (
+              <div className="bg-green-50 rounded-xl p-4 mb-4 text-sm text-green-800 space-y-2">
+                <p>Vas a activar el plan <strong>Gratis</strong>: hasta 2 cursos, sin tarjeta ni pagos.</p>
+                <p className="text-green-600 text-xs mt-2">
+                  Podés pasarte a un plan pago cuando quieras desde esta misma pantalla.
+                </p>
+              </div>
+            ) : (
+              <div className="bg-violet-50 rounded-xl p-4 mb-4 text-sm text-violet-800 space-y-2">
+                <p>Serás redirigido a <strong>MercadoPago</strong> para completar tu suscripción.</p>
+                <p>Para que la renovación sea <strong>automática</strong> necesitás:</p>
+                <ol className="list-decimal list-inside space-y-1 pl-2">
+                  <li>Tener una cuenta en MercadoPago (o crear una gratis)</li>
+                  <li>Agregar una tarjeta de crédito o débito</li>
+                  <li>Confirmar la suscripción</li>
+                </ol>
+                <p className="text-violet-500 text-xs mt-2">
+                  Solo necesitás hacerlo una vez. Después MercadoPago cobra automáticamente cada {planSeleccionado.periodo === 'Anual' ? 'año' : 'mes'}.
+                </p>
+              </div>
+            )}
 
             <p className="text-center font-bold text-violet-900 mb-4">
               {planSeleccionado.nombre} {planSeleccionado.periodo} — {planSeleccionado.precio}
@@ -202,7 +243,7 @@ export default function PlanesClient() {
                 onClick={confirmarSuscripcion}
                 className="flex-1 py-2 rounded-xl bg-violet-700 text-white hover:bg-violet-800 transition font-bold"
               >
-                Ir a MercadoPago →
+                {planSeleccionado.gratis ? 'Activar plan gratis' : 'Ir a MercadoPago →'}
               </button>
             </div>
           </div>
