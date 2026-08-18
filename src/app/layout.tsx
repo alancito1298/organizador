@@ -106,13 +106,11 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Organizador" />
-        {ADSENSE_CLIENT_ID && (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
-            crossOrigin="anonymous"
-          />
-        )}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2280844536116745"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className={`${inter.className} ${mono.variable} min-h-screen`}>
         <Script src="https://accounts.google.com/gsi/client?hl=es" strategy="afterInteractive" />
