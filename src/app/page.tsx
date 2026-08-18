@@ -26,6 +26,33 @@ const softwareSchema = {
   },
 };
 
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  name: "Organizador Docente",
+  image: "https://www.organizadordocente.com/agenda-img.jpeg",
+  logo: "https://www.organizadordocente.com/odicono.svg",
+  "@id": "https://www.organizadordocente.com/#organization",
+  url: "https://www.organizadordocente.com",
+  description: "Plataforma web de gestión pedagógica y organización escolar para docentes en Argentina y Latinoamérica.",
+  priceRange: "Free - $4999 ARS",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Buenos Aires",
+    addressCountry: "AR",
+  },
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    opens: "00:00",
+    closes: "23:59",
+  },
+  sameAs: [
+    "https://www.instagram.com/organizadordocente",
+    "https://www.facebook.com/organizadordocente",
+  ],
+};
+
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -87,6 +114,10 @@ export default function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
       <script
         type="application/ld+json"
