@@ -204,7 +204,7 @@ c-678 -1 -1243 0 -1255 3 l-23 5 0 915 0 915 2075 0 2075 0 0 360 0 360 -2459
 <span className='h-20 bg-violet-950 lg:h-0 w-full mb-10 mx-3 lg:m-0 rounded-b-full'></span>
                 <div className='grid grid-cols-2 items-center gap-3 justify-center p-2 lg:grid-cols-3 flex-row'>
                         <BtnMenu ruta="/agenda"  icono={<CalendarPlus size={50} />} nombre="Agenda" />
-                        <BtnMenu ruta="/menu-cursos" icono={<Users size={50}  />} nombre="Cursos" />
+                        <BtnMenu ruta="/cursos" icono={<Users size={50}  />} nombre="Cursos" />
                         <BtnMenu ruta="/planificaciones" icono={<SquareChartGantt size={50} />} nombre="Planificaciones" />
                         <BtnMenu ruta="/horario" icono={<Clock8 size={50} />} nombre="Horarios" />
                         <BtnMenu ruta="/planes" icono={<Banknote size={50} />} nombre="Pagos" />

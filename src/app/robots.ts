@@ -6,14 +6,16 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
-      allow: ['/', '/registro', '/login', '/planes', '/forgotpassword'],
+      allow: ['/', '/registro', '/login', '/planes', '/recuperar', '/forgotpassword'],
       disallow: [
         '/home',
+        '/cursos',
         '/menu-cursos',
         '/agenda',
         '/horario',
         '/planificaciones',
         '/perfil',
+        '/curso/',
         '/sub-menu-curso/',
         '/api/',
       ],

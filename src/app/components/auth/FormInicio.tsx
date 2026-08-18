@@ -117,7 +117,7 @@ export default function LoginForm() {
          
           <br />
           <span className="text-violet-950 underline font-light cursor-pointer">
-            <a href="/forgotpassword">Olvide mi contraseña</a>
+            <a href="/recuperar">Olvidé mi contraseña</a>
           </span>
         </div>
         </form>

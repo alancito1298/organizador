@@ -3,13 +3,16 @@ Allow: /
 Allow: /registro
 Allow: /login
 Allow: /planes
+Allow: /recuperar
 Allow: /forgotpassword
 Disallow: /home
+Disallow: /cursos
 Disallow: /menu-cursos
 Disallow: /agenda
 Disallow: /horario
 Disallow: /planificaciones
 Disallow: /perfil
+Disallow: /curso/
 Disallow: /sub-menu-curso/
 Disallow: /api/
 

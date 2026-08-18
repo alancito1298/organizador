@@ -32,7 +32,7 @@ export default function Footer() {
         <div>
           <h4 className="font-bold text-sm uppercase text-yellow-400 tracking-wider mb-3">Módulos de Gestión</h4>
           <ul className="space-y-2 text-xs text-violet-200">
-            <li><Link href="/menu-cursos" className="hover:text-white transition flex items-center gap-1.5">👥 Mis Cursos y Aulas</Link></li>
+            <li><Link href="/cursos" className="hover:text-white transition flex items-center gap-1.5">👥 Mis Cursos y Aulas</Link></li>
             <li><Link href="/agenda" className="hover:text-white transition flex items-center gap-1.5">📅 Agenda y Calendario Escolar</Link></li>
             <li><Link href="/horario" className="hover:text-white transition flex items-center gap-1.5">⏰ Grilla de Horarios Lectivos</Link></li>
             <li><Link href="/planificaciones" className="hover:text-white transition flex items-center gap-1.5">📚 Planificaciones y Secuencias</Link></li>
@@ -56,7 +56,7 @@ export default function Footer() {
         <div>
           <h4 className="font-bold text-sm uppercase text-yellow-400 tracking-wider mb-3">Soporte y Seguridad</h4>
           <ul className="space-y-2 text-xs text-violet-200">
-            <li><Link href="/forgotpassword" className="hover:text-white transition">🔑 Recuperar Contraseña</Link></li>
+            <li><Link href="/recuperar" className="hover:text-white transition">🔑 Recuperar Contraseña</Link></li>
             <li><a href="https://www.organizadordocente.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">🌐 Sitio Oficial</a></li>
             <li><span className="opacity-80">🛡️ Exportación Segura a Excel</span></li>
             <li><span className="opacity-80">🔒 Datos Protegidos en la Nube</span></li>

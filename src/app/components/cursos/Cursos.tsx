@@ -96,7 +96,7 @@ export default function Cursos() {
             anio={curso.anio}
             escuela={curso.escuela}
             materia={curso.materia}
-            ruta={`/sub-menu-curso/${curso.id}`}
+            ruta={`/curso/${curso.id}`}
           />
         ))}
 
