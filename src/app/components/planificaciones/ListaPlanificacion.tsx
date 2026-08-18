@@ -99,8 +99,8 @@ export default function ListaPlanificaciones() {
 
       {/* Header */}
       <div className="flex flex-col items-center gap-3 pt-4">
-        <h1 className="text-4xl text-violet-950 font-extralight text-center uppercase">
-          Planificaciones
+        <h1 className="text-3xl text-violet-950 font-bold text-center uppercase tracking-tight">
+          Repositorio de Planificaciones y Secuencias Didácticas
         </h1>
         <button
           onClick={() => setMostrarFormulario((prev) => !prev)}

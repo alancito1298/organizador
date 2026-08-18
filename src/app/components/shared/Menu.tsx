@@ -19,7 +19,7 @@ return (<div>
 <div className='min-h-screen w-screen flex flex-col justify-around lg:justify-start lg:gap-8 items-center  bg-violet-100 '>
 
 <div className='h-56 lg:h-40 w-full lg:mt-10 lg:bg-violet-100   bg-violet-950 flex flex-col items-center justify-end lg:justify-center '>
-        <h1 className='font-extralight w-full text-lg uppercase text-center lg:text-violet-950'>Bienvenido!</h1>
+        <h1 className='font-bold w-full text-xl uppercase text-center lg:text-violet-950 tracking-wide'>¡Hola Docente! Tu panel de gestión</h1>
 <svg className='w-96 h-auto text-violet-100 lg:text-violet-950' version="1.0" xmlns="http://www.w3.org/2000/svg"
  width="6501.000000pt" height="2163.000000pt" color="white"viewBox="0 0 6501.000000 2163.000000"
  preserveAspectRatio="xMidYMid meet">

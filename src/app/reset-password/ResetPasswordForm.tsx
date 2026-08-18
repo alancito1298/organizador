@@ -175,7 +175,7 @@ export default function ResetPasswordForm() {
         text-violet-900
         mb-2
         ">
-          Recuperar contraseña
+          Crear nueva clave de acceso
         </h1>
 
         <p className="

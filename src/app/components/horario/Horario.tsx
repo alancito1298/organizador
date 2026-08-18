@@ -200,8 +200,8 @@ export default function Horario() {
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-5xl md:text-4xl my-20 font-extralight text-center uppercase text-violet-950">
-              Horarios
+            <h1 className="text-4xl md:text-5xl my-10 font-bold text-center uppercase text-violet-950 tracking-tight">
+              Grilla Semanal de Horarios Lectivos
             </h1>
           </div>
  

@@ -105,9 +105,10 @@ export default function FormRegistro() {
         onSubmit={handleSubmit}
         className="bg-purple-200 m-20 text-violet-950 p-8 border border-violet-300 shadow-lg w-full max-w-md"
       >
-        <h1 className="text-4xl my-10 text-center uppercase">
-          Crear tu cuenta
+        <h1 className="text-3xl my-8 text-center uppercase font-bold tracking-tight text-violet-950">
+          ¡Comenzá a organizar tus clases hoy!
         </h1>
+        <p className="text-center text-violet-800 text-sm -mt-6 mb-8 font-medium">Creá tu cuenta docente 100% gratis</p>
 
         <label className={labelClass}>Nombre</label>
         <input

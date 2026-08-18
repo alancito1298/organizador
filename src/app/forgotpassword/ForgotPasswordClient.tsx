@@ -34,8 +34,8 @@ export default function ForgotPasswordClient() {
     <div className="min-h-screen bg-violet-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
 
-        <h1 className="text-2xl font-bold text-violet-900 mb-2 text-center">
-          Recuperar contraseña
+        <h1 className="text-2xl font-bold text-violet-900 mb-2 text-center tracking-tight">
+          ¿Olvidaste tu clave de acceso?
         </h1>
 
         {!enviado ? (

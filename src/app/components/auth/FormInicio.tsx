@@ -46,9 +46,9 @@ export default function LoginForm() {
 
         <form onSubmit={handleSubmit} className="mt-6 p-8  mb-25 border-2 bg-violet-100 border-violet-300 space-y-5">
           {/* EMAIL */}
-          <h1 className="text-4xl uppercase font-extralight mt-8 text-violet-950 text-center">
-          Iniciar sesión
-        </h1>
+          <h1 className="text-3xl uppercase font-bold mt-4 text-violet-950 text-center tracking-tight">
+            Bienvenido a tu espacio docente
+          </h1>
 
         <p className="text-sm font-semibold text-white-500 text-center mt-2 text-violet-800 ">
           Accedé a tu organizador
