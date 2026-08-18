@@ -2,6 +2,7 @@
 
 import { UserRound } from "lucide-react";
 import { useState, useEffect } from "react";
+import ShareAndInstallButtons from "./ShareAndInstallButtons";
 
 interface Usuario {
   nombre: string;
@@ -146,16 +147,16 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
       </div></a>
 
       {/* ACCIONES */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3">
+        <ShareAndInstallButtons />
 
         {/* USUARIO */}
-        <div className="text-sm font-extralight font-mono normal-case">
+        <div className="text-sm font-extralight font-mono normal-case hidden sm:block">
           {usuario ? ` ${usuario.nombre} ` : ""}
         </div>
-        <div className="w-9 h-9 rounded-full bg-yellow-100 flex flex-col text-violet-950 items-center justify-center">
-          <UserRound />
+        <div className="w-8 h-8 rounded-full bg-yellow-100 flex flex-col text-violet-950 items-center justify-center shrink-0">
+          <UserRound size={18} />
         </div>
-
       </div>
     </nav>
   );

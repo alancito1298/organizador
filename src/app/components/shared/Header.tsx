@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import ShareAndInstallButtons from "./ShareAndInstallButtons";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -145,11 +146,13 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
             mounted && open ? "translate-x-0 opacity-100" : "opacity-0 -translate-x-full"
           }`}
         >
-          <div className="h-full uppercase text-violet-100 flex flex-col items-center justify-around sm:flex-row">
-            <a href="#" className="md:px-6 hover:text-indigo-300">Nosotros</a>
-           
-            <a href="#" className="md:px-6 hover:text-indigo-300">Contactos</a>
-            <a href="/login" className="md:px-6 hover:text-indigo-300">Iniciar Sesión</a>
+          <div className="h-full uppercase text-violet-100 flex flex-col items-center justify-around sm:flex-row gap-3">
+            <a href="#" className="md:px-4 hover:text-indigo-300">Nosotros</a>
+            <a href="#" className="md:px-4 hover:text-indigo-300">Contactos</a>
+            <a href="/login" className="md:px-4 hover:text-indigo-300">Iniciar Sesión</a>
+            <div className="pt-2 sm:pt-0">
+              <ShareAndInstallButtons />
+            </div>
           </div>
         </div>
       </nav>
