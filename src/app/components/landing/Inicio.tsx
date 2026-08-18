@@ -20,43 +20,46 @@ export default function Inicio() {
 
 const items = [
   {
-   
-    titulo: " ✔ Crear y gestionar cursos fácilmente ",
+    titulo: "✔ Crear y gestionar cursos fácilmente",
     descripcion: "Organizá todas tus materias en segundos, separando cursos, años y contenido sin complicaciones",
     icono: Book,
-    imagen:"/cursos-img.jpeg"
+    imagen: "/cursos-img.jpeg",
+    alt: "Captura de pantalla de la interfaz de gestión de cursos, escuelas y materias en Organizador Docente",
   },
   {
-    titulo: " ✔ Registrar asistencia y concepto en segundos ",
+    titulo: "✔ Registrar asistencia y concepto en segundos",
     descripcion: "Marcá el registro de tus clases con tan solo un click",
     icono: Book,
-    imagen:"/asistencias-img.jpeg"
+    imagen: "/asistencias-img.jpeg",
+    alt: "Planilla digital de toma de asistencia escolar diaria, ausentes y conceptos pedagógicos",
   },
-
   {
     titulo: "✔ Tener toda tu información en un solo lugar",
     descripcion: "Vas a tener todo en un solo lugar: Agenda, Planificaciones, Calificaciones, Horarios, Asistencia, Conceptos y Recordatorios",
     icono: Book,
-    imagen:"/agenda-img.jpeg"
-  },
-
-  {
-    titulo: "✔ Seguimiento organizado de calificaciónes",
-    descripcion: "Agrega, ordena, consulta y edita calificaciónes facilmente",
-    icono: Book,
-    imagen:"/calificaciones-img.jpeg"
+    imagen: "/agenda-img.jpeg",
+    alt: "Calendario y agenda docente interactiva con recordatorios de exámenes y eventos escolares",
   },
   {
-    titulo: "✔ Admistra tus alumnos con sencillez",
-    descripcion: "Agrega, borra, consulta y edita estudiantes con un solo click",
+    titulo: "✔ Seguimiento organizado de calificaciones",
+    descripcion: "Agregá, ordená, consultá y editá calificaciones fácilmente",
     icono: Book,
-    imagen:"/alumnos-img.jpeg"
+    imagen: "/calificaciones-img.jpeg",
+    alt: "Registro de calificaciones escolares, notas de evaluaciones y promedios automáticos por trimestre",
+  },
+  {
+    titulo: "✔ Administrá tus alumnos con sencillez",
+    descripcion: "Agregá, borrá, consultá y editá estudiantes con un solo click",
+    icono: Book,
+    imagen: "/alumnos-img.jpeg",
+    alt: "Listado completo de estudiantes inscritos y datos de contacto de las familias por curso",
   },
   {
     titulo: "✔ Seguimiento detallado de cada alumno",
-    descripcion: "Vas a poder visualizar todas las estadísticas de cada alumno, para tener un seguimiento mas preciso",
+    descripcion: "Vas a poder visualizar todas las estadísticas de cada alumno para tener un seguimiento más preciso",
     icono: Book,
-    imagen:"/detalle-alumno-img.jpeg"
+    imagen: "/detalle-alumno-img.jpeg",
+    alt: "Ficha individual de estudiante con historial de asistencias y desempeño pedagógico",
   },
 ];
   return (

@@ -16,10 +16,11 @@ export default function Features({ items }: any) {
             {item.imagen && (
               <Image
                 src={item.imagen}
-                alt={item.titulo}
-                width={20000}
-                height={5000}
-                className=" w-full h-full lg:h-auto lg:mt-6 lg:w-1/2 rounded-4xl "
+                alt={item.alt || item.titulo}
+                title={item.alt || item.titulo}
+                width={800}
+                height={500}
+                className="w-full h-auto rounded-3xl border border-violet-300 shadow-md"
               />
             )}
           
