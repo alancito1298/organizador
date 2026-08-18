@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
+const softwareSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: "Organizador Docente",
@@ -26,12 +26,71 @@ const jsonLd = {
   },
 };
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "¿El Plan Gratis vence en algún momento?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No. El Plan Gratis es 100% gratuito para siempre. Te permite gestionar hasta 2 cursos con lista de alumnos, tomar asistencias, cargar calificaciones y llevar tu agenda sin ingresar ninguna tarjeta de crédito.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Puedo exportar mis planillas de asistencia y notas a Excel?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Sí. Todos los planes de pago (Básico y Plus) cuentan con la función de exportación directa a planillas formato Excel (.xlsx) con un solo clic, listas para entregar a secretaría o dirección escolar.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Cómo se procesan los cobros de las suscripciones?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Todos los pagos se procesan con la máxima seguridad mediante Mercado Pago. Podés suscribirte de manera mensual o anual utilizando tarjeta de débito, crédito o dinero en tu cuenta de Mercado Pago.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Tengo que descargar una aplicación desde Google Play o App Store?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No hace falta instalar nada. Organizador Docente es una Web App moderna accesible desde cualquier celular (Android o iPhone), tablet o computadora. Además, podés agregar un acceso rápido a tu pantalla de inicio en 1 segundo.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Qué diferencia hay entre el Plan Básico y el Plan Plus?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "El Plan Básico te permite administrar hasta 4 cursos simultáneos con exportación a Excel y notificaciones. El Plan Plus ofrece cursos ilimitados, módulos de planificaciones anuales, bibliografía pedagógica y cero publicidad.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Mis datos e información de los alumnos están seguros?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Absolutamente. Toda la información de tus cursos, planificaciones y calificaciones se almacena de forma encriptada en la nube con copias de seguridad continuas y acceso exclusivo desde tu cuenta.",
+      },
+    },
+  ],
+};
+
 export default function Home() {
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <Inicio />
     </>
