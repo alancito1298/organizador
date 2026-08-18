@@ -15,8 +15,10 @@ const PLANES = [
     frecuencia: 'para siempre',
     planMpId: 'gratis',
     gratis: true,
+    badgeTop: '¡100% GRATIS!',
+    badgeSub: '🌱 Sin Tarjeta',
     features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios'],
-    bg: 'bg-green-700',
+    bg: 'bg-emerald-800 border-emerald-500/40',
   },
   {
     nombre: 'Básico',
@@ -25,8 +27,10 @@ const PLANES = [
     frecuencia: 'por mes',
     planMpId: 'd9333165a97b4e60a9b87f27b13c6676',
     gratis: false,
+    badgeTop: '¡30 DÍAS GRATIS!',
+    badgeSub: 'Especial Primaria',
     features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios'],
-    bg: 'bg-violet-800',
+    bg: 'bg-violet-800 border-violet-500/40',
   },
   {
     nombre: 'Básico',
@@ -35,8 +39,10 @@ const PLANES = [
     frecuencia: 'por año',
     planMpId: 'f597ba1d700440b7b40139c8060f78dc',
     gratis: false,
-    features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios', 'Ahorrás $18.000'],
-    bg: 'bg-violet-900',
+    badgeTop: '¡30 DÍAS GRATIS!',
+    badgeSub: 'Ahorrás $18.000',
+    features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios'],
+    bg: 'bg-purple-900 border-purple-500/40',
   },
   {
     nombre: 'Plus',
@@ -45,8 +51,10 @@ const PLANES = [
     frecuencia: 'por mes',
     planMpId: '00418792d857442da35980be23928b2a',
     gratis: false,
-    features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios', 'Planificaciones', 'Bibliografía', 'Generación de Excel', 'Recordatorios'],
-    bg: 'bg-violet-950',
+    badgeTop: '¡30 DÍAS GRATIS!',
+    badgeSub: '⭐ Más Popular',
+    features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Planificaciones', 'Bibliografía', 'Generación de Excel', 'Recordatorios'],
+    bg: 'bg-indigo-900 border-indigo-500/40',
   },
   {
     nombre: 'Plus',
@@ -55,8 +63,10 @@ const PLANES = [
     frecuencia: 'por año',
     planMpId: '055a8d3ffb0f403eb1376ed38adde4ba',
     gratis: false,
-    features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios', 'Planificaciones', 'Bibliografía', 'Generación de Excel', 'Recordatorios', 'Ahorrás $20.000'],
-    bg: 'bg-black',
+    badgeTop: '¡30 DÍAS GRATIS!',
+    badgeSub: 'Ahorrás $20.000',
+    features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Planificaciones', 'Bibliografía', 'Generación de Excel', 'Recordatorios'],
+    bg: 'bg-slate-900 border-slate-700',
   },
 ];
 
@@ -141,7 +151,7 @@ export default function PlanesClient() {
     <div className="min-h-screen mb-55">
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12">
 
         {/* HEADER */}
         <div className="text-center mb-10">
@@ -149,10 +159,7 @@ export default function PlanesClient() {
             Elegí tu plan
           </h1>
           <p className="text-violet-500 text-sm mt-2">
-
-          </p>
-          <p className="text-violet-500 text-sm mt-2">
-        30 Diás gratis · Cancelá cuando quieras · Renovación automática
+            30 Días gratis · Cancelá cuando quieras · Renovación automática
           </p>
         </div>
 
@@ -170,28 +177,64 @@ export default function PlanesClient() {
         )}
 
         {/* PLANES */}
-        <div className="grid grid-cols-1 m-4 md:grid-cols-2 xl:grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 items-stretch my-6">
           {PLANES.map((plan) => (
-            <div key={plan.planMpId} className={`rounded-xl text-white shadow-lg flex flex-col ${plan.bg}`}>
-              <h2 className="text-5xl font-extralight text-center uppercase m-5 mb-0">{plan.nombre}</h2>
-              <p className="text-lg text-center font-bold uppercase text-yellow-400">{plan.periodo}</p>
-              <p className="text-4xl mt-4 text-center">{plan.precio}</p>
-              <p className="text-sm text-black mb-4 text-center mt-2 bg-amber-400">/{plan.frecuencia}</p>
+            <div
+              key={plan.planMpId}
+              className={`rounded-2xl p-6 text-white shadow-xl border flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${plan.bg}`}
+            >
+              {/* BADGES SUPERIORES ALINEADOS */}
+              <div className="min-h-[4rem] flex flex-col items-center justify-start gap-1.5 mb-4 text-center">
+                {plan.badgeTop && (
+                  <span
+                    className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${
+                      plan.gratis
+                        ? 'bg-emerald-500 text-emerald-950'
+                        : 'bg-red-600 text-white animate-pulse'
+                    }`}
+                  >
+                    {plan.badgeTop}
+                  </span>
+                )}
+                {plan.badgeSub && (
+                  <span className="text-xs font-semibold uppercase px-2.5 py-0.5 rounded-full bg-black/40 text-yellow-300 border border-yellow-400/30">
+                    {plan.badgeSub}
+                  </span>
+                )}
+              </div>
 
-              <ul className="flex-1 space-y-2 text-center mb-4">
+              {/* ENCABEZADO */}
+              <div className="text-center mb-4">
+                <h2 className="text-xl font-bold uppercase tracking-wide mb-1 min-h-[3rem] flex items-center justify-center gap-1">
+                  {plan.nombre} {plan.periodo && <span className="text-yellow-400 font-extrabold">{plan.periodo}</span>}
+                </h2>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-4xl sm:text-5xl font-extrabold text-yellow-300">
+                    {plan.precio}
+                  </span>
+                </div>
+                <p className="text-xs uppercase tracking-wider opacity-75 mt-1">
+                  /{plan.frecuencia}
+                </p>
+              </div>
+
+              {/* CARACTERÍSTICAS */}
+              <ul className="flex-1 space-y-2 py-4 border-t border-white/10 mb-6 text-sm">
                 {plan.features.map((f) => (
-                  <li key={f} className="text-sm">
-                    <strong className="text-yellow-400 text-xl">✓</strong> {f}
+                  <li key={f} className="flex items-start gap-2 text-xs sm:text-sm">
+                    <span className="text-yellow-400 font-bold shrink-0">✓</span>
+                    <span className="opacity-90">{f}</span>
                   </li>
                 ))}
               </ul>
 
+              {/* BOTÓN */}
               <button
                 onClick={() => setPlanSeleccionado(plan)}
                 disabled={cargando === plan.planMpId}
-                className="bg-yellow-400 text-violet-900 py-2 rounded font-bold disabled:opacity-50 m-2"
+                className="w-full py-3 px-4 bg-yellow-400 hover:bg-yellow-300 text-violet-950 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-200 disabled:opacity-50"
               >
-                {cargando === plan.planMpId ? 'Procesando...' : 'Suscribirme'}
+                {cargando === plan.planMpId ? 'Procesando...' : plan.gratis ? 'Activar Gratis' : 'Suscribirme'}
               </button>
             </div>
           ))}
