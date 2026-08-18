@@ -1,4 +1,6 @@
 'use client'
+import ShareAndInstallButtons from './ShareAndInstallButtons';
+
 export default function Footer() {
 
 return (<footer className="flex flex-col gap-5 lg:flex-row lg:justify-around items-center h-full w-full py-20   mb-0 text-white bg-violet-950">
@@ -161,15 +163,17 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
   <span className="w-full border-b lg:opacity-0 lg:w-0 border-b-violet-300 h-1"></span>
   </div >
   
-  <div className="w-full lg:items-center flex flex-col items-center mt-10 lg:mb-10   p-4 justify-center lg:w-1/3 ">
+  <div className="w-full lg:items-center flex flex-col items-center mt-10 lg:mb-10 p-4 justify-center lg:w-1/3 gap-3">
+    <div className="mb-2">
+      <ShareAndInstallButtons />
+    </div>
     <p className="pl-4">Desarrollado por<a href="https://cv-sigma-umber.vercel.app/" className="font-bold"> Alan G. Amarillo</a></p>
     <p className="text-center pl-4">Copyright © 2026. Todos los derechos reservados.</p>
     <div className="flex">
-    <p className="text-center pl-4 underline">Términos y codiciones</p>
-    <p className="text-center pl-4 underline">Políticas de privacidad</p>
+      <p className="text-center pl-4 underline">Términos y condiciones</p>
+      <p className="text-center pl-4 underline">Políticas de privacidad</p>
     </div>
-
-    </div>
+  </div>
  
 
 </footer>)
