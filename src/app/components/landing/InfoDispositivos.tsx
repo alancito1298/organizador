@@ -1,66 +1,53 @@
-"use client";
+'use client';
 
 import { Smartphone, Tablet, Laptop, Monitor } from "lucide-react";
 
-export default function InfoDispotivos() {
+export default function InfoDispositivo() {
   const dispositivos = [
     {
-      icon: <Smartphone size={32} />,
+      icon: <Smartphone size={36} />,
       titulo: "Celular",
-      descripcion:
-        "Accedé a tu información en cualquier momento desde tu teléfono, ideal para usar en clase o en movimiento.",
+      descripcion: "Accedé a tu información en cualquier momento desde tu teléfono, ideal para usar en clase o en movimiento.",
     },
     {
-      icon: <Tablet size={32} />,
+      icon: <Tablet size={36} />,
       titulo: "Tablet",
-      descripcion:
-        "Una experiencia cómoda y visual para gestionar cursos, asistencias y agenda con mayor espacio.",
+      descripcion: "Una experiencia cómoda y visual para gestionar cursos, asistencias y agenda con mayor espacio.",
     },
     {
-      icon: <Laptop size={32} />,
+      icon: <Laptop size={36} />,
       titulo: "Notebook",
-      descripcion:
-        "Perfecto para planificar, cargar calificaciones y organizar tu trabajo con mayor productividad y comodamente.",
+      descripcion: "Perfecto para planificar, cargar calificaciones y organizar tu trabajo con mayor comodidad.",
     },
     {
-      icon: <Monitor size={32} />,
-      titulo: "PC de Escritorio",
-      descripcion:
-        "Trabajá con total comodidad en pantalla grande, ideal para gestionar toda tu información sin límites desde tu casa.",
+      icon: <Monitor size={36} />,
+      titulo: "PC",
+      descripcion: "Trabajá con total comodidad en pantalla grande, ideal para gestionar toda tu información docente.",
     },
   ];
 
   return (
-    <section className=" bg-violet-800 w-full ">
-      {/* TÍTULO */}
-      <div className="text-center mt-15 mb-10">
-        <h2 className="text-5xl font-bold text-white-800 lg:text-6xl mt-40">
+    <section className="py-16 px-4 sm:px-8 bg-violet-50/90 border-y border-violet-100 text-center" id="dispositivos">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-violet-950 uppercase tracking-tight mb-4">
           Accedé desde cualquier dispositivo
         </h2>
-        <p className="mt-3 text-2xl p-20 text-gray-100">
-          Es totalmente multiplataforma, lo que significa que
-          podés usarla desde cualquier dispositivo sin perder funcionalidad ni
-          información.
+        <p className="text-gray-600 text-base sm:text-lg mb-12 max-w-2xl mx-auto">
+          Llevá tu agenda y planillas a todas partes. Tu información se sincroniza automáticamente en la nube.
         </p>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+          {dispositivos.map((item, i) => (
+            <div key={i} className="flex flex-col items-center gap-3 group">
+              <div className="w-20 h-20 bg-white rounded-2xl shadow-sm border border-violet-200/70 flex items-center justify-center text-violet-950 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md group-hover:border-violet-400">
+                {item.icon}
+              </div>
+              <span className="font-bold text-lg text-violet-950">{item.titulo}</span>
+              <p className="text-xs text-gray-500 hidden sm:block max-w-[200px] leading-relaxed">{item.descripcion}</p>
+            </div>
+          ))}
+        </div>
       </div>
-
-      {/* GRID */}
-      <div className=" lg:mx-50 flex flex-col items-center justify-center lg:mb-20 lg:grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
-        {dispositivos.map((item, i) => (
-          <div
-            key={i}
-            className="p-6 mb-5 w-7/8 lg:w-full h-50 border border-black rounded-2xl bg-violet-950 backdrop-blur-md shadow-sm hover:shadow-md transition"
-          >
-            <div className="text-violet-white mx-4 mt-4">{item.icon}</div>
-
-            <h3 className="text-xl mx-4 text-yellow-200 uppercase font-mono font-extralight">
-              {item.titulo}
-            </h3>
-
-            <p className="text-sm text-white m-4">{item.descripcion}</p>
-          </div>
-        ))}
-      <span className="h-50 "></span></div>
     </section>
   );
 }

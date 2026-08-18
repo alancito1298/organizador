@@ -1,177 +1,176 @@
 'use client';
 
+import { Check, Star, Sparkles } from 'lucide-react';
+
 const PLANES = [
   {
     nombre: 'Gratis',
     precio: '$0',
     frecuencia: 'para siempre',
     gratis: true,
-    badgeTop: '¡100% GRATIS!',
-    badgeSub: '🌱 Sin Tarjeta',
+    badgeTop: '🌱 100% GRATIS',
     features: [
       'Hasta 2 cursos',
       'Alumnos ilimitados',
-      'Asistencias',
-      'Calificaciones',
+      'Asistencias y Calificaciones',
       'Agenda y Horarios',
       'Con anuncios discretos',
     ],
     link: '/registro',
-    color: 'bg-emerald-800 border-emerald-500/40 text-white',
     btnText: 'Registrarme Gratis',
+    destacado: false,
   },
   {
     nombre: 'Básico Mensual',
     precio: '$3.999',
     frecuencia: 'por mes',
-    badgeTop: '¡30 DÍAS GRATIS!',
-    badgeSub: 'Especial Primaria',
+    badgeTop: 'RECOMENDADO',
     features: [
       'Hasta 4 cursos',
-      'Alumnos ilimitados',
-      'Asistencias',
-      'Calificaciones',
-      'Agenda y Horarios',
-      'Exportación de Excel',
+      'Exportación Excel',
       'Notificaciones',
       'Sin publicidad',
     ],
     link: '/registro',
-    color: 'bg-violet-800 border-violet-500/40 text-white',
     btnText: 'Probar Gratis!',
+    destacado: false,
   },
   {
     nombre: 'Plus Mensual',
     precio: '$4.999',
     frecuencia: 'por mes',
     destacado: true,
-    badgeTop: '¡30 DÍAS GRATIS!',
-    badgeSub: '⭐ Más Popular',
+    badgeTop: '⭐ Más Popular',
+    badgeSub: '¡30 DÍAS GRATIS!',
     features: [
       'Cursos ilimitados',
-      'Alumnos ilimitados',
-      'Asistencias',
-      'Calificaciones',
-      'Agenda y Horarios',
       'Planificaciones y Bibliografía',
-      'Exportación de Excel',
-      'Notificaciones',
+      'Exportación Excel Pro',
       'Sin publicidad',
     ],
     link: '/registro',
-    color: 'bg-indigo-900 border-indigo-500/40 text-white',
     btnText: 'Probar Gratis!',
   },
   {
     nombre: 'Básico Anual',
     precio: '$24.999',
     frecuencia: 'por año',
-    badgeTop: '¡30 DÍAS GRATIS!',
-    badgeSub: 'Ahorrás $22.999',
+    ahorro: 'Ahorrás $22.999',
+    badgeTop: 'AHORRO ANUAL',
     features: [
       'Hasta 4 cursos',
-      'Alumnos ilimitados',
-      'Asistencias',
-      'Calificaciones',
-      'Agenda y Horarios',
-      'Exportación de Excel',
-      'Notificaciones',
+      'Exportación Excel',
       'Sin publicidad',
     ],
     link: '/registro',
-    color: 'bg-purple-900 border-purple-500/40 text-white',
     btnText: 'Probar Gratis!',
+    destacado: false,
   },
   {
     nombre: 'Plus Anual',
     precio: '$39.999',
     frecuencia: 'por año',
-    destacado: true,
-    badgeTop: '¡30 DÍAS GRATIS!',
-    badgeSub: 'Ahorrás $19.999',
+    ahorro: 'Ahorrás $19.999',
+    badgeTop: 'MÁXIMO VALOR',
     features: [
       'Cursos ilimitados',
-      'Alumnos ilimitados',
-      'Asistencias',
-      'Calificaciones',
-      'Agenda y Horarios',
       'Planificaciones y Bibliografía',
-      'Exportación de Excel',
-      'Notificaciones',
+      'Exportación Excel Pro',
       'Sin publicidad',
     ],
     link: '/registro',
-    color: 'bg-slate-900 border-slate-700 text-white',
     btnText: 'Probar Gratis!',
+    destacado: false,
   },
 ];
 
 export default function Planes() {
   return (
-    <div className="flex flex-col min-h-screen items-center w-full px-4 py-16 bg-gradient-to-t from-violet-950 to-violet-900 text-white">
-      <div className="max-w-7xl w-full flex flex-col items-center">
-        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold uppercase text-center mb-4 tracking-tight">
-          Elegí el <span className="text-yellow-400">plan</span> ideal para vos
-        </h2>
-        <p className="text-violet-200 text-center max-w-2xl text-base sm:text-lg mb-12 font-light">
-          Todos nuestros planes incluyen acceso desde cualquier dispositivo y soporte continuo.
-        </p>
+    <section className="py-16 px-4 sm:px-8 bg-violet-50/50 border-t border-violet-100" id="precios">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-violet-950 uppercase tracking-tight mb-3">
+            Elegí el plan ideal para vos
+          </h2>
+          <p className="text-gray-600 text-base sm:text-lg">
+            Todos nuestros planes incluyen acceso desde cualquier dispositivo y soporte continuo.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 w-full max-w-7xl items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
           {PLANES.map((plan) => (
             <div
               key={plan.nombre}
-              className={`rounded-3xl p-8 sm:p-10 flex flex-col justify-between shadow-xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${plan.color}`}
+              className={`rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 ${
+                plan.destacado
+                  ? 'bg-violet-950 text-white shadow-2xl border-2 border-violet-700 relative overflow-hidden transform lg:-translate-y-2'
+                  : 'bg-white text-gray-900 border border-violet-200/80 shadow-sm hover:shadow-md hover:border-violet-300'
+              }`}
             >
-              {/* BADGES SUPERIORES ALINEADOS */}
-              <div className="min-h-[4rem] flex flex-col items-center justify-start gap-1.5 mb-4 text-center">
-                {plan.badgeTop && (
+              {plan.destacado && (
+                <div className="absolute top-0 right-0 bg-yellow-400 text-violet-950 font-extrabold text-[10px] uppercase px-3 py-1 rounded-bl-xl tracking-wider">
+                  ⭐ Más Popular
+                </div>
+              )}
+
+              <div>
+                {/* BADGE TOP */}
+                <div className="mb-4">
                   <span
-                    className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${
+                    className={`inline-block text-[11px] font-bold uppercase px-3 py-1 rounded-full ${
                       plan.gratis
-                        ? 'bg-emerald-500 text-emerald-950'
-                        : 'bg-red-600 text-white animate-pulse'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : plan.destacado
+                        ? 'bg-white/20 text-white'
+                        : 'bg-violet-100 text-violet-900'
                     }`}
                   >
                     {plan.badgeTop}
                   </span>
-                )}
-                {plan.badgeSub && (
-                  <span className="text-xs font-semibold uppercase px-2.5 py-0.5 rounded-full bg-black/40 text-yellow-300 border border-yellow-400/30">
-                    {plan.badgeSub}
-                  </span>
-                )}
-              </div>
+                </div>
 
-              {/* ENCABEZADO DE TARJETA */}
-              <div className="text-center mb-4">
-                <h2 className="text-xl font-bold uppercase tracking-wide mb-1 min-h-[3rem] flex items-center justify-center">
+                {/* NOMBRE Y PRECIO */}
+                <h3 className={`font-bold text-xl mb-1 ${plan.destacado ? 'text-white' : 'text-violet-950'}`}>
                   {plan.nombre}
-                </h2>
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-4xl sm:text-5xl font-extrabold text-yellow-300">
+                </h3>
+                
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className={`text-4xl font-extrabold ${plan.destacado ? 'text-yellow-400' : 'text-violet-950'}`}>
                     {plan.precio}
                   </span>
+                  <span className={`text-xs ${plan.destacado ? 'text-violet-200' : 'text-gray-500'}`}>
+                    /{plan.frecuencia}
+                  </span>
                 </div>
-                <p className="text-xs uppercase tracking-wider opacity-75 mt-1">
-                  {plan.frecuencia}
-                </p>
-              </div>
 
-              {/* LISTA DE CARACTERÍSTICAS */}
-              <ul className="flex-1 space-y-2 py-4 border-t border-white/10 mb-6 text-sm">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-xs sm:text-sm">
-                    <span className="text-yellow-400 font-bold shrink-0">✓</span>
-                    <span className="opacity-90">{f}</span>
-                  </li>
-                ))}
-              </ul>
+                {plan.ahorro && (
+                  <p className="text-xs font-bold text-emerald-600 mb-4">{plan.ahorro}</p>
+                )}
+
+                {/* LISTA DE CARACTERÍSTICAS */}
+                <ul className="space-y-2.5 my-6 text-xs sm:text-sm border-t border-b border-violet-100 py-4">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2">
+                      <Check
+                        size={16}
+                        className={`shrink-0 mt-0.5 ${
+                          plan.destacado ? 'text-yellow-400' : 'text-violet-700'
+                        }`}
+                      />
+                      <span className={plan.destacado ? 'text-violet-100' : 'text-gray-700'}>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
               {/* BOTÓN CTA */}
               <a
                 href={plan.link}
-                className="w-full py-3 px-4 bg-yellow-400 hover:bg-yellow-300 text-violet-950 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all duration-200 text-center block"
+                className={`w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-center block transition shadow-sm ${
+                  plan.destacado
+                    ? 'bg-yellow-400 hover:bg-yellow-300 text-violet-950 shadow-lg font-extrabold'
+                    : 'bg-white hover:bg-violet-50 text-violet-950 border border-violet-300'
+                }`}
               >
                 {plan.btnText}
               </a>
@@ -179,11 +178,11 @@ export default function Planes() {
           ))}
         </div>
 
-        <p className="text-center text-sm sm:text-base text-violet-200 font-light mt-12">
-          Los pagos son procesados de forma segura por <b className="font-bold text-white">MercadoPago</b>.<br />
+        <p className="text-center text-xs sm:text-sm text-gray-500 mt-12">
+          Los pagos son procesados de forma segura por <strong className="text-violet-950">MercadoPago</strong>.<br />
           Podés cancelar o cambiar de plan en cualquier momento.
         </p>
       </div>
-    </div>
+    </section>
   );
 }

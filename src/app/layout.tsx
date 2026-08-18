@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Inter, Roboto_Mono, Bebas_Neue, Atma, Poppins } from "next/font/google";
+import { Inter, Roboto_Mono, Bebas_Neue, Atma, Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
 import GoogleAnalytics from "./components/shared/GoogleAnalytics";
 import "./globals.css";
@@ -10,7 +10,12 @@ const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter", // opcional
+  variable: "--font-inter",
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
 });
 
 const bebas = Bebas_Neue({
@@ -102,6 +107,9 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
         <meta name="theme-color" content="#6d28d9" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -112,7 +120,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className={`${inter.className} ${mono.variable} min-h-screen`}>
+      <body className={`${inter.className} ${jakarta.variable} ${mono.variable} min-h-screen`}>
         <Script src="https://accounts.google.com/gsi/client?hl=es" strategy="afterInteractive" />
         {GA_MEASUREMENT_ID && (
           <>
