@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import BottomNav from "../components/shared/BottomNav";
 import Agenda from "../components/agenda/Agenda";
+import Footer from "../components/shared/Footer";
 
 export const metadata: Metadata = {
   title: "Agenda y Calendario",
@@ -13,6 +14,7 @@ export default function AgendaPage() {
   return (
     <div>
       <Agenda />
+      <Footer />
       <BottomNav />
     </div>
   );

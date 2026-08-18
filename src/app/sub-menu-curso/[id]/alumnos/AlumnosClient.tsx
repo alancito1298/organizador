@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import FormularioAlumno from "./FormularioAlumno";
 import BottomNav from "@/app/components/shared/BottomNav";
+import Footer from "@/app/components/shared/Footer";
 import type PerfilAlumno from "../../../types/perfilAlumno";
 import { usePerfilAlumno } from "@/app/hooks/usePerfilAlumno";
 import PerfilAlumnoModal from "@/app/components/alumnos/PerfilAlumnoModal";
@@ -175,6 +176,7 @@ export default function AlumnosClient() {
           onCerrar={() => setPerfilAbierto(false)}
         />
       )}
+      <Footer />
       <BottomNav />
 
       {eliminandoId && (

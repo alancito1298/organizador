@@ -148,10 +148,8 @@ c-52 1 -529 16 -1060 33 l-965 31 -49 46 c-83 81 -294 321 -423 482 -351 440
 
       {/* ACCIONES */}
       <div className="flex items-center gap-3">
-        <ShareAndInstallButtons />
-
         {/* USUARIO */}
-        <div className="text-sm font-extralight font-mono normal-case hidden sm:block">
+        <div className="text-sm font-extralight font-mono normal-case">
           {usuario ? ` ${usuario.nombre} ` : ""}
         </div>
         <div className="w-8 h-8 rounded-full bg-yellow-100 flex flex-col text-violet-950 items-center justify-center shrink-0">

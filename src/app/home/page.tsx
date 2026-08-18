@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Menu from "../components/shared/Menu";
 import Navbar from "../components/shared/Navbar";
+import Footer from "../components/shared/Footer";
 
 export const metadata: Metadata = {
   title: "Panel Principal",
@@ -14,6 +15,7 @@ export default function Home() {
     <div className="bg-violet-500 items-center justify-items-center min-h-screen">
       <Navbar />
       <Menu />
+      <Footer />
     </div>
   );
 }

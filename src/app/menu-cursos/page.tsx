@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ListaCursos from "@/app/components/cursos/Cursos";
 import BottomNav from "../components/shared/BottomNav";
+import Footer from "../components/shared/Footer";
 
 export const metadata: Metadata = {
   title: "Mis Cursos",
@@ -13,6 +14,7 @@ export default function MenuCursos() {
   return (
     <>
       <ListaCursos />
+      <Footer />
       <BottomNav />
     </>
   );

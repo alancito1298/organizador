@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Navbar from "../components/shared/Navbar";
 import BottomNav from "../components/shared/BottomNav";
 import PerfilDocente from "../components/perfil/PerfilDocente";
+import Footer from "../components/shared/Footer";
 
 export const metadata: Metadata = {
   title: "Mi Perfil",
@@ -15,6 +16,7 @@ export default function PerfilPage() {
     <>
       <Navbar />
       <PerfilDocente />
+      <Footer />
       <BottomNav />
     </>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import BottomNav from "../../../components/shared/BottomNav";
 import ListaAsistencias from "../../../components/asistencias/ListaAsistencias";
+import Footer from "../../../components/shared/Footer";
 
 export const metadata: Metadata = {
   title: "Control de Asistencia",
@@ -12,6 +13,7 @@ export default function AsistenciasPage() {
   return (
     <div className="bg-fuchsia-200 h-full">
       <ListaAsistencias />
+      <Footer />
       <BottomNav />
     </div>
   );

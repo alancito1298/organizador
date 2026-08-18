@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ListaPlanificaciones from "../components/planificaciones/ListaPlanificacion";
 import BottomNav from "../components/shared/BottomNav";
+import Footer from "../components/shared/Footer";
 
 export const metadata: Metadata = {
   title: "Planificaciones y Recursos",
@@ -13,6 +14,7 @@ export default function PlanificacionesPage() {
   return (
     <>
       <ListaPlanificaciones />
+      <Footer />
       <BottomNav />
     </>
   );

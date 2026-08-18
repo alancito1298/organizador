@@ -3,7 +3,7 @@ import ShareAndInstallButtons from './ShareAndInstallButtons';
 
 export default function Footer() {
 
-return (<footer className="flex flex-col gap-5 lg:flex-row lg:justify-around items-center h-full w-full py-20   mb-0 text-white bg-violet-950">
+return (<footer className="flex flex-col gap-5 lg:flex-row lg:justify-around items-center h-full w-full py-12 pb-24 text-white bg-violet-950 border-t border-violet-900">
 <div>
 <div className="flex flex-col w-full items-start mb-10 ">
 
