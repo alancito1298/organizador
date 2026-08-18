@@ -104,56 +104,48 @@ export default function AdBanner() {
   const currentAd = DEMO_ADS[adIndex];
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-3 my-4 animate-fade-in">
-      <div className="relative bg-gradient-to-r from-violet-950 via-indigo-900 to-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-2xl border border-violet-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div className="w-full max-w-4xl mx-auto px-2 animate-fade-in">
+      <div className="relative bg-gradient-to-r from-violet-950 via-indigo-950 to-slate-900 text-white rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 shadow-xl border border-violet-500/30 flex flex-row items-center justify-between gap-2 h-12 sm:h-14">
         
-        {/* ICONO Y ANUNCIO DE PRUEBA */}
-        <div className="flex items-start gap-3 w-full sm:w-auto">
-          <div className="p-3 bg-violet-800/70 rounded-xl text-yellow-400 shrink-0 hidden sm:flex items-center justify-center">
-            <Megaphone size={24} className="animate-bounce" />
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span className={`text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full ${currentAd.tagColor}`}>
-                {currentAd.badge}
-              </span>
-              <span className="text-[11px] text-violet-300 font-medium">
-                Visualización Plan Gratuito
-              </span>
-            </div>
-            <h4 className="font-bold text-sm sm:text-base text-white leading-snug">
+        {/* ICONO Y ANUNCIO - EN UNA SOLA LÍNEA */}
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <span className={`text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full shrink-0 ${currentAd.tagColor}`}>
+            {currentAd.badge}
+          </span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 min-w-0 flex-1">
+            <h4 className="font-bold text-xs sm:text-sm text-white truncate">
               {currentAd.titulo}
             </h4>
-            <p className="text-xs text-violet-200 mt-1 opacity-90 leading-relaxed">
-              {currentAd.subtitulo}
+            <p className="text-[10px] sm:text-xs text-violet-200 opacity-80 truncate hidden md:block">
+              • {currentAd.subtitulo}
             </p>
           </div>
         </div>
 
-        {/* BOTONES DE ACCIÓN */}
-        <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end border-t sm:border-t-0 border-white/10 pt-3 sm:pt-0">
+        {/* BOTONES DE ACCIÓN COMPACTOS */}
+        <div className="flex items-center gap-1.5 shrink-0">
           <a
             href={currentAd.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 bg-violet-800/80 hover:bg-violet-700 text-violet-100 rounded-xl transition border border-violet-500/40"
+            className="hidden xs:flex items-center gap-1 text-[10px] sm:text-xs font-semibold px-2 py-1 bg-violet-800/80 hover:bg-violet-700 text-violet-100 rounded-lg transition border border-violet-500/40"
           >
-            {currentAd.linkText} <ExternalLink size={13} />
+            {currentAd.linkText} <ExternalLink size={11} />
           </a>
 
           <Link
             href="/planes"
-            className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 bg-yellow-400 hover:bg-yellow-300 text-violet-950 rounded-xl transition shadow uppercase tracking-wider shrink-0"
+            className="flex items-center gap-1 text-[10px] sm:text-xs font-bold px-2.5 py-1 bg-yellow-400 hover:bg-yellow-300 text-violet-950 rounded-lg transition shadow uppercase tracking-wider shrink-0 whitespace-nowrap"
           >
-            <Sparkles size={13} /> Quitar anuncios
+            <Sparkles size={11} /> Quitar ads
           </Link>
 
           <button
             onClick={handleDismiss}
             title="Cerrar anuncio"
-            className="p-1.5 text-violet-300 hover:text-white hover:bg-violet-800/50 rounded-lg transition"
+            className="p-1 text-violet-300 hover:text-white hover:bg-violet-800/50 rounded transition"
           >
-            <X size={16} />
+            <X size={14} />
           </button>
         </div>
       </div>
