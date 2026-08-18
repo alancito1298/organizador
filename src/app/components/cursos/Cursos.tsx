@@ -82,9 +82,9 @@ export default function Cursos() {
   return (
     <div className="p-3 bg-violet-100 min-h-screen">
 <Navbar></Navbar>
-      <h2 className="text-3xl font-light bg-violet-950 mb-10 text-violet-100 text-center py-6 uppercase">
+      <h1 className="text-3xl font-light bg-violet-950 mb-10 text-violet-100 text-center py-6 uppercase">
         Tus cursos
-      </h2>
+      </h1>
 
       <div className="flex flex-col px-4 w-full gap-4 items-center">
 

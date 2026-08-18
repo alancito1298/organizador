@@ -110,9 +110,9 @@ export default function Planes() {
   return (
     <div className="flex flex-col min-h-screen items-center w-full px-4 py-16 bg-gradient-to-t from-violet-950 to-violet-900 text-white">
       <div className="max-w-7xl w-full flex flex-col items-center">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold uppercase text-center mb-4 tracking-tight">
+        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold uppercase text-center mb-4 tracking-tight">
           Elegí el <span className="text-yellow-400">plan</span> ideal para vos
-        </h1>
+        </h2>
         <p className="text-violet-200 text-center max-w-2xl text-base sm:text-lg mb-12 font-light">
           Todos nuestros planes incluyen acceso desde cualquier dispositivo y soporte continuo.
         </p>

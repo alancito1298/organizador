@@ -105,9 +105,9 @@ export default function FormRegistro() {
         onSubmit={handleSubmit}
         className="bg-purple-200 m-20 text-violet-950 p-8 border border-violet-300 shadow-lg w-full max-w-md"
       >
-        <h2 className="text-4xl my-10 text-center uppercase">
+        <h1 className="text-4xl my-10 text-center uppercase">
           Crear tu cuenta
-        </h2>
+        </h1>
 
         <label className={labelClass}>Nombre</label>
         <input

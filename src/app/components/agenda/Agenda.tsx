@@ -134,9 +134,9 @@ export default function AgendaCalendario() {
 
       {/* ── HEADER MES ── */}
      
-      <h2 className="text-4xl pt-10 text-start font-bold text-violet-200 uppercase tracking-wide">
+      <h1 className="text-4xl pt-10 text-start font-bold text-violet-200 uppercase tracking-wide">
           {MESES[month]} <span className='font-extralight text-yellow-200'>{year}</span>
-        </h2>
+        </h1>
       {/* ── CABECERA DÍAS ── */}
       <div className="grid grid-cols-7 mb-1 bg-violet-200">
         {DIAS.map((d) => (
