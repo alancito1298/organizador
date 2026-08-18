@@ -85,11 +85,18 @@ export default function Planes() {
             className={`rounded-2xl p-10 lg:m-5 lg:h-150 flex flex-col lg:w-80  items-center shadow-md ${plan.color}`}
           >
           <div className="flex items-start justify-items-start w-full">
-            {!plan.gratis && (
-              <p className="h-auto text-start w-auto  p-1 rounded-full border animate-vibrar border-green-900 px-3 bg-red-600 font-bold text-xl">¡30 días gratis!</p>
+            {plan.gratis ? (
+              <p className="h-auto text-start w-auto p-1 rounded-full border border-green-300 px-3 bg-emerald-600 font-bold text-xl text-white">¡100% Gratis!</p>
+            ) : (
+              <p className="h-auto text-start w-auto p-1 rounded-full border animate-vibrar border-green-900 px-3 bg-red-600 font-bold text-xl">¡30 días gratis!</p>
             )}
           </div>
               <div className="w-full h-full flex flex-col items-center justify-between">
+              {plan.gratis && (
+              <span className="text-sm font-bold uppercase mt-3 text-emerald-300 bg-black border-emerald-400 border-2 rounded-full px-6 py-1 self-start">
+                🌱 Sin Tarjeta
+              </span>
+            )}
               {plan.inicial && (
               <span className="text-sm font-bold uppercase mt-3 text-cyan-400 bg-black border-cyan-400 border-2 rounded-full px-10 py-1 self-start ">
                 Especial Primaria
@@ -120,11 +127,9 @@ export default function Planes() {
              
             <a
               href="/registro"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`text-center py-3  rounded-xl font-bold text-sm transition mb-8 uppercase ${plan.btnColor}`}
+              className={`text-center py-3 rounded-xl font-bold text-sm transition mb-8 uppercase ${plan.btnColor}`}
             >
-             Probar Gratis!
+             {plan.gratis ? 'Registrarme Gratis' : 'Probar Gratis!'}
             </a>
           </div>
           </div>

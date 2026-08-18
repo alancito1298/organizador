@@ -68,13 +68,16 @@ const items = [
         {/* HERO */}
         <section className=" w-full  mt-10">
           <div className="relative grid w-full bg-violet-950  lg:h-[32rem] place-items-center">
-            <div className="flex flex-col items-center mx-auto text-center">
+            <div className="flex flex-col items-center mx-auto text-center px-4">
+              <span className="mb-4 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-xs sm:text-sm font-semibold tracking-wide uppercase">
+                🌱 Plan 100% Gratis disponible (hasta 2 cursos) — Sin tarjeta
+              </span>
               <h1 className="text-4xl font-semibold text-white uppercase md:text-6xl">Organizador Docente</h1>
-              <p className="mt-6 text-lg font-extralight font-mono  text-white">Diseñados por docentes.</p>
+              <p className="mt-6 text-lg font-extralight font-mono  text-white">Diseñado por docentes.</p>
             </div>
             <div className=" flex justify-center uppercase font-sans gap-5 text-sm items-center h-20"> 
-              <a href="/login" className=" border-violet-600 text-white border p-3 rounded-xl"> Iniciar Sesión</a>
-              <a href="/registro"className="text-violet-600 bg-white p-3 border rounded-xl">Registrarme</a>              
+              <a href="/login" className=" border-violet-600 text-white border p-3 rounded-xl hover:bg-violet-900 transition"> Iniciar Sesión</a>
+              <a href="/registro" className="text-violet-950 bg-yellow-400 font-bold p-3 border border-yellow-400 rounded-xl hover:bg-yellow-300 transition"> Registrarme Gratis</a>              
             </div>
 
           </div>
