@@ -100,21 +100,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <head><link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#6d28d9" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="Organizador" /></head>
-      <body className={`${inter.className} ${mono.variable} min-h-screen` }>
-        <Script src="https://accounts.google.com/gsi/client?hl=es" strategy="afterInteractive" />
-        {ADSENSE_CLIENT_ID && ADSENSE_CLIENT_ID !== "ca-pub-XXXXXXXXXXXXXXXX" && (
-          <Script
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#6d28d9" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Organizador" />
+        {ADSENSE_CLIENT_ID && (
+          <script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
             crossOrigin="anonymous"
-            strategy="afterInteractive"
           />
         )}
+      </head>
+      <body className={`${inter.className} ${mono.variable} min-h-screen`}>
+        <Script src="https://accounts.google.com/gsi/client?hl=es" strategy="afterInteractive" />
         {GA_MEASUREMENT_ID && (
           <>
             <Script
