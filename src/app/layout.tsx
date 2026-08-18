@@ -6,6 +6,7 @@ import GoogleAnalytics from "./components/shared/GoogleAnalytics";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
 const inter = Inter({
   subsets: ["latin"],
@@ -106,6 +107,14 @@ export default function RootLayout({
 <meta name="apple-mobile-web-app-title" content="Organizador" /></head>
       <body className={`${inter.className} ${mono.variable} min-h-screen` }>
         <Script src="https://accounts.google.com/gsi/client?hl=es" strategy="afterInteractive" />
+        {ADSENSE_CLIENT_ID && ADSENSE_CLIENT_ID !== "ca-pub-XXXXXXXXXXXXXXXX" && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
         {GA_MEASUREMENT_ID && (
           <>
             <Script
