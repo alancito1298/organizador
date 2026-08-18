@@ -71,7 +71,7 @@ export default function Inicio() {
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-bl from-violet-100/60 to-transparent -z-10 rounded-bl-[100px] pointer-events-none" />
 
           {/* COLUMNA IZQUIERDA: TEXTO HERO */}
-          <div className="flex-1 flex flex-col items-start gap-4 z-10">
+          <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left gap-4 z-10">
             
             {/* BADGE PLAN GRATIS */}
             <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-700 px-3.5 py-1.5 rounded-full text-xs font-bold border border-emerald-500/20 shadow-xs">
@@ -96,7 +96,7 @@ export default function Inicio() {
             </p>
 
             {/* BOTONES DE ACCIÓN */}
-            <div className="flex flex-wrap items-center gap-3 mt-4 w-full sm:w-auto">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mt-4 w-full sm:w-auto">
               <a
                 href="/registro"
                 className="bg-violet-950 text-white font-bold text-xs sm:text-sm uppercase tracking-wider px-6 py-3.5 rounded-xl hover:bg-violet-900 transition shadow-md flex items-center gap-2"
@@ -115,7 +115,7 @@ export default function Inicio() {
             </div>
 
             {/* BADGES RÁPIDOS */}
-            <div className="flex items-center gap-4 mt-6 text-xs text-gray-500 font-medium border-t border-violet-100 pt-4 w-full">
+            <div className="flex items-center justify-center lg:justify-start gap-4 mt-6 text-xs text-gray-500 font-medium border-t border-violet-100 pt-4 w-full">
               <div className="flex items-center gap-1"><CheckCircle2 size={16} className="text-emerald-500" /> Agenda</div>
               <div className="flex items-center gap-1"><CheckCircle2 size={16} className="text-emerald-500" /> Planificaciones</div>
               <div className="flex items-center gap-1"><CheckCircle2 size={16} className="text-emerald-500" /> Asistencia</div>
@@ -222,7 +222,7 @@ export default function Inicio() {
         <section className="py-16 px-4 sm:px-8 max-w-7xl mx-auto overflow-hidden">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             
-            <div className="flex-1 space-y-6">
+            <div className="flex-1 space-y-6 flex flex-col items-center lg:items-start text-center lg:text-left">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">
                 <FileSpreadsheet size={14} /> Exportación instantánea
               </span>
