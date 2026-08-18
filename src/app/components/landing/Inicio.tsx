@@ -8,6 +8,7 @@ import Header from "../shared/Header";
 import Footer from "../shared/Footer";
 import InfoDispotivos from "./InfoDispositivos";
 import Faq from "./Faq";
+import StickyMobileCta from "./StickyMobileCta";
 
 export default function Inicio() {
  
@@ -313,8 +314,8 @@ const items = [
 
       </main>
 
- <Footer></Footer>
-
-    </div>
+  <Footer></Footer>
+  <StickyMobileCta />
+</div>
   );
 }

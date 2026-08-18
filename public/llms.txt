@@ -1,0 +1,23 @@
+# Organizador Docente
+
+> Organizador Docente es la plataforma web de gestión pedagógica diseñada para docentes en Argentina y Latinoamérica. Permite administrar cursos, tomar asistencia, calcular calificaciones, organizar la agenda escolar y exportar planillas a Excel en 1 clic.
+
+## Resumen de Funciones
+- **Gestión de Cursos y Materias**: Separación prolija por escuela, año y materia escolar.
+- **Toma de Asistencia en 1 Clic**: Registro diario de presentismo, ausencias justificadas y conceptos pedagógicos.
+- **Cálculo de Calificaciones**: Carga de notas por evaluaciones y exámenes con promedio ponderado automático.
+- **Agenda Docente**: Calendario interactivo para eventos, exámenes y fechas institucionales.
+- **Planificaciones Pedagógicas**: Repositorio de secuencias didácticas y unidades de aprendizaje.
+- **Exportación a Excel (.xlsx)**: Generación de planillas compatibles con Microsoft Excel, Google Sheets y LibreOffice.
+
+## Planes y Tarifas
+- **Plan Gratis**: Gratuito de por vida, hasta 2 cursos completos con agenda y asistencias.
+- **Plan Básico**: $3.999 ARS/mes (o tarifa anual con descuento), admite hasta 4 cursos y exportación a Excel.
+- **Plan Plus**: $4.999 ARS/mes, cursos ilimitados, secuencias didácticas y sin publicidad.
+
+## Enlaces Principales
+- [Página Principal](https://www.organizadordocente.com/)
+- [Registro Docente Gratis](https://www.organizadordocente.com/registro)
+- [Iniciar Sesión](https://www.organizadordocente.com/login)
+- [Planes y Precios](https://www.organizadordocente.com/planes)
+- [Recuperar Contraseña](https://www.organizadordocente.com/recuperar)
