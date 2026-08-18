@@ -26,14 +26,15 @@ export default function Features({ items }: any) {
              <h3 className="text-3xl mt-10 uppercase font-light m-2 text-violet-950 text-center h-auto">
               {item.titulo}
             </h3>
-            <p className="text-violet-950 m-8 mb-10  text-xl text-center">
+            <p className="text-violet-950 m-8 mb-10 text-xl text-center">
               {item.descripcion}
             </p>
-           
-          
-            
-
-           
+            <a
+              href="/registro"
+              className="text-xs font-bold uppercase tracking-wider text-violet-900 bg-white hover:bg-violet-900 hover:text-white px-4 py-2 rounded-xl border border-violet-400 transition shadow-sm mt-auto"
+            >
+              Probar esta función gratis →
+            </a>
           </div>
         ))}
       </div>
