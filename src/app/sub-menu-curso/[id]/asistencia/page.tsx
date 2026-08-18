@@ -1,18 +1,18 @@
-'use client'
+import type { Metadata } from "next";
+import BottomNav from "../../../components/shared/BottomNav";
+import ListaAsistencias from "../../../components/asistencias/ListaAsistencias";
 
-import React from "react"
+export const metadata: Metadata = {
+  title: "Control de Asistencia",
+  description: "Toma de asistencia escolar y registro de conceptos por fecha y trimestre.",
+  robots: { index: false, follow: true },
+};
 
-import BottomNav from "../../../components/shared/BottomNav"
-import ListaAsistencias from "../../../components/asistencias/ListaAsistencias"
-
-
-
-export default function Asistencias() {
+export default function AsistenciasPage() {
   return (
-    <div className=" bg-fuchsia-200 h-full">
-    
-     <ListaAsistencias ></ListaAsistencias>
-     <BottomNav></BottomNav>
+    <div className="bg-fuchsia-200 h-full">
+      <ListaAsistencias />
+      <BottomNav />
     </div>
   );
 }
