@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /registro
+Allow: /login
+Allow: /planes
+Allow: /forgotpassword
+Disallow: /home
+Disallow: /menu-cursos
+Disallow: /agenda
+Disallow: /horario
+Disallow: /planificaciones
+Disallow: /perfil
+Disallow: /sub-menu-curso/
+Disallow: /api/
+
+Sitemap: https://www.organizadordocente.com/sitemap.xml
