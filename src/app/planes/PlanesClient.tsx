@@ -181,7 +181,7 @@ export default function PlanesClient() {
           {PLANES.map((plan) => (
             <div
               key={plan.planMpId}
-              className={`rounded-2xl p-6 text-white shadow-xl border flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${plan.bg}`}
+              className={`rounded-3xl p-8 sm:p-10 text-white shadow-xl border flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${plan.bg}`}
             >
               {/* BADGES SUPERIORES ALINEADOS */}
               <div className="min-h-[4rem] flex flex-col items-center justify-start gap-1.5 mb-4 text-center">
