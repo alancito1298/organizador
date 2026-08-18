@@ -167,10 +167,20 @@ const items = [
               Organizá tus clases sin perder tiempo
               </h2>
 
-              <p className="m-6 text-gray-500">
-              Gestioná cursos, alumnos, asistencia y notas desde un solo lugar.
-Diseñado para docentes reales.
-              </p> </div>
+              <p className="m-6 text-gray-600 text-base leading-relaxed">
+                Gestioná cursos, alumnos, asistencia y notas desde un solo lugar. Diseñado por y para docentes reales.
+              </p>
+
+              {/* CTA DESPUÉS DEL PRIMER PÁRRAFO */}
+              <div className="mx-6 mt-4 flex justify-center lg:justify-start">
+                <a
+                  href="/registro"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-yellow-400 hover:bg-yellow-300 text-violet-950 font-extrabold rounded-2xl shadow-xl transition text-sm uppercase tracking-wider border border-yellow-500/30"
+                >
+                  ⚡ Probar Gratis — Crear Cuenta en 30 Segundos
+                </a>
+              </div>
+            </div>
      
 
  
