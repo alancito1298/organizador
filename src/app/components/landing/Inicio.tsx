@@ -66,20 +66,36 @@ const items = [
       <main className="w-full flex items-center flex-col">
 
         {/* HERO */}
-        <section className=" w-full  mt-10">
-          <div className="relative grid w-full bg-violet-950  lg:h-[32rem] place-items-center">
-            <div className="flex flex-col items-center mx-auto text-center px-4">
+        <section className="w-full mt-6">
+          <div className="relative grid w-full bg-violet-950 lg:h-[34rem] place-items-center py-12 px-4">
+            <div className="flex flex-col items-center mx-auto text-center max-w-4xl">
               <span className="mb-4 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-xs sm:text-sm font-semibold tracking-wide uppercase">
                 🌱 Plan 100% Gratis disponible (hasta 2 cursos) — Sin tarjeta
               </span>
-              <h1 className="text-4xl font-semibold text-white uppercase md:text-6xl">Organizador Docente</h1>
-              <p className="mt-6 text-lg font-extralight font-mono  text-white">Diseñado por docentes.</p>
-            </div>
-            <div className=" flex justify-center uppercase font-sans gap-5 text-sm items-center h-20"> 
-              <a href="/login" className=" border-violet-600 text-white border p-3 rounded-xl hover:bg-violet-900 transition"> Iniciar Sesión</a>
-              <a href="/registro" className="text-violet-950 bg-yellow-400 font-bold p-3 border border-yellow-400 rounded-xl hover:bg-yellow-300 transition"> Registrarme Gratis</a>              
+              <h1 className="text-4xl font-extrabold text-white uppercase md:text-6xl tracking-tight">
+                Organizador Docente
+              </h1>
+              <p className="mt-4 text-base sm:text-xl font-light text-violet-100 max-w-2xl leading-relaxed">
+                Organizá tu agenda de clases, planificaciones, tomá asistencia y llevá tus notas en un solo lugar. Exportá todo a Excel en 1 clic.
+              </p>
+
+              {/* PILLS DE RESPUESTA A INTENCIÓN DE BÚSQUEDA */}
+              <div className="flex flex-wrap justify-center gap-2 mt-6 text-xs sm:text-sm font-medium text-violet-200">
+                <span className="px-3 py-1 bg-violet-900/80 rounded-full border border-violet-700/50">📅 Agenda & Calendario</span>
+                <span className="px-3 py-1 bg-violet-900/80 rounded-full border border-violet-700/50">📚 Planificaciones</span>
+                <span className="px-3 py-1 bg-violet-900/80 rounded-full border border-violet-700/50">📝 Asistencia & Conceptos</span>
+                <span className="px-3 py-1 bg-violet-900/80 rounded-full border border-violet-700/50">📊 Calificaciones & Excel</span>
+              </div>
             </div>
 
+            <div className="flex justify-center uppercase font-sans gap-4 text-sm items-center mt-8"> 
+              <a href="/registro" className="text-violet-950 bg-yellow-400 font-bold px-6 py-3.5 border border-yellow-400 rounded-xl hover:bg-yellow-300 transition shadow-lg tracking-wider">
+                Registrarme Gratis 🚀
+              </a>              
+              <a href="/login" className="border-violet-400/60 text-white border px-6 py-3.5 rounded-xl hover:bg-violet-900 transition">
+                Iniciar Sesión
+              </a>
+            </div>
           </div>
 
           <svg className="fill-violet-950" viewBox="0 0 1440 57">
