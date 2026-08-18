@@ -7,6 +7,7 @@ import Planes from "./PlanesPrecios";
 import Header from "../shared/Header";
 import Footer from "../shared/Footer";
 import InfoDispotivos from "./InfoDispositivos";
+import Faq from "./Faq";
 
 export default function Inicio() {
  
@@ -303,6 +304,7 @@ const items = [
 <span className="h-50 bg-white"></span>
 <InfoDispotivos></InfoDispotivos>
 
+<Faq />
 
 <Planes></Planes>
 
