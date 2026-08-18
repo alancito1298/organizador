@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { Home, Bell, ArrowLeft, X, Calendar } from "lucide-react";
+import AdBanner from "./AdBanner";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
@@ -83,6 +84,12 @@ const BottomNav = () => {
 
   return (
     <>
+      <div className={`fixed bottom-16 left-0 right-0 z-40 px-2 transition-transform duration-300 pointer-events-none ${visible ? "translate-y-0" : "translate-y-full"}`}>
+        <div className="max-w-4xl mx-auto pointer-events-auto">
+          <AdBanner />
+        </div>
+      </div>
+
       <nav
         className={`fixed bottom-0 left-0 right-0 z-50 bg-white/90 border-t border-violet-950 shadow-xl transition-transform duration-300 ${
           visible ? "translate-y-0" : "translate-y-full"
