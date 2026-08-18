@@ -17,7 +17,7 @@ const PLANES = [
     gratis: true,
     badgeTop: '¡100% GRATIS!',
     badgeSub: '🌱 Sin Tarjeta',
-    features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios'],
+    features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Con anuncios discretos'],
     bg: 'bg-emerald-800 border-emerald-500/40',
   },
   {
