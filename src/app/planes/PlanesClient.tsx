@@ -29,7 +29,7 @@ const PLANES = [
     gratis: false,
     badgeTop: '¡30 DÍAS GRATIS!',
     badgeSub: 'Especial Primaria',
-    features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios'],
+    features: ['Hasta 4 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Exportación de Excel', 'Notificaciones'],
     bg: 'bg-violet-800 border-violet-500/40',
   },
   {
@@ -41,7 +41,7 @@ const PLANES = [
     gratis: false,
     badgeTop: '¡30 DÍAS GRATIS!',
     badgeSub: 'Ahorrás $18.000',
-    features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda', 'Horarios'],
+    features: ['Hasta 4 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Exportación de Excel', 'Notificaciones'],
     bg: 'bg-purple-900 border-purple-500/40',
   },
   {
@@ -53,7 +53,7 @@ const PLANES = [
     gratis: false,
     badgeTop: '¡30 DÍAS GRATIS!',
     badgeSub: '⭐ Más Popular',
-    features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Planificaciones', 'Bibliografía', 'Generación de Excel', 'Recordatorios'],
+    features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Planificaciones', 'Bibliografía', 'Exportación de Excel', 'Notificaciones'],
     bg: 'bg-indigo-900 border-indigo-500/40',
   },
   {
@@ -65,7 +65,7 @@ const PLANES = [
     gratis: false,
     badgeTop: '¡30 DÍAS GRATIS!',
     badgeSub: 'Ahorrás $20.000',
-    features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Planificaciones', 'Bibliografía', 'Generación de Excel', 'Recordatorios'],
+    features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Planificaciones', 'Bibliografía', 'Exportación de Excel', 'Notificaciones'],
     bg: 'bg-slate-900 border-slate-700',
   },
 ];
