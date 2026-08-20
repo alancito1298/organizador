@@ -1,187 +1,93 @@
 'use client';
 
-import { Check, Star, Sparkles } from 'lucide-react';
-
-const PLANES = [
-  {
-    nombre: 'Gratis',
-    precio: '$0',
-    frecuencia: 'para siempre',
-    gratis: true,
-    badgeTop: '🌱 100% GRATIS',
-    features: [
-      'Hasta 2 cursos',
-      'Alumnos ilimitados',
-      'Asistencias y Calificaciones',
-      'Agenda y Horarios',
-      'Con anuncios discretos',
-    ],
-    link: '/registro',
-    btnText: 'Registrarme Gratis',
-    destacado: false,
-  },
-  {
-    nombre: 'Básico Mensual',
-    precio: '$3.999',
-    frecuencia: 'por mes',
-    badgeTop: 'RECOMENDADO',
-    features: [
-      'Hasta 4 cursos',
-      'Exportación Excel',
-      'Notificaciones',
-      'Sin publicidad',
-    ],
-    link: '/registro',
-    btnText: 'Probar Gratis!',
-    destacado: false,
-  },
-  {
-    nombre: 'Plus Mensual',
-    precio: '$4.999',
-    frecuencia: 'por mes',
-    destacado: true,
-    badgeTop: '⭐ Más Popular',
-    badgeSub: '¡30 DÍAS GRATIS!',
-    features: [
-      'Cursos ilimitados',
-      'Planificaciones y Bibliografía',
-      'Exportación Excel Pro',
-      'Sin publicidad',
-    ],
-    link: '/registro',
-    btnText: 'Probar Gratis!',
-  },
-  {
-    nombre: 'Básico Anual',
-    precio: '$24.999',
-    frecuencia: 'por año',
-    ahorro: 'Ahorrás $22.999',
-    badgeTop: 'AHORRO ANUAL',
-    features: [
-      'Hasta 4 cursos',
-      'Exportación Excel',
-      'Sin publicidad',
-    ],
-    link: '/registro',
-    btnText: 'Probar Gratis!',
-    destacado: false,
-  },
-  {
-    nombre: 'Plus Anual',
-    precio: '$39.999',
-    frecuencia: 'por año',
-    ahorro: 'Ahorrás $19.999',
-    badgeTop: 'MÁXIMO VALOR',
-    features: [
-      'Cursos ilimitados',
-      'Planificaciones y Bibliografía',
-      'Exportación Excel Pro',
-      'Sin publicidad',
-    ],
-    link: '/registro',
-    btnText: 'Probar Gratis!',
-    destacado: false,
-  },
-];
-
 export default function Planes() {
   return (
-    <section className="py-16 px-4 sm:px-8 bg-violet-50/50 border-t border-violet-100" id="precios">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-violet-950 uppercase tracking-tight mb-3">
-            Elegí el plan ideal para vos
-          </h2>
-          <p className="text-gray-600 text-base sm:text-lg">
-            Todos nuestros planes incluyen acceso desde cualquier dispositivo y soporte continuo.
-          </p>
+    <section className="py-xl px-margin-mobile md:px-margin-desktop bg-surface-container-low" id="precios">
+      <div className="text-center mb-xl">
+        <h2 className="font-display-lg text-display-lg text-primary mb-sm">Elegí el plan ideal para vos</h2>
+        <p className="font-body-lg text-body-lg text-on-surface-variant">Todos nuestros planes incluyen acceso desde cualquier dispositivo y soporte continuo.</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md max-w-7xl mx-auto items-stretch">
+
+        {/* Plan 1: Gratis */}
+        <div className="bg-surface rounded-2xl p-lg border border-outline-variant shadow-sm flex flex-col">
+          <div className="inline-block bg-success-green/10 text-success-green font-label-sm px-sm py-xs rounded-full mb-md w-max">🌱 100% GRATIS</div>
+          <h3 className="text-xl font-bold text-primary mb-xs">Gratis</h3>
+          <div className="text-4xl font-bold text-primary mb-sm">$0 <span className="text-base font-normal text-on-surface-variant">/siempre</span></div>
+          <ul className="mt-md mb-xl space-y-sm flex-1">
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-success-green text-[20px]">check</span> Hasta 2 cursos</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-success-green text-[20px]">check</span> Alumnos ilimitados</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-success-green text-[20px]">check</span> Asistencias y Calificaciones</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-success-green text-[20px]">check</span> Agenda y Horarios</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-on-surface-variant/50 text-[20px]">info</span> Anuncios discretos</li>
+          </ul>
+          <a className="w-full py-sm text-center rounded-lg border border-primary text-primary font-label-md hover:bg-surface-lavender transition-colors block" href="/registro">Registrarme Gratis</a>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
-          {PLANES.map((plan) => (
-            <div
-              key={plan.nombre}
-              className={`rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 ${
-                plan.destacado
-                  ? 'bg-violet-950 text-white shadow-2xl border-2 border-violet-700 relative overflow-hidden transform lg:-translate-y-2'
-                  : 'bg-white text-gray-900 border border-violet-200/80 shadow-sm hover:shadow-md hover:border-violet-300'
-              }`}
-            >
-              {plan.destacado && (
-                <div className="absolute top-0 right-0 bg-yellow-400 text-violet-950 font-extrabold text-[10px] uppercase px-3 py-1 rounded-bl-xl tracking-wider">
-                  ⭐ Más Popular
-                </div>
-              )}
-
-              <div>
-                {/* BADGE TOP */}
-                <div className="mb-4">
-                  <span
-                    className={`inline-block text-[11px] font-bold uppercase px-3 py-1 rounded-full ${
-                      plan.gratis
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : plan.destacado
-                        ? 'bg-white/20 text-white'
-                        : 'bg-violet-100 text-violet-900'
-                    }`}
-                  >
-                    {plan.badgeTop}
-                  </span>
-                </div>
-
-                {/* NOMBRE Y PRECIO */}
-                <h3 className={`font-bold text-xl mb-1 ${plan.destacado ? 'text-white' : 'text-violet-950'}`}>
-                  {plan.nombre}
-                </h3>
-                
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className={`text-4xl font-extrabold ${plan.destacado ? 'text-yellow-400' : 'text-violet-950'}`}>
-                    {plan.precio}
-                  </span>
-                  <span className={`text-xs ${plan.destacado ? 'text-violet-200' : 'text-gray-500'}`}>
-                    /{plan.frecuencia}
-                  </span>
-                </div>
-
-                {plan.ahorro && (
-                  <p className="text-xs font-bold text-emerald-600 mb-4">{plan.ahorro}</p>
-                )}
-
-                {/* LISTA DE CARACTERÍSTICAS */}
-                <ul className="space-y-2.5 my-6 text-xs sm:text-sm border-t border-b border-violet-100 py-4">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <Check
-                        size={16}
-                        className={`shrink-0 mt-0.5 ${
-                          plan.destacado ? 'text-yellow-400' : 'text-violet-700'
-                        }`}
-                      />
-                      <span className={plan.destacado ? 'text-violet-100' : 'text-gray-700'}>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* BOTÓN CTA */}
-              <a
-                href={plan.link}
-                className={`w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-center block transition shadow-sm ${
-                  plan.destacado
-                    ? 'bg-yellow-400 hover:bg-yellow-300 text-violet-950 shadow-lg font-extrabold'
-                    : 'bg-white hover:bg-violet-50 text-violet-950 border border-violet-300'
-                }`}
-              >
-                {plan.btnText}
-              </a>
-            </div>
-          ))}
+        {/* Plan 2: Básico Mensual */}
+        <div className="bg-surface rounded-2xl p-lg border border-outline-variant shadow-sm flex flex-col">
+          <div className="inline-block bg-primary/10 text-primary font-label-sm px-sm py-xs rounded-full mb-md w-max">RECOMENDADO</div>
+          <h3 className="text-xl font-bold text-primary mb-xs">Básico Mensual</h3>
+          <div className="text-4xl font-bold text-primary mb-sm">$3.999 <span className="text-base font-normal text-on-surface-variant">/mes</span></div>
+          <ul className="mt-md mb-xl space-y-sm flex-1">
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Hasta 4 cursos</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Exportación Excel</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Notificaciones</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Sin publicidad</li>
+          </ul>
+          <a className="w-full py-sm text-center rounded-lg border border-primary text-primary font-label-md hover:bg-surface-lavender transition-colors block" href="/registro">Probar Gratis!</a>
         </div>
 
-        <p className="text-center text-xs sm:text-sm text-gray-500 mt-12">
-          Los pagos son procesados de forma segura por <strong className="text-violet-950">MercadoPago</strong>.<br />
-          Podés cancelar o cambiar de plan en cualquier momento.
-        </p>
+        {/* Plan 3: Plus Mensual (Highlighted) */}
+        <div className="bg-primary text-white rounded-2xl p-lg shadow-lg flex flex-col border border-primary-container relative overflow-hidden">
+          <div className="absolute top-0 right-0 bg-tertiary-fixed text-on-tertiary-fixed font-label-sm px-md py-xs rounded-bl-lg font-bold">⭐ Más Popular</div>
+          <div className="inline-block bg-white/20 text-white font-label-sm px-sm py-xs rounded-full mb-md w-max mt-4">¡30 DÍAS GRATIS!</div>
+          <h3 className="text-xl font-bold mb-xs">Plus Mensual</h3>
+          <div className="text-4xl font-bold mb-sm">$4.999 <span className="text-base font-normal text-primary-fixed-dim">/mes</span></div>
+          <ul className="mt-md mb-xl space-y-sm flex-1">
+            <li className="flex items-center gap-sm"><span className="material-symbols-outlined text-tertiary-fixed text-[20px]">check</span> Cursos ilimitados</li>
+            <li className="flex items-center gap-sm"><span className="material-symbols-outlined text-tertiary-fixed text-[20px]">check</span> Planificaciones y Bibliografía</li>
+            <li className="flex items-center gap-sm"><span className="material-symbols-outlined text-tertiary-fixed text-[20px]">check</span> Exportación Excel Pro</li>
+            <li className="flex items-center gap-sm"><span className="material-symbols-outlined text-tertiary-fixed text-[20px]">check</span> Sin publicidad</li>
+          </ul>
+          <a className="w-full py-sm text-center rounded-lg bg-tertiary-fixed text-on-tertiary-fixed font-label-md hover:bg-tertiary transition-colors shadow-md font-bold block" href="/registro">Probar Gratis!</a>
+        </div>
+
+        {/* Plan 4: Básico Anual */}
+        <div className="bg-surface rounded-2xl p-lg border border-outline-variant shadow-sm flex flex-col">
+          <div className="inline-block bg-primary/10 text-primary font-label-sm px-sm py-xs rounded-full mb-md w-max">AHORRO ANUAL</div>
+          <h3 className="text-xl font-bold text-primary mb-xs">Básico Anual</h3>
+          <div className="text-4xl font-bold text-primary mb-sm">$24.999 <span className="text-base font-normal text-on-surface-variant">/año</span></div>
+          <div className="text-xs text-secondary-container font-label-sm mb-md">Ahorrás $22.999</div>
+          <ul className="mt-md mb-xl space-y-sm flex-1">
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Hasta 4 cursos</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Exportación Excel</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Sin publicidad</li>
+          </ul>
+          <a className="w-full py-sm text-center rounded-lg border border-primary text-primary font-label-md hover:bg-surface-lavender transition-colors block" href="/registro">Probar Gratis!</a>
+        </div>
+
+        {/* Plan 5: Plus Anual */}
+        <div className="bg-surface rounded-2xl p-lg border border-outline-variant shadow-sm flex flex-col">
+          <div className="inline-block bg-secondary-container text-white font-label-sm px-sm py-xs rounded-full mb-md w-max">MÁXIMO VALOR</div>
+          <h3 className="text-xl font-bold text-primary mb-xs">Plus Anual</h3>
+          <div className="text-4xl font-bold text-primary mb-sm">$39.999 <span className="text-base font-normal text-on-surface-variant">/año</span></div>
+          <div className="text-xs text-secondary-container font-label-sm mb-md">Ahorrás $19.999</div>
+          <ul className="mt-md mb-xl space-y-sm flex-1">
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Cursos ilimitados</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Planificaciones y Bibliografía</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Exportación Excel Pro</li>
+            <li className="flex items-center gap-sm text-on-surface-variant"><span className="material-symbols-outlined text-primary text-[20px]">check</span> Sin publicidad</li>
+          </ul>
+          <a className="w-full py-sm text-center rounded-lg border border-primary text-primary font-label-md hover:bg-surface-lavender transition-colors block" href="/registro">Probar Gratis!</a>
+        </div>
+
+      </div>
+
+      <div className="text-center mt-lg text-on-surface-variant font-body-md text-sm">
+        Los pagos son procesados de forma segura por <strong>MercadoPago</strong>.<br />
+        Podés cancelar o cambiar de plan en cualquier momento.
       </div>
     </section>
   );

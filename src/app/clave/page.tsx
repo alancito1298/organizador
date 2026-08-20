@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import ResetPasswordForm from "../reset-password/ResetPasswordForm";
 
 export const metadata: Metadata = {
@@ -9,5 +10,16 @@ export const metadata: Metadata = {
 };
 
 export default function ClavePage() {
-  return <ResetPasswordForm />;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Cargando...
+        </div>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
+  );
 }
+
