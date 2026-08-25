@@ -289,218 +289,90 @@ export default function AsistenciasTabla() {
   // CARGA INICIAL
   // =====================
 
-  useEffect(() => {
-
+  const fetchData = async () => {
     if (!cursoId) {
-
       setCargando(false);
-
       return;
-
     }
 
-    const fetchData =
-      async () => {
+    setCargando(true);
 
-        setCargando(true);
-
-        try {
-
-          const token =
-            localStorage.getItem(
-              'token'
-            );
-
-            const headers = {
-              Authorization:
-                `Bearer ${token}`,
-            };
-            
-            // CURSO
-            const resCurso =
-              await fetch(
-                `${API}/cursos/${rawId}`,
-                { headers }
-              );
-            
-            const cursoData =
-              await resCurso.json();
-            
-            setCurso(
-              cursoData
-            );
-            
-         
-
-          // ALUMNOS
-          const resAlumnos =
-            await fetch(
-              `${API}/inscripciones/curso/${rawId}`,
-              { headers }
-            );
-
-          const alumnosData:
-            AlumnoCurso[] =
-              await resAlumnos.json();
-
-          alumnosData.sort(
-            (a, b) =>
-              a.alumno.apellido.localeCompare(
-                b.alumno.apellido
-              )
-          );
-
-          // ASISTENCIAS
-          const resAsistencias =
-            await fetch(
-              `${API}/asistencias/curso/${rawId}?trimestre=${trimestre}`,
-              { headers }
-            );
-
-          const asistenciasData:
-            Asistencia[] =
-              await resAsistencias.json();
-
-          // FECHAS
-          const fechasSet =
-            new Set<string>();
-
-          for (
-            const a
-            of asistenciasData
-          ) {
-
-            fechasSet.add(
-              a.fecha
-                .split('T')[0]
-            );
-
-          }
-
-          const fechasOrdenadas =
-            [...fechasSet]
-              .sort()
-              .reverse();
-
-          // MATRICES
-          const matriz:
-            EstadoVisual[][] = [];
-
-          const idsMatriz:
-            (number | null)[][] = [];
-
-          for (
-            const insc
-            of alumnosData
-          ) {
-
-            const filaEstados:
-              EstadoVisual[] = [];
-
-            const filaIds:
-              (number | null)[] = [];
-
-            if (
-              fechasOrdenadas.length === 0
-            ) {
-
-              filaEstados.push(
-                'vacio'
-              );
-
-              filaIds.push(
-                null
-              );
-
-            } else {
-
-              for (
-                const fecha
-                of fechasOrdenadas
-              ) {
-
-                const asist =
-                  asistenciasData.find(
-                    (a) =>
-                      a.alumnoCursoId ===
-                        insc.id &&
-                      a.fecha
-                        .split('T')[0] ===
-                        fecha
-                  );
-
-                filaEstados.push(
-                  asist
-                    ? estadoBackendAVisual(
-                        asist.estado
-                      )
-                    : 'vacio'
-                );
-
-                filaIds.push(
-                  asist
-                    ? asist.id
-                    : null
-                );
-
-              }
-
-            }
-
-            matriz.push(
-              filaEstados
-            );
-
-            idsMatriz.push(
-              filaIds
-            );
-
-          }
-
-          setInscripciones(
-            alumnosData
-          );
-
-          setFechas(
-            fechasOrdenadas.length > 0
-              ? fechasOrdenadas
-              : [
-                  new Date()
-                    .toISOString()
-                    .split('T')[0]
-                ]
-          );
-
-          setDatos(
-            matriz
-          );
-
-          setAsistenciaIds(
-            idsMatriz
-          );
-
-        } catch (err) {
-
-          console.error(
-            'Error cargando asistencias:',
-            err
-          );
-
-          setInscripciones([]);
-          setFechas([]);
-          setDatos([]);
-          setAsistenciaIds([]);
-
-        } finally {
-
-          setCargando(false);
-
-        }
-
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
       };
 
-    fetchData();
+      // CURSO
+      const resCurso = await fetch(`${API}/cursos/${rawId}`, { headers });
+      const cursoData = await resCurso.json();
+      setCurso(cursoData);
 
+      // ALUMNOS
+      const resAlumnos = await fetch(`${API}/inscripciones/curso/${rawId}`, { headers });
+      const alumnosData: AlumnoCurso[] = await resAlumnos.json();
+      alumnosData.sort((a, b) => a.alumno.apellido.localeCompare(b.alumno.apellido));
+
+      // ASISTENCIAS
+      const resAsistencias = await fetch(
+        `${API}/asistencias/curso/${rawId}?trimestre=${trimestre}`,
+        { headers }
+      );
+      const asistenciasData: Asistencia[] = await resAsistencias.json();
+
+      // FECHAS
+      const fechasSet = new Set<string>();
+      for (const a of asistenciasData) {
+        fechasSet.add(a.fecha.split('T')[0]);
+      }
+      const fechasOrdenadas = [...fechasSet].sort().reverse();
+
+      // MATRICES
+      const matriz: EstadoVisual[][] = [];
+      const idsMatriz: (number | null)[][] = [];
+
+      for (const insc of alumnosData) {
+        const filaEstados: EstadoVisual[] = [];
+        const filaIds: (number | null)[] = [];
+
+        if (fechasOrdenadas.length === 0) {
+          filaEstados.push('vacio');
+          filaIds.push(null);
+        } else {
+          for (const fecha of fechasOrdenadas) {
+            const asist = asistenciasData.find(
+              (a) => a.alumnoCursoId === insc.id && a.fecha.startsWith(fecha)
+            );
+            filaEstados.push(asist ? estadoBackendAVisual(asist.estado) : 'vacio');
+            filaIds.push(asist ? asist.id : null);
+          }
+        }
+
+        matriz.push(filaEstados);
+        idsMatriz.push(filaIds);
+      }
+
+      setInscripciones(alumnosData);
+      setFechas(
+        fechasOrdenadas.length > 0
+          ? fechasOrdenadas
+          : [new Date().toISOString().split('T')[0]]
+      );
+      setDatos(matriz);
+      setAsistenciaIds(idsMatriz);
+    } catch (err) {
+      console.error('Error cargando asistencias:', err);
+      setInscripciones([]);
+      setFechas([]);
+      setDatos([]);
+      setAsistenciaIds([]);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, [cursoId, trimestre]);
 
   // =====================
