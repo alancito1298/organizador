@@ -10,7 +10,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'El mensaje es requerido' }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY || 'AIzaSyAJw13Dy64mVbPlubdimOoBGWwLya_EDzQ';
+    const apiKey = process.env.GEMINI_API_KEY;
 
     // Inyectar contexto dinámico de la cuenta del usuario si está autenticado
     const authHeader = req.headers.get('authorization');
