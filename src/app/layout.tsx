@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Inter, Roboto_Mono, Bebas_Neue, Atma, Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
 import GoogleAnalytics from "./components/shared/GoogleAnalytics";
+import ChatbotIA from "./components/shared/ChatbotIA";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -115,11 +116,13 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Organizador" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2280844536116745"
-          crossOrigin="anonymous"
-        />
+        {ADSENSE_CLIENT_ID && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+            crossOrigin="anonymous"
+          />
+        )}
       </head>
       <body className={`${inter.className} ${jakarta.variable} ${mono.variable} min-h-screen`}>
         <Script src="https://accounts.google.com/gsi/client?hl=es" strategy="afterInteractive" />
@@ -143,6 +146,9 @@ export default function RootLayout({
           </>
         )}
         {children}
+        <Suspense fallback={null}>
+          <ChatbotIA />
+        </Suspense>
       </body>
     </html>
   );

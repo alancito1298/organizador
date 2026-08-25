@@ -40,7 +40,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-8/9  flex  items-center justify-center bg-none mt-20 ">
+    <div className="w-full max-w-md flex items-center justify-center bg-none mt-20">
       
         
 

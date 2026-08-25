@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function CalificacionesPage() {
   return (
-    <div className="bg-fuchsia-200 h-full">
+    <div className="bg-surface-container-low min-h-screen pb-24">
       <ListaCalificaciones />
       <Footer />
       <BottomNav />

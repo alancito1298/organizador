@@ -11,6 +11,12 @@ import StickyMobileCta from "./StickyMobileCta";
 
 const items = [
   {
+    titulo: "🤖 Asistente Pedagógico con IA",
+    descripcion: "Generá secuencias didácticas, exámenes listos para imprimir, rúbricas y adaptaciones curriculares en segundos con Inteligencia Artificial.",
+    imagen: "/cursos-img.jpeg",
+    alt: "Asistente de inteligencia artificial para docentes para crear planificaciones y exámenes",
+  },
+  {
     titulo: "Crear y gestionar cursos fácilmente",
     descripcion: "Organizá todas tus materias en segundos, separando cursos, años y contenido sin complicaciones.",
     imagen: "/cursos-img.jpeg",
@@ -40,12 +46,6 @@ const items = [
     imagen: "/alumnos-img.jpeg",
     alt: "Listado completo de estudiantes inscritos y datos de contacto de las familias por curso",
   },
-  {
-    titulo: "Seguimiento detallado por alumno",
-    descripcion: "Visualizá todas las estadísticas de cada alumno para tener un seguimiento más preciso y personalizado.",
-    imagen: "/detalle-alumno-img.jpeg",
-    alt: "Ficha individual de estudiante con historial de asistencias y desempeño pedagógico",
-  },
 ];
 
 export default function Inicio() {
@@ -63,9 +63,14 @@ export default function Inicio() {
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-bl from-surface-lavender to-transparent -z-10 rounded-bl-[100px] opacity-70" />
 
           <div className="flex-1 flex flex-col items-start gap-md z-10">
-            <div className="inline-flex items-center gap-xs bg-success-green/10 text-success-green px-sm py-xs rounded-full font-label-md text-label-md mb-xs border border-success-green/20">
-              <span className="material-symbols-outlined text-[16px]">eco</span>
-              Plan 100% Gratis disponible (hasta 2 cursos) — Sin tarjeta
+            <div className="flex flex-wrap gap-xs mb-xs">
+              <div className="inline-flex items-center gap-xs bg-success-green/10 text-success-green px-sm py-xs rounded-full font-label-md text-label-md border border-success-green/20">
+                <span className="material-symbols-outlined text-[16px]">eco</span>
+                Plan 100% Gratis disponible (hasta 4 cursos)
+              </div>
+              <div className="inline-flex items-center gap-xs bg-tertiary-fixed text-on-tertiary-fixed font-bold px-sm py-xs rounded-full font-label-md text-label-md shadow-sm">
+                <span>🤖</span> NUEVO: Asistente Pedagógico con IA
+              </div>
             </div>
 
             <h1 className="font-display-lg text-display-lg text-primary max-w-2xl">
@@ -79,7 +84,7 @@ export default function Inicio() {
             </h1>
 
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
-              Tomá asistencia, llevá el seguimiento de tus alumnos y exportá todo a Excel en 1 clic. Diseñado por y para docentes reales para reducir tu carga administrativa.
+              Generá exámenes e ideas con IA, tomá asistencia, llevá el seguimiento de tus alumnos y exportá todo a Excel en 1 clic. Diseñado por y para docentes.
             </p>
 
             <div className="flex flex-wrap items-center gap-sm mt-sm">
@@ -93,10 +98,11 @@ export default function Inicio() {
               </a>
             </div>
 
-            <div className="flex items-center gap-md mt-md text-sm text-on-surface-variant font-label-sm">
-              <div className="flex items-center gap-base"><span className="material-symbols-outlined text-[16px] text-success-green">check_circle</span> Agenda</div>
+            <div className="flex flex-wrap items-center gap-md mt-md text-sm text-on-surface-variant font-label-sm">
+              <div className="flex items-center gap-base"><span className="material-symbols-outlined text-[16px] text-success-green">check_circle</span> 🤖 Asistente IA</div>
+              <div className="flex items-center gap-base"><span className="material-symbols-outlined text-[16px] text-success-green">check_circle</span> Agenda y Horarios</div>
               <div className="flex items-center gap-base"><span className="material-symbols-outlined text-[16px] text-success-green">check_circle</span> Planificaciones</div>
-              <div className="flex items-center gap-base"><span className="material-symbols-outlined text-[16px] text-success-green">check_circle</span> Asistencia</div>
+              <div className="flex items-center gap-base"><span className="material-symbols-outlined text-[16px] text-success-green">check_circle</span> Exportar a Excel</div>
             </div>
           </div>
 
@@ -132,36 +138,47 @@ export default function Inicio() {
                 <p className="font-body-md text-body-md text-on-surface-variant max-w-md">Agendá exámenes, entregas y eventos escolares con alertas. Visualiza toda tu semana de un vistazo y nunca olvides una fecha importante.</p>
               </div>
             </div>
-            {/* Card 2 */}
+            {/* Card 2: Asistente IA (Destacado) */}
+            <div className="bg-gradient-to-br from-primary to-primary-container text-white rounded-xl p-lg shadow-md hover:shadow-lg transition-shadow group relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-tertiary-fixed text-on-tertiary-fixed font-label-sm px-md py-xs rounded-bl-lg font-bold">
+                ⭐ NUEVO
+              </div>
+              <div className="w-12 h-12 bg-white/20 text-white rounded-lg flex items-center justify-center mb-md text-2xl">
+                🤖
+              </div>
+              <h3 className="font-headline-md text-headline-md mb-sm text-white">2. Asistente Pedagógico IA</h3>
+              <p className="font-body-md text-body-md text-white/90">Generá exámenes listos para imprimir, secuencias didácticas y adaptaciones de aula en segundos.</p>
+            </div>
+            {/* Card 3 */}
             <div className="bg-surface rounded-xl p-lg border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
               <div className="w-12 h-12 bg-secondary-container text-white rounded-lg flex items-center justify-center mb-md">
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>library_books</span>
               </div>
-              <h3 className="font-headline-md text-headline-md text-primary mb-sm">2. Planificaciones</h3>
+              <h3 className="font-headline-md text-headline-md text-primary mb-sm">3. Planificaciones</h3>
               <p className="font-body-md text-body-md text-on-surface-variant">Secuencias didácticas, unidades y archivos en un solo lugar.</p>
             </div>
-            {/* Card 3 */}
+            {/* Card 4 */}
             <div className="bg-surface rounded-xl p-lg border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
               <div className="w-12 h-12 bg-success-green/20 text-success-green rounded-lg flex items-center justify-center mb-md">
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>
               </div>
-              <h3 className="font-headline-md text-headline-md text-primary mb-sm">3. Asistencias</h3>
+              <h3 className="font-headline-md text-headline-md text-primary mb-sm">4. Asistencias</h3>
               <p className="font-body-md text-body-md text-on-surface-variant">Marcá presente, ausente y concepto pedagógico en 1 clic.</p>
             </div>
-            {/* Card 4 */}
+            {/* Card 5 */}
             <div className="bg-surface rounded-xl p-lg border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
               <div className="w-12 h-12 bg-tertiary-container text-on-tertiary-container rounded-lg flex items-center justify-center mb-md">
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>bar_chart</span>
               </div>
-              <h3 className="font-headline-md text-headline-md text-primary mb-sm">4. Calificaciones</h3>
+              <h3 className="font-headline-md text-headline-md text-primary mb-sm">5. Calificaciones</h3>
               <p className="font-body-md text-body-md text-on-surface-variant">Notas de trabajos y evaluaciones con promedio automático.</p>
             </div>
-            {/* Card 5 */}
+            {/* Card 6 */}
             <div className="bg-surface rounded-xl p-lg border border-outline-variant shadow-sm hover:shadow-md transition-shadow group bg-gradient-to-br from-surface to-surface-lavender">
               <div className="w-12 h-12 bg-deep-indigo text-white rounded-lg flex items-center justify-center mb-md">
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>download</span>
               </div>
-              <h3 className="font-headline-md text-headline-md text-primary mb-sm">5. Exportar a Excel</h3>
+              <h3 className="font-headline-md text-headline-md text-primary mb-sm">6. Exportar a Excel</h3>
               <p className="font-body-md text-body-md text-on-surface-variant">Descargá todas tus planillas a .xlsx listas para presentar a directivos.</p>
             </div>
           </div>

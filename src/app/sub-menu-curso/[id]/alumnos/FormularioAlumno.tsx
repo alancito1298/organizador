@@ -153,7 +153,7 @@ export default function FormularioAlumno({
           className="border p-2 rounded text-violet-600 bg-amber-50"
         />*/}
       </div>
-<div className="w-8/9 h-10 flex items-center justify-end">
+<div className="w-full h-10 flex items-center justify-end">
       <button
         onClick={agregarAlumno}
         disabled={loading}

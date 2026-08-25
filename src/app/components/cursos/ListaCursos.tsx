@@ -35,27 +35,29 @@ export default function ListaCursos({ id, anio, escuela, materia, ruta, onElimin
 
   return (
     <>
-      <div className="flex min-h-w-1/3 w-8/9 h-35  sm:w-screen sm:m-0 md:max-w-96 md:mx-2 p-10 text-violet-800 border-0 overflow-hidden hover:bg-violet-300 transition relative group ">
+      <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-md hover:shadow-lg border border-violet-200 overflow-hidden transition-all duration-200 relative group my-2">
         {/* Tarjeta clickeable */}
-        <a href={ruta} className="flex flex-1 p-0   border-l-4 border rounded-2xl border-violet-950 ">
-          <div className="flex items-center justify-center m-0 p-6 min-w-1/3 bg-violet-700 rounded-l-xl  text-8xl font-extralight ">
-            <h5 className='text-white'>{anio}</h5>
+        <a href={ruta} className="flex items-center p-4 gap-4 pr-12">
+          <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-violet-700 rounded-xl shrink-0 text-white font-extrabold text-2xl sm:text-3xl shadow-sm">
+            {anio}°
           </div>
-        
-          <div className="flex flex-col items-start justify-start px-8 mt-3 py-2 leading-tight">
-        
-            <p className="pl-4  text-1xl  sm:text-2xl text-gray-800 uppercase font-bold">{escuela}</p>
-            <p className="text-2xl sm:text-3xl text-violet-900 font-extralight tracking-wider pl-4 uppercase font-">{materia}</p>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm text-violet-600 font-bold uppercase tracking-wider truncate mb-0.5">{escuela}</p>
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 uppercase truncate">{materia}</h3>
+            <span className="inline-flex items-center gap-1 text-xs text-violet-700 font-semibold mt-1 hover:underline">
+              Ingresar al aula →
+            </span>
           </div>
         </a>
 
         {/* Botón eliminar */}
-         <button
+        <button
           onClick={(e) => { e.preventDefault(); setConfirmando(true); }}
-         className="absolute bottom-0 right-0 w-7 text-xl justify-center p-1 m-1 h-7  text-center rounded-3xl border-red-500 border text-red-500"
+          className="absolute top-4 right-4 text-gray-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition"
           title="Eliminar curso"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="auto" height="auto" fill="currentColor" viewBox="0 0 16 16">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
             <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
           </svg>
         </button>

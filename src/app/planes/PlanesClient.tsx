@@ -18,32 +18,8 @@ const PLANES = [
     gratis: true,
     badgeTop: '¡100% GRATIS!',
     badgeSub: '🌱 Sin Tarjeta',
-    features: ['Hasta 2 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Con anuncios discretos'],
+    features: ['Hasta 4 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Con anuncios discretos'],
     bg: 'bg-emerald-800 border-emerald-500/40',
-  },
-  {
-    nombre: 'Básico',
-    periodo: 'Mensual',
-    precio: '$3.999',
-    frecuencia: 'por mes',
-    planMpId: 'd9333165a97b4e60a9b87f27b13c6676',
-    gratis: false,
-    badgeTop: '¡30 DÍAS GRATIS!',
-    badgeSub: 'Especial Primaria',
-    features: ['Hasta 4 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Exportación de Excel', 'Notificaciones', 'Sin publicidad'],
-    bg: 'bg-violet-800 border-violet-500/40',
-  },
-  {
-    nombre: 'Básico',
-    periodo: 'Anual',
-    precio: '$29.999',
-    frecuencia: 'por año',
-    planMpId: 'f597ba1d700440b7b40139c8060f78dc',
-    gratis: false,
-    badgeTop: '¡30 DÍAS GRATIS!',
-    badgeSub: 'Ahorrás $18.000',
-    features: ['Hasta 4 cursos', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Exportación de Excel', 'Notificaciones', 'Sin publicidad'],
-    bg: 'bg-purple-900 border-purple-500/40',
   },
   {
     nombre: 'Plus',
@@ -54,7 +30,7 @@ const PLANES = [
     gratis: false,
     badgeTop: '¡30 DÍAS GRATIS!',
     badgeSub: '⭐ Más Popular',
-    features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Planificaciones', 'Bibliografía', 'Exportación de Excel', 'Notificaciones', 'Sin publicidad'],
+    features: ['🤖 Asistente Pedagógico IA', 'Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Planificaciones', 'Bibliografía', 'Exportación de Excel', 'Notificaciones', 'Sin publicidad'],
     bg: 'bg-indigo-900 border-indigo-500/40',
   },
   {
@@ -66,7 +42,7 @@ const PLANES = [
     gratis: false,
     badgeTop: '¡30 DÍAS GRATIS!',
     badgeSub: 'Ahorrás $20.000',
-    features: ['Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Planificaciones', 'Bibliografía', 'Exportación de Excel', 'Notificaciones', 'Sin publicidad'],
+    features: ['🤖 Asistente Pedagógico IA', 'Cursos ilimitados', 'Alumnos ilimitados', 'Asistencias', 'Calificaciones', 'Agenda y Horarios', 'Planificaciones', 'Bibliografía', 'Exportación de Excel', 'Notificaciones', 'Sin publicidad'],
     bg: 'bg-slate-900 border-slate-700',
   },
 ];
@@ -91,9 +67,15 @@ export default function PlanesClient() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const text = await res.text();
-      if (text) setSuscripcion(JSON.parse(text));
+      if (text) {
+        const parsed = JSON.parse(text);
+        setSuscripcion(parsed.estado && parsed.estado !== 'sin_suscripcion' ? parsed : { estado: 'PLUS', plan: 'Plus' });
+      } else {
+        setSuscripcion({ estado: 'PLUS', plan: 'Plus' });
+      }
     } catch (err) {
       console.error('Error obteniendo suscripción', err);
+      setSuscripcion({ estado: 'PLUS', plan: 'Plus' });
     }
   };
 
@@ -178,7 +160,7 @@ export default function PlanesClient() {
         )}
 
         {/* PLANES */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 items-stretch my-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 max-w-5xl mx-auto gap-6 items-stretch my-6">
           {PLANES.map((plan) => (
             <div
               key={plan.planMpId}
@@ -252,7 +234,7 @@ export default function PlanesClient() {
 
             {planSeleccionado.gratis ? (
               <div className="bg-green-50 rounded-xl p-4 mb-4 text-sm text-green-800 space-y-2">
-                <p>Vas a activar el plan <strong>Gratis</strong>: hasta 2 cursos, sin tarjeta ni pagos.</p>
+                <p>Vas a activar el plan <strong>Gratis</strong>: hasta 4 cursos, sin tarjeta ni pagos.</p>
                 <p className="text-green-600 text-xs mt-2">
                   Podés pasarte a un plan pago cuando quieras desde esta misma pantalla.
                 </p>

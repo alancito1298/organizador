@@ -62,7 +62,7 @@ const faqSchema = {
       name: "¿El Plan Gratis vence en algún momento?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No. El Plan Gratis es 100% gratuito para siempre. Te permite gestionar hasta 2 cursos con lista de alumnos, tomar asistencias, cargar calificaciones y llevar tu agenda sin ingresar ninguna tarjeta de crédito.",
+        text: "No. El Plan Gratis es 100% gratuito para siempre. Te permite gestionar hasta 4 cursos con lista de alumnos, tomar asistencias, cargar calificaciones y llevar tu agenda sin ingresar ninguna tarjeta de crédito.",
       },
     },
     {
@@ -70,7 +70,7 @@ const faqSchema = {
       name: "¿Puedo exportar mis planillas de asistencia y notas a Excel?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Todos los planes de pago (Básico y Plus) cuentan con la función de exportación directa a planillas formato Excel (.xlsx) con un solo clic, listas para entregar a secretaría o dirección escolar.",
+        text: "Sí. El Plan Plus cuenta con la función de exportación e importación directa a planillas formato Excel (.xlsx) con un solo clic, listas para entregar a secretaría o dirección escolar.",
       },
     },
     {
@@ -91,10 +91,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "¿Qué diferencia hay entre el Plan Básico y el Plan Plus?",
+      name: "¿Qué incluye el Plan Plus a diferencia del Plan Gratis?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "El Plan Básico te permite administrar hasta 4 cursos simultáneos con exportación a Excel y notificaciones. El Plan Plus ofrece cursos ilimitados, módulos de planificaciones anuales, bibliografía pedagógica y cero publicidad.",
+        text: "El Plan Gratis te permite gestionar hasta 4 cursos completos con asistencia, calificaciones y agenda. El Plan Plus desbloquea cursos ilimitados, exportación e importación de notas a Excel, módulo de planificaciones anuales, bibliografía pedagógica y cero publicidad.",
       },
     },
     {

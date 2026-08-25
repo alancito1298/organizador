@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function AsistenciasPage() {
   return (
-    <div className="bg-fuchsia-200 h-full">
+    <div className="bg-surface-container-low min-h-screen pb-24">
       <ListaAsistencias />
       <Footer />
       <BottomNav />

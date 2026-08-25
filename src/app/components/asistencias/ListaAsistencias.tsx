@@ -789,12 +789,11 @@ export default function AsistenciasTabla() {
         );
 
         setGuardadoOk(true);
+        fetchData();
 
         setTimeout(
           () => {
-
-            window.location.reload();
-
+            setGuardadoOk(false);
           },
           3000
         );
