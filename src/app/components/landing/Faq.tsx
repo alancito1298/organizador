@@ -3,19 +3,19 @@
 const FAQS = [
   {
     pregunta: '¿Es realmente gratis?',
-    respuesta: 'Sí, ofrecemos un plan 100% gratuito que te permite gestionar hasta 2 cursos con alumnos ilimitados para siempre, sin necesidad de ingresar tarjeta de crédito.',
+    respuesta: 'Sí, ofrecemos un plan 100% gratuito que te permite gestionar hasta 4 cursos con alumnos ilimitados para siempre, sin necesidad de ingresar tarjeta de crédito.',
   },
   {
-    pregunta: '¿Puedo usarlo sin internet?',
-    respuesta: 'Actualmente, Organizador Docente requiere conexión a internet para sincronizar tus datos en tiempo real de forma segura en la nube, permitiéndote acceder desde cualquier dispositivo.',
+    pregunta: '¿Puedo usarlo sin internet en el aula?',
+    respuesta: '¡Sí! Organizador Docente cuenta con Modo Offline en el aula. Podés tomar asistencia y registrar calificaciones en tu celular, tablet o computadora aunque no tengas Wi-Fi ni señal en la escuela. Tus cambios se guardan localmente en tu dispositivo y se sincronizan de forma automática en la nube apenas recuperás conexión.',
   },
   {
     pregunta: '¿Cómo exporto mis datos a Excel?',
-    respuesta: 'Desde la vista de cualquier curso, encontrarás un botón de "Exportar". Al hacer clic, podrás elegir si deseas descargar las asistencias, calificaciones o lista de alumnos en formato .xlsx.',
+    respuesta: 'Desde la vista de cualquier curso, encontrarás un botón de "Exportar". Al hacer clic, podrás descargar las planillas de asistencia, calificaciones o nóminas de alumnos en formato .xlsx listas para entregar a secretaría o dirección.',
   },
   {
     pregunta: '¿Qué pasa con mis datos si dejo de pagar el plan Plus?',
-    respuesta: 'Tus datos nunca se borran. Si tu suscripción Plus caduca, tu cuenta pasará al plan gratuito. Podrás seguir viendo toda tu información, pero no podrás agregar nuevos cursos si ya superaste el límite de 2.',
+    respuesta: 'Tus datos nunca se borran. Si tu suscripción Plus caduca, tu cuenta pasará al plan gratuito. Podrás seguir viendo toda tu información, pero no podrás agregar nuevos cursos si ya superaste el límite de 4.',
   },
 ];
 

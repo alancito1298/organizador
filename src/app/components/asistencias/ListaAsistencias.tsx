@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import {
   exportarExcelAsistencias
 } from '../../utils/exportarExcelAsitencias';
+import { enqueueSyncAction } from '@/app/utils/offlineSync';
 import {
   ThumbsUp,
   ThumbsDown,
@@ -532,6 +533,8 @@ export default function AsistenciasTabla() {
             const fecha =
               fechas[j];
 
+            const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+
             if (
               asistenciaId
             ) {
@@ -540,47 +543,70 @@ export default function AsistenciasTabla() {
                 estadoVisual ===
                 'vacio'
               ) {
-
-                promesas.push(
-                  fetch(
-                    `${API}/asistencias/${asistenciaId}`,
-                    {
-                      method:
-                        'DELETE',
-
-                      headers: {
-                        Authorization:
-                          `Bearer ${token}`,
-                      },
-                    }
-                  )
-                );
+                if (isOffline) {
+                  enqueueSyncAction({
+                    url: `${API}/asistencias/${asistenciaId}`,
+                    method: 'DELETE',
+                    tipo: 'asistencia',
+                    descripcion: `Eliminar asistencia`,
+                  });
+                } else {
+                  promesas.push(
+                    fetch(
+                      `${API}/asistencias/${asistenciaId}`,
+                      {
+                        method: 'DELETE',
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      }
+                    ).catch(() => {
+                      enqueueSyncAction({
+                        url: `${API}/asistencias/${asistenciaId}`,
+                        method: 'DELETE',
+                        tipo: 'asistencia',
+                        descripcion: `Eliminar asistencia`,
+                      });
+                      return new Response(null, { status: 200 });
+                    })
+                  );
+                }
 
               } else {
-
-                promesas.push(
-                  fetch(
-                    `${API}/asistencias/${asistenciaId}`,
-                    {
-                      method:
-                        'PUT',
-
-                      headers: {
-                        'Content-Type':
-                          'application/json',
-
-                        Authorization:
-                          `Bearer ${token}`,
-                      },
-
-                      body:
-                        JSON.stringify({
-                          estado:
-                            estadoBackend,
+                if (isOffline) {
+                  enqueueSyncAction({
+                    url: `${API}/asistencias/${asistenciaId}`,
+                    method: 'PUT',
+                    body: { estado: estadoBackend },
+                    tipo: 'asistencia',
+                    descripcion: `Actualizar asistencia`,
+                  });
+                } else {
+                  promesas.push(
+                    fetch(
+                      `${API}/asistencias/${asistenciaId}`,
+                      {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                          estado: estadoBackend,
                         }),
-                    }
-                  )
-                );
+                      }
+                    ).catch(() => {
+                      enqueueSyncAction({
+                        url: `${API}/asistencias/${asistenciaId}`,
+                        method: 'PUT',
+                        body: { estado: estadoBackend },
+                        tipo: 'asistencia',
+                        descripcion: `Actualizar asistencia`,
+                      });
+                      return new Response(null, { status: 200 });
+                    })
+                  );
+                }
 
               }
 
@@ -591,65 +617,65 @@ export default function AsistenciasTabla() {
               const ci = i;
               const cj = j;
 
-              promesas.push(
-                fetch(
-                  `${API}/asistencias`,
-                  {
-                    method:
-                      'POST',
-
-                    headers: {
-                      'Content-Type':
-                        'application/json',
-
-                      Authorization:
-                        `Bearer ${token}`,
-                    },
-
-                    body:
-                      JSON.stringify({
+              if (isOffline) {
+                enqueueSyncAction({
+                  url: `${API}/asistencias`,
+                  method: 'POST',
+                  body: {
+                    fecha,
+                    estado: estadoBackend,
+                    trimestre,
+                    alumnoCursoId,
+                  },
+                  tipo: 'asistencia',
+                  descripcion: `Crear asistencia ${fecha}`,
+                });
+              } else {
+                promesas.push(
+                  fetch(
+                    `${API}/asistencias`,
+                    {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({
                         fecha,
-                        estado:
-                          estadoBackend,
+                        estado: estadoBackend,
                         trimestre,
                         alumnoCursoId,
                       }),
-                  }
-                ).then(
-                  async (res) => {
-
-                    if (res.ok) {
-
-                      const nueva:
-                        Asistencia =
-                          await res
-                            .clone()
-                            .json();
-
-                      setAsistenciaIds(
-                        (prev) => {
-
-                          const copia =
-                            prev.map(
-                              (f) => [...f]
-                            );
-
-                          copia[ci][cj] =
-                            nueva.id;
-
-                          return copia;
-
-                        }
-                      );
-
                     }
-
-                    return res;
-
-                  }
-                )
-              );
-
+                  ).then(
+                    async (res) => {
+                      if (res.ok) {
+                        const nueva: Asistencia = await res.clone().json();
+                        setAsistenciaIds((prev) => {
+                          const copia = prev.map((f) => [...f]);
+                          copia[ci][cj] = nueva.id;
+                          return copia;
+                        });
+                      }
+                      return res;
+                    }
+                  ).catch(() => {
+                    enqueueSyncAction({
+                      url: `${API}/asistencias`,
+                      method: 'POST',
+                      body: {
+                        fecha,
+                        estado: estadoBackend,
+                        trimestre,
+                        alumnoCursoId,
+                      },
+                      tipo: 'asistencia',
+                      descripcion: `Crear asistencia ${fecha}`,
+                    });
+                    return new Response(null, { status: 200 });
+                  })
+                );
+              }
             }
 
           }

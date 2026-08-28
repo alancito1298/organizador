@@ -11,6 +11,12 @@ import StickyMobileCta from "./StickyMobileCta";
 
 const items = [
   {
+    titulo: "⚡ Modo Offline en el Aula",
+    descripcion: "¿Poca señal o sin Wi-Fi en tu escuela? Tomá asistencia y cargá notas sin internet. Tus datos se guardan en tu dispositivo y se sincronizan al reconectar.",
+    imagen: "/asistencias-img.jpeg",
+    alt: "Modo sin conexión offline para tomar asistencia y notas escolares en el aula sin internet",
+  },
+  {
     titulo: "🤖 Asistente Pedagógico con IA",
     descripcion: "Generá secuencias didácticas, exámenes listos para imprimir, rúbricas y adaptaciones curriculares en segundos con Inteligencia Artificial.",
     imagen: "/cursos-img.jpeg",
@@ -68,8 +74,11 @@ export default function Inicio() {
                 <span className="material-symbols-outlined text-[16px]">eco</span>
                 Plan 100% Gratis disponible (hasta 4 cursos)
               </div>
+              <div className="inline-flex items-center gap-xs bg-amber-500/15 text-amber-900 border border-amber-500/30 font-bold px-sm py-xs rounded-full font-label-md text-label-md shadow-sm">
+                <span>⚡</span> Modo Offline: Funciona sin Internet
+              </div>
               <div className="inline-flex items-center gap-xs bg-tertiary-fixed text-on-tertiary-fixed font-bold px-sm py-xs rounded-full font-label-md text-label-md shadow-sm">
-                <span>🤖</span> NUEVO: Asistente Pedagógico con IA
+                <span>🤖</span> IA Pedagógica
               </div>
             </div>
 

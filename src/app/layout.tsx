@@ -4,6 +4,7 @@ import { Inter, Roboto_Mono, Bebas_Neue, Atma, Plus_Jakarta_Sans } from "next/fo
 import Script from "next/script";
 import GoogleAnalytics from "./components/shared/GoogleAnalytics";
 import ChatbotIA from "./components/shared/ChatbotIA";
+import OfflineIndicator from "./components/shared/OfflineIndicator";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -148,6 +149,9 @@ export default function RootLayout({
         {children}
         <Suspense fallback={null}>
           <ChatbotIA />
+        </Suspense>
+        <Suspense fallback={null}>
+          <OfflineIndicator />
         </Suspense>
       </body>
     </html>

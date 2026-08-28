@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { ListPlus, Download } from "lucide-react";
 import Cargando from "../shared/Cargando";
 import { exportarExcelCalificaciones } from '../../utils/exportarExcelCalificaciones';
+import { enqueueSyncAction } from '@/app/utils/offlineSync';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "https://backend-organizador.vercel.app";
 
@@ -142,6 +143,9 @@ export default function ListaCalificaciones() {
     }
 
     setGuardando(true);
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+    let guardadosOffline = 0;
+
     try {
       const promesas: Promise<Response>[] = [];
       for (let i = 0; i < datos.length; i++) {
@@ -151,41 +155,87 @@ export default function ListaCalificaciones() {
           if (!valor || !col.tipo || !col.trimestre || !col.fecha) continue;
           const calificacionId = calificacionIds[i]?.[j];
           const alumnoCursoId = inscripciones[i].id;
-          const body = JSON.stringify({
+          const payload = {
             valor: parseFloat(valor),
             fecha: col.fecha,
             trimestre: Number(col.trimestre),
             tipo: col.tipo,
             alumnoCursoId,
-          });
-          if (calificacionId) {
-            promesas.push(fetch(`${API}/calificaciones/${calificacionId}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-              body,
-            }));
+          };
+          const body = JSON.stringify(payload);
+
+          if (isOffline) {
+            if (calificacionId) {
+              enqueueSyncAction({
+                url: `${API}/calificaciones/${calificacionId}`,
+                method: "PUT",
+                body: payload,
+                tipo: "calificacion",
+                descripcion: `Actualizar nota #${calificacionId}`,
+              });
+            } else {
+              enqueueSyncAction({
+                url: `${API}/calificaciones`,
+                method: "POST",
+                body: payload,
+                tipo: "calificacion",
+                descripcion: `Crear nota ${col.tipo}`,
+              });
+            }
+            guardadosOffline++;
           } else {
-            const ci = i, cj = j;
-            promesas.push(fetch(`${API}/calificaciones`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-              body,
-            }).then(async res => {
-              if (res.ok) {
-                const nueva: Calificacion = await res.clone().json();
-                setCalificacionIds(prev => {
-                  const copia = prev.map(f => [...f]);
-                  copia[ci][cj] = nueva.id;
-                  return copia;
+            if (calificacionId) {
+              promesas.push(fetch(`${API}/calificaciones/${calificacionId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body,
+              }).catch(() => {
+                enqueueSyncAction({
+                  url: `${API}/calificaciones/${calificacionId}`,
+                  method: "PUT",
+                  body: payload,
+                  tipo: "calificacion",
+                  descripcion: `Actualizar nota #${calificacionId}`,
                 });
-              }
-              return res;
-            }));
+                return new Response(null, { status: 200 });
+              }));
+            } else {
+              const ci = i, cj = j;
+              promesas.push(fetch(`${API}/calificaciones`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body,
+              }).then(async res => {
+                if (res.ok) {
+                  const nueva: Calificacion = await res.clone().json();
+                  setCalificacionIds(prev => {
+                    const copia = prev.map(f => [...f]);
+                    copia[ci][cj] = nueva.id;
+                    return copia;
+                  });
+                }
+                return res;
+              }).catch(() => {
+                enqueueSyncAction({
+                  url: `${API}/calificaciones`,
+                  method: "POST",
+                  body: payload,
+                  tipo: "calificacion",
+                  descripcion: `Crear nota ${col.tipo}`,
+                });
+                return new Response(null, { status: 200 });
+              }));
+            }
           }
         }
       }
-      await Promise.all(promesas);
-      alert("✅ Calificaciones guardadas correctamente");
+
+      if (isOffline) {
+        alert(`⚡ Modo Offline: ${guardadosOffline} calificaciones guardadas en tu dispositivo. Se sincronizarán automáticamente al reconectar.`);
+      } else {
+        await Promise.all(promesas);
+        alert("✅ Calificaciones guardadas correctamente");
+      }
     } catch (error) {
       console.error(error);
       alert("❌ Error al guardar");

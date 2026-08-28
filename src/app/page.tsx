@@ -83,10 +83,18 @@ const faqSchema = {
     },
     {
       "@type": "Question",
+      name: "¿Puedo usar la aplicación si en mi escuela no hay internet o tengo mala señal?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Sí. Organizador Docente cuenta con Modo Offline en el aula. Podés tomar asistencia y registrar notas dentro de la clase sin conexión. En cuanto tu dispositivo recupere conexión Wi-Fi o datos móviles, la app sincronizará los cambios automáticamente en la nube.",
+      },
+    },
+    {
+      "@type": "Question",
       name: "¿Tengo que descargar una aplicación desde Google Play o App Store?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No hace falta instalar nada. Organizador Docente es una Web App moderna accesible desde cualquier celular (Android o iPhone), tablet o computadora. Además, podés agregar un acceso rápido a tu pantalla de inicio en 1 segundo.",
+        text: "No hace falta instalar nada pesado. Organizador Docente es una Progressive Web App (PWA) moderna accesible desde cualquier celular (Android o iPhone), tablet o computadora. Además, podés agregar un acceso rápido a tu pantalla de inicio en 1 segundo y funciona offline.",
       },
     },
     {
