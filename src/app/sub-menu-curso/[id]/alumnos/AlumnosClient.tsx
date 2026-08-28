@@ -8,6 +8,8 @@ import Footer from "@/app/components/shared/Footer";
 import type PerfilAlumno from "../../../types/perfilAlumno";
 import { usePerfilAlumno } from "@/app/hooks/usePerfilAlumno";
 import PerfilAlumnoModal from "@/app/components/alumnos/PerfilAlumnoModal";
+import ImportarAlumnosModal from "@/app/components/alumnos/ImportarAlumnosModal";
+import { FileSpreadsheet } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
@@ -28,6 +30,7 @@ export default function AlumnosClient() {
   const [formEdit, setFormEdit] = useState({ nombre: "", apellido: "", contacto: "" });
   const [guardandoEdit, setGuardandoEdit] = useState(false);
   const [perfilAbierto, setPerfilAbierto] = useState(false);
+  const [importarAbierto, setImportarAbierto] = useState(false);
   
   const { perfil, cargarPerfil } = usePerfilAlumno();
 
@@ -121,8 +124,19 @@ export default function AlumnosClient() {
   return (
     <div className="p-4 w-full lg:max-w-2/3 mb-8">
       <h2 className="h-25 text-5xl text-center text-violet-950 mt-8 font-extralight">ALUMNOS</h2>
+
+      <div className="flex justify-center mb-6">
+        <button
+          onClick={() => setImportarAbierto(true)}
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 text-sm"
+        >
+          <FileSpreadsheet className="w-5 h-5" />
+          Importar desde Excel / CSV
+        </button>
+      </div>
+
       {alumnos.length === 0 ? (
-        <p className="text-center text-gray-500">No hay alumnos</p>
+        <p className="text-center text-gray-500">No hay alumnos cargados aún.</p>
       ) : (
         <div className="flex flex-col gap-2 max-w-200 m-auto">
           {alumnos.map((alumno) => (
@@ -176,6 +190,13 @@ export default function AlumnosClient() {
           onCerrar={() => setPerfilAbierto(false)}
         />
       )}
+
+      <ImportarAlumnosModal
+        cursoId={cursoId}
+        abierto={importarAbierto}
+        onCerrar={() => setImportarAbierto(false)}
+        onImportacionExitosa={fetchAlumnos}
+      />
       <Footer />
       <BottomNav />
 

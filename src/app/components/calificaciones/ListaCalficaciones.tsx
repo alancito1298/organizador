@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ListPlus, Download } from "lucide-react";
+import { ListPlus, Download, FileText } from "lucide-react";
 import Cargando from "../shared/Cargando";
 import { exportarExcelCalificaciones } from '../../utils/exportarExcelCalificaciones';
+import { exportarInformeCursoPdf } from '../../utils/exportarInformePdf';
 import { enqueueSyncAction } from '@/app/utils/offlineSync';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "https://backend-organizador.vercel.app";
@@ -251,6 +252,55 @@ export default function ListaCalificaciones() {
 
   if (cargando) return <Cargando texto="Cargando calificaciones..." />;
 
+  const handleExportarPdf = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      let asistenciasData: any[] = [];
+      try {
+        const resAsis = await fetch(`${API}/asistencias/curso/${rawId}`, { headers });
+        if (resAsis.ok) asistenciasData = await resAsis.json();
+      } catch (e) {
+        console.log("No se pudieron cargar asistencias para el PDF:", e);
+      }
+
+      const listaCalificaciones: any[] = [];
+      for (let i = 0; i < datos.length; i++) {
+        for (let j = 0; j < columnas.length; j++) {
+          const val = datos[i][j];
+          const col = columnas[j];
+          if (val && col.tipo) {
+            listaCalificaciones.push({
+              alumnoCursoId: inscripciones[i].id,
+              valor: parseFloat(val),
+              tipo: col.tipo,
+              trimestre: Number(col.trimestre) || 1,
+              fecha: col.fecha,
+            });
+          }
+        }
+      }
+
+      exportarInformeCursoPdf({
+        escuela: curso?.escuela || '',
+        anio: curso?.anio || '',
+        materia: curso?.materia || '',
+        alumnos: inscripciones.map(i => ({
+          id: i.alumno.id,
+          alumnoCursoId: i.id,
+          nombre: i.alumno.nombre,
+          apellido: i.alumno.apellido,
+        })),
+        calificaciones: listaCalificaciones,
+        asistencias: asistenciasData,
+      });
+    } catch (err) {
+      console.error("Error generando PDF:", err);
+      alert("Error al generar el informe PDF");
+    }
+  };
+
   return (
     <div className="p-1
     bg-violet-100
@@ -363,13 +413,24 @@ export default function ListaCalificaciones() {
         </table>
       </div>
 
-      {/* BOTÓN EXCEL */}
-      <button
-        onClick={() => exportarExcelCalificaciones({ columnas, datos, inscripciones, curso })}
-        className="w-full max-w-90 m-auto mt-14 mb-40 hover:bg-emerald-700 text-green-800 px-6 py-3 bg-white border-2 border-green-500 rounded-xl shadow-2xl text-sm transition-all flex items-center justify-center gap-1 font-bold"
-      >
-        Planilla Excel <Download />
-      </button>
+      {/* BOTONES DE EXPORTACIÓN */}
+      <div className="flex flex-wrap items-center justify-center gap-4 max-w-xl mx-auto mt-12 mb-36 px-4">
+        <button
+          onClick={() => exportarExcelCalificaciones({ columnas, datos, inscripciones, curso })}
+          className="flex-1 min-w-[200px] hover:bg-emerald-50 text-emerald-800 px-5 py-3 bg-white border-2 border-emerald-500 rounded-2xl shadow-lg text-sm transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 font-bold"
+        >
+          <Download className="w-4 h-4 text-emerald-600" />
+          Planilla Excel (.xlsx)
+        </button>
+
+        <button
+          onClick={handleExportarPdf}
+          className="flex-1 min-w-[200px] hover:bg-violet-900 text-white px-5 py-3 bg-violet-950 border-2 border-violet-950 rounded-2xl shadow-lg text-sm transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 font-bold"
+        >
+          <FileText className="w-4 h-4 text-violet-200" />
+          Descargar Informe PDF
+        </button>
+      </div>
 
       {/* BOTÓN AGREGAR COLUMNA */}
       <button

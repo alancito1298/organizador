@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import {
   exportarExcelAsistencias
 } from '../../utils/exportarExcelAsitencias';
+import { exportarInformeCursoPdf } from '../../utils/exportarInformePdf';
 import { enqueueSyncAction } from '@/app/utils/offlineSync';
 import {
   ThumbsUp,
@@ -13,7 +14,8 @@ import {
   Clock,
   ListPlus,
   Sheet,
-  Download
+  Download,
+  FileText
 } from 'lucide-react';
 
 import Cargando from '../shared/Cargando';
@@ -742,6 +744,52 @@ Cargando asistencias..."
 
   };
 
+  const handleExportarPdf = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      let calificacionesData: any[] = [];
+      try {
+        const resNotas = await fetch(`${API}/calificaciones/curso/${rawId}`, { headers });
+        if (resNotas.ok) calificacionesData = await resNotas.json();
+      } catch (e) {
+        console.log("No se pudieron cargar notas para el PDF:", e);
+      }
+
+      const listaAsistencias: any[] = [];
+      for (let i = 0; i < inscripciones.length; i++) {
+        for (let j = 0; j < fechas.length; j++) {
+          const est = datos[i]?.[j];
+          if (est && est !== 'vacio') {
+            listaAsistencias.push({
+              alumnoCursoId: inscripciones[i].id,
+              estado: est,
+              trimestre,
+            });
+          }
+        }
+      }
+
+      exportarInformeCursoPdf({
+        escuela: curso?.escuela || '',
+        anio: curso?.anio || '',
+        materia: curso?.materia || '',
+        alumnos: inscripciones.map((i: any) => ({
+          id: i.alumno.id,
+          alumnoCursoId: i.id,
+          nombre: i.alumno.nombre,
+          apellido: i.alumno.apellido,
+        })),
+        calificaciones: calificacionesData,
+        asistencias: listaAsistencias,
+      });
+    } catch (err) {
+      console.error("Error generando PDF:", err);
+      alert("Error al generar el informe PDF");
+    }
+  };
+
   
   
   // =====================
@@ -1171,38 +1219,27 @@ mt-3
 
 
 
-</div><button
-  onClick={descargarExcel}
-  className="
-  w-full 
-  max-w-90
-  m-auto
-  right-0
-  hover:bg-emerald-700
-  text-green-800
-  px-6
-  py-3
-  border-2
-border-green-500
-  mt-2
-  rounded-xl
-  shadow-2xl
-  text-sm
-  transition-all
-  flex
-  items-center
-  justify-center
-  gap-1
-  mb-40
-  font-bold
+</div>
 
-  "
-  title="Descargar Excel"
->
+<div className="flex flex-wrap items-center justify-center gap-4 max-w-xl mx-auto mt-6 mb-36 px-4">
+  <button
+    onClick={descargarExcel}
+    className="flex-1 min-w-[200px] hover:bg-emerald-50 text-emerald-800 px-5 py-3 bg-white border-2 border-emerald-500 rounded-2xl shadow-lg text-sm transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 font-bold"
+    title="Descargar Planilla Excel"
+  >
+    <Download className="w-4 h-4 text-emerald-600" />
+    Planilla Excel (.xlsx)
+  </button>
 
-Planilla Excel
-<Download />
-</button>
+  <button
+    onClick={handleExportarPdf}
+    className="flex-1 min-w-[200px] hover:bg-violet-900 text-white px-5 py-3 bg-violet-950 border-2 border-violet-950 rounded-2xl shadow-lg text-sm transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 font-bold"
+    title="Descargar Informe Pedagógico en PDF"
+  >
+    <FileText className="w-4 h-4 text-violet-200" />
+    Descargar Informe PDF
+  </button>
+</div>
 </div>
       {/* BOTONES */}
 
