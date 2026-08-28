@@ -2,24 +2,89 @@ import { NextResponse } from 'next/server';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
+// Rate Limiter en memoria (Sliding window por IP / Token)
+interface RateLimitRecord {
+  timestamps: number[];
+}
+
+const rateLimitMap = new Map<string, RateLimitRecord>();
+
+function checkRateLimit(key: string, limit: number, windowMs: number): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(key) || { timestamps: [] };
+
+  // Limpiar timestamps fuera de la ventana
+  record.timestamps = record.timestamps.filter((t) => now - t < windowMs);
+
+  if (record.timestamps.length >= limit) {
+    return false; // Límite excedido
+  }
+
+  record.timestamps.push(now);
+  rateLimitMap.set(key, record);
+
+  // Limpieza periódica para evitar fugas de memoria
+  if (rateLimitMap.size > 5000) {
+    for (const [k, v] of rateLimitMap.entries()) {
+      if (v.timestamps.length === 0 || now - v.timestamps[v.timestamps.length - 1] > windowMs) {
+        rateLimitMap.delete(k);
+      }
+    }
+  }
+
+  return true;
+}
+
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown-ip';
+    const authHeader = req.headers.get('authorization');
+    const isAutenticado = Boolean(authHeader && authHeader.startsWith('Bearer ') && authHeader.length > 15);
+
+    // Límite de Rate Limit: 15 req/min para autenticados, 3 req/10min para invitados/público
+    const rateLimitKey = isAutenticado ? `auth_${authHeader!.slice(-12)}` : `guest_${ip}`;
+    const maxRequests = isAutenticado ? 15 : 3;
+    const windowMs = isAutenticado ? 60 * 1000 : 10 * 60 * 1000;
+
+    if (!checkRateLimit(rateLimitKey, maxRequests, windowMs)) {
+      return NextResponse.json(
+        {
+          error: isAutenticado
+            ? 'Has alcanzado el límite de consultas por minuto. Por favor, aguarda un instante.'
+            : 'Has alcanzado el límite de consultas de prueba. Inicia sesión para continuar.',
+        },
+        { status: 429 }
+      );
+    }
+
     const { prompt } = await req.json();
 
-    if (!prompt || typeof prompt !== 'string') {
+    if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
       return NextResponse.json({ error: 'El mensaje es requerido' }, { status: 400 });
     }
 
+    if (prompt.length > 2500) {
+      return NextResponse.json(
+        { error: 'El mensaje no puede superar los 2500 caracteres' },
+        { status: 400 }
+      );
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'Servicio de IA temporalmente no disponible' },
+        { status: 503 }
+      );
+    }
 
     // Inyectar contexto dinámico de la cuenta del usuario si está autenticado
-    const authHeader = req.headers.get('authorization');
     let contextoUsuario = '';
 
-    if (authHeader && authHeader.startsWith('Bearer ') && authHeader.length > 15) {
+    if (isAutenticado) {
       try {
         const resCursos = await fetch(`${API}/cursos`, {
-          headers: { Authorization: authHeader },
+          headers: { Authorization: authHeader! },
         });
 
         if (resCursos.ok) {
@@ -36,7 +101,7 @@ export async function POST(req: Request) {
 
               try {
                 const resInsc = await fetch(`${API}/inscripciones/curso/${c.id}`, {
-                  headers: { Authorization: authHeader },
+                  headers: { Authorization: authHeader! },
                 });
                 if (resInsc.ok) {
                   const inscripciones = await resInsc.json();
@@ -60,7 +125,7 @@ export async function POST(req: Request) {
               // 2. Obtener calificaciones del curso
               try {
                 const resNotas = await fetch(`${API}/calificaciones/curso/${c.id}`, {
-                  headers: { Authorization: authHeader },
+                  headers: { Authorization: authHeader! },
                 });
                 if (resNotas.ok) {
                   const notas = await resNotas.json();
@@ -100,7 +165,7 @@ export async function POST(req: Request) {
                 let todasAsistencias: any[] = [];
                 for (let t = 1; t <= 3; t++) {
                   const resAsis = await fetch(`${API}/asistencias/curso/${c.id}?trimestre=${t}`, {
-                    headers: { Authorization: authHeader },
+                    headers: { Authorization: authHeader! },
                   });
                   if (resAsis.ok) {
                     const dataAsis = await resAsis.json();
@@ -163,7 +228,7 @@ REGLAS OBLIGATORIAS DE CONFIGURACIÓN DEL USUARIO:
 4. NIVEL EDUCATIVO: Diseñado para Nivel Secundario en Argentina (adaptable a Primaria si la consigna lo menciona).
 5. FORMATO: Usa Markdown limpio, estructurado con negritas, listas y bloques bien organizados listo para imprimir o copiar.${contextoUsuario}`;
 
-    const modelos = ['gemini-flash-latest', 'gemini-3.5-flash', 'gemini-3.6-flash'];
+    const modelos = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite'];
     let replyText = '';
 
     for (const mod of modelos) {

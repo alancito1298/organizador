@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface Message {
   id: string;
@@ -17,7 +18,12 @@ const PROMPTS_SUGERIDOS = [
   '♿ Idea para adaptación curricular',
 ];
 
+const RUTAS_SIN_CHAT = ['/', '/login', '/registro', '/planes', '/recuperar', '/forgotpassword', '/reset-password', '/clave'];
+
 export default function ChatbotIA() {
+  const pathname = usePathname();
+
+  if (RUTAS_SIN_CHAT.includes(pathname)) return null;
   const [abierto, setAbierto] = useState(false);
   const [mensajes, setMensajes] = useState<Message[]>([
     {
