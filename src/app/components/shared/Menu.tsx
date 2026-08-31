@@ -87,11 +87,6 @@ export default function Menu() {
     fetchAgenda();
   }, []);
 
-  const cerrarSesion = () => {
-    localStorage.removeItem('token');
-    window.location.replace('/');
-  };
-
   // Cálculo del mes actual y eventos
   const hoy = new Date();
   const currentYear = hoy.getFullYear();
@@ -151,17 +146,6 @@ export default function Menu() {
               </div>
               <span className="font-body-sm text-body-sm font-bold text-accent-violet">Horarios</span>
             </Link>
-
-
-            <button
-              onClick={cerrarSesion}
-              className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-red-600 transition-colors text-left w-full mt-2"
-            >
-              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform text-accent-violet group-hover:text-red-600">
-                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>logout</span>
-              </div>
-              <span className="font-body-sm text-body-sm font-bold text-accent-violet group-hover:text-red-600">Cerrar Sesión</span>
-            </button>
           </nav>
         </aside>
 
@@ -202,17 +186,6 @@ export default function Menu() {
               <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Horarios</span>
             </a>
           </div>
-
-          {/* Cerrar sesión mobile */}
-          <button
-            onClick={cerrarSesion}
-            className="w-full py-4 rounded-2xl bg-surface-bg neumorphic-raised flex items-center justify-center gap-2 text-accent-violet font-bold text-sm uppercase tracking-wider hover:text-red-600 active:scale-95 transition-all mb-6"
-          >
-            <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center">
-              <span className="material-symbols-outlined text-xl">logout</span>
-            </div>
-            <span>Cerrar Sesión</span>
-          </button>
         </div>
 
         {/* Content Area (solo desktop) */}
