@@ -152,25 +152,11 @@ export default function Menu() {
               <span className="font-body-sm text-body-sm font-bold text-accent-violet">Horarios</span>
             </Link>
 
-            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/planes">
-              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
-                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>payments</span>
-              </div>
-              <span className="font-body-sm text-body-sm font-bold text-accent-violet">Pagos</span>
-            </Link>
-
             <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/horario">
               <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
                 <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>bug_report</span>
               </div>
               <span className="font-body-sm text-body-sm font-bold text-accent-violet">Ayuda</span>
-            </Link>
-
-            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/perfil">
-              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
-                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>account_circle</span>
-              </div>
-              <span className="font-body-sm text-body-sm font-bold text-accent-violet">Perfil</span>
             </Link>
 
             <button
@@ -221,29 +207,18 @@ export default function Menu() {
               </div>
               <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Horarios</span>
             </a>
-            <a href="/planes" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
-              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>payments</span>
-              </div>
-              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Pagos</span>
-            </a>
-            <a href="/perfil" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
-              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>account_circle</span>
-              </div>
-              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Perfil</span>
-            </a>
-
-            <button
-              onClick={cerrarSesion}
-              className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95 text-accent-violet hover:text-red-600"
-            >
-              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>logout</span>
-              </div>
-              <span className="font-bold text-sm uppercase tracking-wide">Cerrar Sesión</span>
-            </button>
           </div>
+
+          {/* Cerrar sesión mobile */}
+          <button
+            onClick={cerrarSesion}
+            className="w-full py-4 rounded-2xl bg-surface-bg neumorphic-raised flex items-center justify-center gap-2 text-accent-violet font-bold text-sm uppercase tracking-wider hover:text-red-600 active:scale-95 transition-all mb-6"
+          >
+            <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center">
+              <span className="material-symbols-outlined text-xl">logout</span>
+            </div>
+            <span>Cerrar Sesión</span>
+          </button>
         </div>
 
         {/* Content Area (solo desktop) */}
