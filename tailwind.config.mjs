@@ -9,6 +9,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        "surface-bg": "#E0E5EC",
+        "accent-violet": "#6D28D9",
+        "text-main": "#4A5568",
+        "shadow-light": "#FFFFFF",
+        "shadow-dark": "#A3B1C6",
         "surface-container-low": "#f4f2fe",
         "on-surface": "#1a1b23",
         "on-secondary-fixed": "#250059",
@@ -33,7 +38,7 @@ module.exports = {
         "error": "#ba1a1a",
         "background": "#fbf8ff",
         "text-primary": "#111827",
-        "secondary": "#712edd",
+        "secondary": "#595f65",
         "surface-dim": "#dad9e4",
         "surface-container-highest": "#e3e1ed",
         "on-background": "#1a1b23",
@@ -44,7 +49,7 @@ module.exports = {
         "on-error": "#ffffff",
         "on-error-container": "#93000a",
         "surface-bright": "#fbf8ff",
-        "on-tertiary-fixed": "#231b00",
+        "on-tertiary-fixed": "#311300",
         "error-container": "#ffdad6",
         "inverse-surface": "#2f3039",
         "on-secondary": "#ffffff",
@@ -58,7 +63,7 @@ module.exports = {
         "primary-container": "#2e1065",
         "on-primary-fixed-variant": "#503788",
         "on-primary": "#ffffff",
-        "tertiary-fixed-dim": "#eec200",
+        "tertiary-fixed-dim": "#ffb688",
         "inverse-primary": "#d1bcff",
         "secondary-fixed-dim": "#d3bbff"
       },

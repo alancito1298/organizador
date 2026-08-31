@@ -1,222 +1,480 @@
 'use client';
-import {Users,CalendarPlus,SquareChartGantt,Clock8,CircleUserRound,Bug,Banknote,LogOut, } from 'lucide-react'
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import BottomNav from './BottomNav';
-import BtnMenu from './BtnMenu';
+
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
+
+type Curso = {
+  id: number;
+  escuela: string;
+  anio: string;
+  materia: string;
+  ruta: string;
+};
+
+type AgendaItem = {
+  id: number;
+  fecha: string;
+  descripcion: string;
+};
+
+const MESES = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+];
+
+const DIAS_SEMANA = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
+
+// Ícono por materia (fallback a 'menu_book')
+const iconoPorMateria = (materia: string): string => {
+  const m = materia.toLowerCase();
+  if (m.includes('mat') || m.includes('álgebra') || m.includes('cálculo')) return 'functions';
+  if (m.includes('hist') || m.includes('geo')) return 'history_edu';
+  if (m.includes('leng') || m.includes('lit') || m.includes('español')) return 'menu_book';
+  if (m.includes('fís') || m.includes('quím') || m.includes('bio') || m.includes('cien')) return 'science';
+  if (m.includes('ed. fís') || m.includes('física') || m.includes('deporte')) return 'sports';
+  if (m.includes('music') || m.includes('arte') || m.includes('plást')) return 'palette';
+  if (m.includes('tecno') || m.includes('inform') || m.includes('comput')) return 'computer';
+  if (m.includes('inglés') || m.includes('idioma') || m.includes('lengua ext')) return 'translate';
+  return 'menu_book';
+};
 
 export default function Menu() {
-       
-       
-       
-        const cerrarSesion = () => {
-                localStorage.removeItem('token');
-                window.location.replace('/');
-              };
+  const [mostrarAds, setMostrarAds] = useState(true);
+  const [cursos, setCursos] = useState<Curso[]>([]);
+  const [cargandoCursos, setCargandoCursos] = useState(true);
+  const [agenda, setAgenda] = useState<AgendaItem[]>([]);
+  const [cargandoAgenda, setCargandoAgenda] = useState(true);
 
-              
-return (<div>
+  useEffect(() => {
+    const fetchCursos = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) { setCargandoCursos(false); return; }
+      try {
+        const res = await fetch(`${API}/cursos`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) { setCursos([]); return; }
+        const data = await res.json();
+        setCursos(Array.isArray(data) ? data : []);
+      } catch {
+        setCursos([]);
+      } finally {
+        setCargandoCursos(false);
+      }
+    };
 
+    const fetchAgenda = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) { setCargandoAgenda(false); return; }
+      try {
+        const res = await fetch(`${API}/agenda`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) { setAgenda([]); return; }
+        const data = await res.json();
+        setAgenda(Array.isArray(data) ? data : []);
+      } catch {
+        setAgenda([]);
+      } finally {
+        setCargandoAgenda(false);
+      }
+    };
 
-<div className='min-h-screen w-screen flex flex-col justify-around lg:justify-start lg:gap-8 items-center  bg-violet-100 '>
+    fetchCursos();
+    fetchAgenda();
+  }, []);
 
-<div className='h-56 lg:h-40 w-full lg:mt-10 lg:bg-violet-100   bg-violet-950 flex flex-col items-center justify-end lg:justify-center '>
-        <h1 className='font-bold w-full text-xl uppercase text-center lg:text-violet-950 tracking-wide'>¡Hola Docente! Tu panel de gestión</h1>
-<svg className='w-96 h-auto text-violet-100 lg:text-violet-950' version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="6501.000000pt" height="2163.000000pt" color="white"viewBox="0 0 6501.000000 2163.000000"
- preserveAspectRatio="xMidYMid meet">
-<metadata>
-Created by potrace 1.16, written by Peter Selinger 2001-2019
-</metadata>
-<g transform="translate(0.000000,2163.000000) scale(0.100000,-0.100000)"
-fill="currentColor" stroke="none">
-<path d="M10781 19602 c-78 -78 -87 -124 -130 -647 -37 -442 -64 -636 -122
--870 -139 -556 -410 -1115 -763 -1575 -139 -182 -253 -309 -465 -520 -331
--330 -658 -597 -1291 -1055 -113 -81 -225 -165 -250 -185 -25 -20 -81 -61
--125 -90 -44 -30 -157 -112 -250 -184 -94 -72 -233 -178 -309 -236 -1038 -787
--1469 -1214 -1857 -1837 -415 -668 -673 -1400 -753 -2138 -38 -350 -57 -783
--57 -1325 -1 -430 9 -656 36 -831 l14 -97 128 -208 c200 -328 559 -951 1243
--2154 1123 -1977 1590 -2775 1768 -3024 66 -92 108 -116 212 -124 91 -6 154
-21 218 97 106 123 262 370 499 786 273 481 590 1036 674 1180 48 83 301 524
-564 980 262 457 521 907 575 1000 54 94 160 278 235 410 76 132 221 380 323
-550 102 171 221 378 263 460 77 148 78 151 89 260 18 163 24 1060 11 1395 -29
-726 -50 922 -135 1253 -178 693 -578 1450 -1066 2017 -114 133 -442 481 -565
-598 -244 236 -857 721 -892 708 -45 -17 -249 -152 -322 -212 -144 -119 -150
--89 52 -261 96 -81 264 -222 373 -313 278 -231 443 -380 557 -501 l99 -104
--184 -6 c-100 -4 -650 -7 -1221 -8 -902 -1 -1046 -3 -1090 -16 -143 -43 -243
--185 -223 -316 10 -66 58 -144 108 -173 115 -67 337 -90 813 -82 601 10 2225
-18 2270 12 40 -6 45 -11 76 -69 18 -34 70 -121 115 -194 46 -72 102 -168 124
--212 39 -77 73 -171 66 -179 -2 -2 -534 2 -1183 8 -1729 16 -2704 -1 -2926
--51 -62 -14 -139 -83 -163 -144 -31 -83 2 -189 101 -324 l45 -61 752 -1 c414
--1 1401 -5 2193 -8 l1440 -6 58 -268 c33 -148 57 -270 56 -272 -2 -1 -164 -9
--359 -15 -399 -15 -2299 -9 -3501 10 -484 8 -709 8 -763 1 -219 -31 -321 -123
--318 -288 3 -152 73 -226 260 -274 115 -29 260 -33 746 -20 1055 28 3507 30
-3926 3 l115 -7 7 -150 c13 -287 -9 -335 -242 -529 -47 -39 -163 -138 -257
--219 l-173 -149 -72 53 c-119 85 -227 181 -353 311 -328 340 -444 412 -611
-386 -99 -15 -179 -65 -319 -198 -44 -41 -228 -208 -410 -370 -181 -162 -347
--310 -367 -328 l-38 -34 -64 46 c-36 26 -217 194 -402 374 -370 360 -443 427
--523 481 -48 32 -62 36 -116 36 -52 0 -74 -6 -147 -42 -87 -43 -187 -115 -288
--206 -77 -68 -301 -307 -432 -460 -61 -70 -114 -127 -118 -125 -5 2 -181 158
--393 348 l-385 344 -8 116 c-9 144 1 393 21 570 91 766 422 1580 915 2245 212
-287 575 676 845 906 50 42 133 113 185 158 52 44 263 208 469 363 465 352 509
-384 598 437 39 23 100 68 135 100 69 63 140 117 522 401 892 661 1373 1142
-1784 1781 363 565 613 1182 716 1769 52 297 58 364 63 795 5 402 4 411 -17
-467 -14 40 -34 69 -62 93 l-42 35 -143 0 -144 0 -48 -48z m-1670 -10778 c18
--20 104 -98 189 -172 85 -75 202 -182 260 -237 205 -198 345 -284 475 -292 39
--3 81 0 95 5 14 6 141 115 283 242 142 127 262 229 265 225 4 -4 9 -64 10
--133 6 -202 -12 -261 -146 -485 -112 -187 -220 -376 -282 -492 -99 -186 -231
--415 -475 -825 -176 -296 -336 -576 -465 -810 -126 -231 -145 -259 -195 -290
-l-36 -22 -807 -9 c-834 -8 -1702 -12 -1707 -7 -6 6 -100 167 -385 658 -635
-1095 -861 1483 -929 1594 -106 175 -195 335 -214 386 -31 84 -47 174 -54 298
--5 107 -4 122 10 122 26 0 146 -97 307 -248 287 -270 418 -343 558 -312 46 10
-67 23 126 78 200 185 395 382 508 512 119 136 215 230 236 230 19 0 183 -134
-312 -254 74 -70 241 -234 370 -364 205 -207 244 -242 302 -270 85 -41 166 -51
-234 -28 92 30 231 148 671 570 120 115 247 232 283 262 58 47 146 104 161 104
-3 0 21 -16 40 -36z"/>
-<path d="M4700 19633 c-25 -1 -69 -8 -97 -14 -48 -9 -57 -16 -100 -72 -65 -85
--73 -125 -73 -344 0 -206 17 -431 60 -776 33 -261 44 -325 96 -532 135 -539
-443 -1192 763 -1620 330 -442 955 -1072 1396 -1406 70 -53 249 -173 317 -212
-l47 -28 78 66 c43 36 109 82 148 102 64 34 215 148 215 162 0 11 -267 231
--516 424 -244 189 -412 329 -537 446 -71 67 -173 188 -165 197 3 2 566 8 1251
-14 1235 9 1247 9 1294 30 174 77 226 303 100 434 -49 51 -99 69 -255 91 -225
-32 -501 38 -1312 29 -900 -10 -1574 -11 -1610 -1 -21 5 -47 46 -145 229 -65
-123 -140 262 -167 309 -26 48 -48 92 -48 98 0 9 487 12 1978 11 1741 -1 1987
-1 2063 14 145 26 225 72 260 151 24 52 24 108 -1 186 -34 111 -120 174 -275
-204 -87 17 -359 21 -670 9 -93 -4 -723 -1 -1400 5 -931 10 -1349 10 -1718 1
--269 -6 -491 -10 -492 -8 -4 4 -95 539 -95 559 0 10 447 11 2123 6 2042 -6
-2375 -3 2558 23 148 21 195 45 244 124 27 44 30 58 30 126 0 68 -4 85 -35 146
--40 79 -63 94 -175 118 -321 67 -1404 81 -3595 45 -781 -12 -1240 -6 -1240 18
-0 7 -9 113 -21 235 -20 222 -26 246 -72 312 -24 34 -119 97 -144 94 -10 -1
--38 -3 -63 -5z"/>
-<path d="M15817 16839 c-613 -50 -1156 -299 -1591 -727 -526 -518 -778 -1155
--753 -1907 15 -428 117 -809 309 -1150 248 -438 629 -806 1066 -1028 157 -81
-251 -118 414 -168 253 -76 451 -103 763 -103 249 0 388 14 595 60 899 198
-1652 943 1874 1856 97 399 93 884 -9 1284 -220 858 -956 1603 -1791 1813 -287
-72 -574 95 -877 70z m378 -1444 c434 -70 786 -418 870 -856 62 -329 -8 -670
--186 -910 -66 -89 -213 -229 -299 -285 -219 -141 -483 -194 -744 -148 -272 47
--489 187 -682 439 -89 115 -173 329 -195 490 -16 124 -6 358 19 455 31 116 77
-228 129 312 238 384 650 575 1088 503z"/>
-<path d="M25525 16839 c-577 -46 -1097 -287 -1500 -693 -319 -322 -525 -684
--636 -1116 -59 -233 -73 -363 -74 -695 0 -323 9 -417 61 -655 190 -857 850
--1598 1634 -1834 429 -129 942 -123 1335 14 246 86 532 269 690 441 301 328
-445 691 445 1127 0 389 -115 717 -386 1092 l-57 80 -689 0 -688 0 0 -550 0
--550 201 0 c117 0 219 -5 246 -11 56 -15 109 -64 115 -110 13 -88 -35 -163
--131 -201 -50 -20 -75 -22 -216 -22 -345 -1 -598 99 -802 318 -174 186 -261
-395 -282 684 -44 582 240 1036 749 1196 277 88 618 68 928 -55 40 -16 77 -29
-82 -29 6 0 10 259 10 720 l0 719 -67 20 c-338 100 -649 136 -968 110z"/>
-<path d="M29670 16844 c-535 -36 -921 -199 -1225 -516 -255 -265 -388 -566
--457 -1033 -8 -58 -13 -534 -15 -1752 l-4 -1673 721 0 720 0 0 580 0 580 210
-0 210 0 0 640 0 640 -210 0 -210 0 0 358 c0 310 3 369 19 448 29 142 78 216
-169 261 72 35 183 43 268 18 114 -33 167 -118 193 -310 8 -51 11 -586 11
--1646 l0 -1569 720 0 721 0 -4 1708 c-4 1741 -4 1749 -43 1982 -44 265 -133
-510 -252 690 -61 92 -192 233 -273 294 -189 142 -459 243 -752 281 -118 15
--414 26 -517 19z"/>
-<path d="M33950 16844 c-294 -20 -537 -83 -764 -198 -158 -80 -276 -166 -406
--296 -272 -272 -409 -560 -477 -1000 -15 -93 -17 -296 -20 -1792 l-4 -1688
-720 0 721 0 2 1633 c3 1546 4 1635 21 1687 46 139 135 211 268 218 173 10 286
--82 325 -267 11 -55 14 -331 14 -1668 l0 -1603 720 0 720 0 0 1603 c0 979 -4
-1654 -10 1737 -65 865 -470 1415 -1166 1581 -172 41 -480 65 -664 53z"/>
-<path d="M42035 16844 c-548 -43 -915 -198 -1221 -516 -214 -223 -348 -484
--420 -820 -49 -233 -48 -168 -51 -1960 l-4 -1678 721 0 720 0 0 580 0 580 210
-0 210 0 0 640 0 640 -210 0 -210 0 0 359 c0 272 4 378 15 435 38 200 132 294
-304 304 151 9 247 -43 290 -155 51 -133 51 -132 51 -1815 l0 -1568 721 0 720
-0 -4 1703 c-4 1736 -5 1755 -43 1982 -68 405 -210 699 -444 919 -199 188 -501
-311 -870 356 -93 11 -405 20 -485 14z"/>
-<path d="M52195 16843 c-219 -18 -389 -47 -570 -98 -775 -218 -1446 -856
--1698 -1615 -93 -278 -129 -512 -129 -830 0 -375 60 -686 193 -1007 120 -287
-363 -636 591 -848 310 -288 682 -501 1051 -600 478 -130 1027 -123 1492 18
-840 255 1536 1020 1710 1880 51 255 68 551 44 807 -53 592 -296 1108 -730
-1551 -436 444 -951 689 -1554 739 -113 9 -310 11 -400 3z m415 -1466 c371 -96
-665 -392 767 -772 25 -92 27 -115 27 -300 1 -221 -11 -295 -75 -453 -93 -235
--306 -459 -544 -573 -126 -60 -238 -88 -386 -96 -297 -15 -549 76 -761 275
--185 174 -299 375 -344 609 -23 119 -23 347 0 467 85 440 432 785 864 862 119
-21 334 12 452 -19z"/>
-<path d="M19250 14300 l0 -2430 720 0 720 0 0 1781 0 1781 218 -5 c160 -3 233
--9 277 -21 192 -53 278 -154 278 -326 1 -154 -52 -266 -154 -328 -82 -50 -140
--64 -282 -69 l-127 -5 2 -632 3 -631 345 -770 346 -770 758 -3 c719 -2 758 -1
-753 15 -2 10 -176 430 -385 933 -209 503 -392 946 -408 984 l-27 68 49 40 c88
-73 244 240 311 332 126 176 219 399 259 621 19 109 21 373 4 495 -47 331 -181
-613 -400 843 -220 232 -458 370 -778 452 -270 69 -393 75 -1519 75 l-963 0 0
--2430z"/>
-<path d="M36180 16030 l0 -700 795 0 c437 0 795 -2 795 -4 0 -2 -12 -30 -26
--62 -14 -33 -84 -192 -154 -354 -217 -502 -376 -869 -685 -1580 -163 -377
--362 -836 -442 -1020 -80 -184 -154 -354 -164 -378 -11 -24 -19 -48 -19 -53 0
--5 725 -9 1825 -9 l1825 0 0 700 0 700 -744 2 -744 3 105 240 c57 132 218 501
-358 820 139 319 329 756 423 970 93 215 256 588 362 830 106 242 208 475 226
-518 l33 77 -1884 0 -1885 0 0 -700z"/>
-<path d="M44750 14301 l0 -2431 720 0 720 0 0 1731 0 1731 383 -5 c290 -4 404
--9 473 -21 504 -89 757 -301 851 -711 25 -113 25 -405 0 -523 -69 -314 -220
--516 -481 -645 -199 -98 -398 -137 -743 -144 l-243 -6 0 -707 0 -707 93 -7
-c460 -31 789 -5 1127 88 754 207 1362 776 1608 1501 224 661 176 1480 -121
-2035 -344 646 -948 1052 -1767 1189 -313 52 -340 53 -1517 58 l-1103 5 0
--2431z"/>
-<path d="M55570 14300 l0 -2430 720 0 720 0 0 1780 0 1780 182 0 c181 0 275
--9 356 -36 166 -54 242 -156 242 -322 0 -260 -156 -391 -467 -392 l-103 0 0
--616 0 -616 352 -789 351 -789 759 0 758 0 -19 48 c-22 56 -595 1435 -722
-1737 l-88 210 72 65 c231 212 369 398 458 619 84 209 116 403 106 641 -16 381
--126 678 -353 950 -293 352 -698 539 -1259 580 -81 6 -543 10 -1102 10 l-963
-0 0 -2430z"/>
-<path d="M23770 10874 c-713 -50 -1303 -271 -1810 -678 -127 -102 -280 -248
--380 -360 -523 -590 -781 -1270 -806 -2126 -23 -751 154 -1422 519 -1978 125
--190 232 -319 421 -507 443 -442 940 -708 1561 -835 470 -97 1069 -90 1545 16
-793 178 1469 650 1925 1344 267 406 429 871 492 1405 21 183 24 670 5 840 -52
-463 -160 832 -349 1195 -146 282 -326 524 -567 765 -525 524 -1119 807 -1889
-901 -117 14 -552 26 -667 18z m477 -735 c575 -48 1043 -257 1442 -644 259
--252 431 -503 564 -825 198 -481 249 -1119 136 -1690 -125 -628 -500 -1189
--1032 -1544 -150 -100 -248 -152 -414 -217 -279 -111 -600 -169 -928 -169
--567 0 -1040 150 -1465 463 -119 88 -383 352 -477 477 -321 429 -481 915 -500
-1515 -18 602 121 1133 415 1576 333 500 815 849 1371 989 282 71 583 95 888
-69z"/>
-<path d="M31130 10873 c-268 -15 -585 -73 -840 -155 -812 -259 -1509 -881
--1863 -1664 -202 -446 -291 -892 -291 -1459 0 -368 32 -640 114 -954 277
--1058 1115 -1911 2159 -2197 318 -87 563 -118 941 -118 291 -1 415 8 635 45
-944 156 1726 701 2202 1533 l62 110 -122 90 c-68 50 -206 153 -309 229 -102
-75 -188 137 -191 137 -4 0 -25 -33 -48 -72 -393 -683 -917 -1105 -1583 -1274
--316 -80 -742 -95 -1081 -38 -503 84 -916 302 -1275 671 -453 464 -680 1023
--706 1736 -23 608 129 1174 433 1617 97 141 165 222 298 355 376 377 821 593
-1375 667 145 19 538 16 685 -6 284 -41 500 -106 740 -220 389 -186 728 -493
-934 -848 34 -59 61 -96 69 -93 9 3 623 435 640 450 2 2 -22 41 -54 87 -256
-366 -580 680 -922 891 -371 230 -764 373 -1222 447 -189 30 -554 46 -780 33z"/>
-<path d="M13930 7610 l0 -3131 1508 4 c1626 3 1583 2 1922 58 516 85 987 274
-1360 547 260 191 515 456 687 717 256 387 409 828 469 1350 25 210 25 663 0
-870 -101 859 -476 1546 -1120 2049 -401 313 -897 524 -1436 610 -313 51 -255
-49 -1872 53 l-1518 4 0 -3131z m3116 2387 c174 -26 308 -55 439 -93 767 -226
-1335 -814 1530 -1586 98 -385 111 -869 35 -1283 -131 -709 -548 -1271 -1165
--1570 -267 -130 -498 -195 -875 -246 -59 -8 -425 -13 -1192 -16 l-1108 -4 0
-2411 0 2411 1113 -4 c978 -3 1125 -5 1223 -20z"/>
-<path d="M35648 10718 c-2 -13 -2 -1421 0 -3130 l2 -3108 2585 0 2585 0 0 360
-0 360 -2200 0 -2200 0 0 1135 0 1135 1255 0 1255 0 0 358 0 357 -1232 -3
-c-678 -1 -1243 0 -1255 3 l-23 5 0 915 0 915 2075 0 2075 0 0 360 0 360 -2459
-0 -2460 0 -3 -22z"/>
-<path d="M41980 7610 l0 -3130 390 0 390 0 0 2336 c0 1559 3 2333 10 2329 6
--3 495 -563 1087 -1243 593 -680 1415 -1624 1827 -2097 412 -473 839 -964 950
--1092 l201 -232 198 0 197 -1 0 3130 0 3130 -385 0 -385 0 -1 -2292 c-1 -2250
--2 -2364 -10 -2372 -2 -3 -83 86 -179 197 -96 111 -282 325 -414 477 -131 151
--325 374 -430 495 -105 121 -355 409 -556 640 -200 231 -448 517 -551 635
--103 118 -312 359 -465 535 -153 176 -301 347 -330 380 -212 243 -845 973
--973 1122 l-156 182 -207 0 -208 1 0 -3130z"/>
-<path d="M47560 10380 l0 -360 1315 0 1315 0 0 -2770 0 -2770 390 0 390 0 0
-2770 0 2770 1318 2 1317 3 0 355 0 355 -3022 3 -3023 2 0 -360z"/>
-<path d="M53940 7610 l0 -3130 2590 0 2590 0 0 360 0 360 -2200 0 -2200 0 0
-1135 0 1135 1255 0 1255 0 0 355 0 355 -1224 0 c-673 0 -1238 3 -1255 6 l-31
-7 0 913 0 914 2073 2 2072 3 3 358 2 357 -2465 0 -2465 0 0 -3130z"/>
-</g>
-</svg>
-</div>
-<span className='h-20 bg-violet-950 lg:h-0 w-full mb-10 mx-3 lg:m-0 rounded-b-full'></span>
-                <div className='grid grid-cols-2 items-center gap-3 justify-center p-2 lg:grid-cols-3 flex-row'>
-                        <BtnMenu ruta="/agenda"  icono={<CalendarPlus size={50} />} nombre="Agenda" />
-                        <BtnMenu ruta="/cursos" icono={<Users size={50}  />} nombre="Cursos" />
-                        <BtnMenu ruta="/planificaciones" icono={<SquareChartGantt size={50} />} nombre="Planificaciones" />
-                        <BtnMenu ruta="/horario" icono={<Clock8 size={50} />} nombre="Horarios" />
-                        <BtnMenu ruta="/planes" icono={<Banknote size={50} />} nombre="Pagos" />
-                        <BtnMenu ruta="/horario" icono={<Bug size={50} />} nombre="Ayuda" />
-                        <BtnMenu ruta="/perfil" icono={<CircleUserRound size={50} />} nombre="Perfil" />
+  const cerrarSesion = () => {
+    localStorage.removeItem('token');
+    window.location.replace('/');
+  };
 
-                        <button onClick={cerrarSesion} className="font-bebas rounded-xl col-span-2 border-violet-900 border w-full lg:col-span-3 lg:w-full mb-25 text-violet-900    py-4 flex justify-center align-center uppercase text-xl m-0"><LogOut className="m-1" />Cerrar Sesión </button>    
+  // Cálculo del mes actual y eventos
+  const hoy = new Date();
+  const currentYear = hoy.getFullYear();
+  const currentMonth = hoy.getMonth();
+  const currentDay = hoy.getDate();
+
+  const primerDia = new Date(currentYear, currentMonth, 1);
+  const totalDiasMes = new Date(currentYear, currentMonth + 1, 0).getDate();
+  let offsetInicio = primerDia.getDay() - 1;
+  if (offsetInicio < 0) offsetInicio = 6;
+
+  const celdasMes: (number | null)[] = [
+    ...Array(offsetInicio).fill(null),
+    ...Array.from({ length: totalDiasMes }, (_, i) => i + 1)
+  ];
+
+  const eventosMes = agenda.filter(item => {
+    const [y, m] = item.fecha.split('T')[0].split('-').map(Number);
+    return y === currentYear && m === (currentMonth + 1);
+  }).sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+  const diasConEvento = new Set(
+    eventosMes.map(item => Number(item.fecha.split('T')[0].split('-')[2]))
+  );
+
+  return (
+    <div className="w-full min-h-screen bg-surface-bg text-text-main flex flex-col antialiased">
+      <main className="flex-grow flex flex-col md:flex-row max-w-[1440px] w-full mx-auto pb-24 md:pb-0 pt-28 md:pt-32 px-4 md:px-margin-page gap-gutter">
+        {/* Vertical Sidebar */}
+        <aside className="hidden md:flex flex-col w-64 flex-shrink-0 bg-surface-bg neumorphic-raised rounded-3xl p-6 h-fit sticky top-24 mb-12">
+          <h3 className="font-headline-md-mobile text-headline-md-mobile text-accent-violet uppercase mb-6 px-4">Menú</h3>
+          <nav className="flex flex-col gap-4">
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/agenda">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>calendar_add_on</span>
+              </div>
+              <span className="font-body-sm text-body-sm font-bold text-accent-violet">Agenda</span>
+            </Link>
+
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/cursos">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>school</span>
+              </div>
+              <span className="font-body-sm text-body-sm font-bold text-accent-violet">Cursos</span>
+            </Link>
+
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/planificaciones">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>edit_document</span>
+              </div>
+              <span className="font-body-sm text-body-sm font-bold text-accent-violet">Planificaciones</span>
+            </Link>
+
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/horario">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>schedule</span>
+              </div>
+              <span className="font-body-sm text-body-sm font-bold text-accent-violet">Horarios</span>
+            </Link>
+
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/planes">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>payments</span>
+              </div>
+              <span className="font-body-sm text-body-sm font-bold text-accent-violet">Pagos</span>
+            </Link>
+
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/horario">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>bug_report</span>
+              </div>
+              <span className="font-body-sm text-body-sm font-bold text-accent-violet">Ayuda</span>
+            </Link>
+
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/perfil">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>account_circle</span>
+              </div>
+              <span className="font-body-sm text-body-sm font-bold text-accent-violet">Perfil</span>
+            </Link>
+
+            <button
+              onClick={cerrarSesion}
+              className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-red-600 transition-colors text-left w-full mt-2"
+            >
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform text-accent-violet group-hover:text-red-600">
+                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>logout</span>
+              </div>
+              <span className="font-body-sm text-body-sm font-bold text-accent-violet group-hover:text-red-600">Cerrar Sesión</span>
+            </button>
+          </nav>
+        </aside>
+
+        {/* Mobile Menu Grid (solo mobile) */}
+        <div className="flex flex-col md:hidden w-full">
+          {/* Page Header Mobile */}
+          <div className="text-center mb-8">
+            <h1 className="font-headline-md text-headline-md text-accent-violet uppercase mb-4 tracking-wide">¡Hola Docente!</h1>
+            <div className="flex justify-center items-center gap-2">
+              <h2 className="font-display-lg text-accent-violet uppercase" style={{ fontSize: '2rem', fontWeight: 800 }}>Organizador<br />Docente</h2>
+            </div>
+          </div>
+
+          {/* Grid de accesos rápidos */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <a href="/agenda" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
+              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>calendar_add_on</span>
+              </div>
+              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Agenda</span>
+            </a>
+            <a href="/cursos" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
+              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>school</span>
+              </div>
+              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Cursos</span>
+            </a>
+            <a href="/planificaciones" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
+              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>edit_document</span>
+              </div>
+              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Planificaciones</span>
+            </a>
+            <a href="/horario" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
+              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>schedule</span>
+              </div>
+              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Horarios</span>
+            </a>
+            <a href="/planes" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
+              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>payments</span>
+              </div>
+              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Pagos</span>
+            </a>
+            <a href="/perfil" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
+              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
+                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>account_circle</span>
+              </div>
+              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Perfil</span>
+            </a>
+
+            <button
+              onClick={cerrarSesion}
+              className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95 text-accent-violet hover:text-red-600"
+            >
+              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
+                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>logout</span>
+              </div>
+              <span className="font-bold text-sm uppercase tracking-wide">Cerrar Sesión</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Content Area (solo desktop) */}
+        <div className="hidden md:flex flex-grow w-full max-w-4xl mx-auto md:mx-0 flex-col">
+          {/* Page Header */}
+          <div className="text-center mb-12">
+            <h1 className="font-headline-md text-headline-md text-accent-violet uppercase mb-6 tracking-wide">¡Hola Docente! Tu panel de gestión</h1>
+            <div className="flex justify-center items-center gap-3">
+              <span className="material-symbols-outlined text-display-lg text-accent-violet">history_edu</span>
+              <h2 className="font-display-lg text-display-lg text-accent-violet leading-none uppercase">Organizador<br />Docente</h2>
+            </div>
+          </div>
+
+          {/* Mis Cursos Recientes Section */}
+          <section className="mb-12">
+            <div className="flex justify-between items-center mb-6 px-2">
+              <h3 className="font-headline-md text-headline-md text-accent-violet uppercase tracking-wide">Mis Cursos Recientes</h3>
+              <Link className="text-body-sm font-bold text-accent-violet hover:opacity-80 transition-opacity uppercase tracking-wider" href="/cursos">Ver todos</Link>
+            </div>
+
+            {/* Skeleton loader */}
+            {cargandoCursos && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="bg-surface-bg neumorphic-inset rounded-2xl p-6 flex flex-col gap-4 animate-pulse">
+                    <div className="flex justify-between items-start">
+                      <div className="w-12 h-12 rounded-xl bg-outline-variant/30" />
+                      <div className="w-10 h-4 rounded bg-outline-variant/30" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="h-5 w-3/4 rounded bg-outline-variant/30" />
+                      <div className="h-4 w-1/2 rounded bg-outline-variant/20" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Sin cursos */}
+            {!cargandoCursos && cursos.length === 0 && (
+              <div className="bg-surface-bg neumorphic-inset rounded-2xl p-10 flex flex-col items-center gap-3 text-center">
+                <span className="material-symbols-outlined text-5xl text-outline-variant">school</span>
+                <p className="font-bold text-text-main">Todavía no tenés cursos cargados</p>
+                <p className="text-sm text-secondary">Creá tu primer curso para empezar a gestionar tu aula.</p>
+                <Link
+                  href="/cursos"
+                  className="mt-2 px-6 py-2 rounded-xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
+                >
+                  Crear curso
+                </Link>
+              </div>
+            )}
+
+            {/* Cursos reales (máx 3) */}
+            {!cargandoCursos && cursos.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {cursos.slice(0, 3).map(curso => (
+                  <Link
+                    key={curso.id}
+                    href={curso.ruta ?? `/sub-menu-curso/${curso.id}`}
+                    className="bg-surface-bg neumorphic-raised rounded-2xl p-6 flex flex-col gap-4 group cursor-pointer hover:scale-[1.02] transition-transform"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
+                        <span className="material-symbols-outlined text-accent-violet text-3xl">{iconoPorMateria(curso.materia)}</span>
+                      </div>
+                      <span className="text-xs font-bold text-secondary uppercase tracking-widest">{curso.anio}°</span>
+                    </div>
+                    <div>
+                      <h4 className="font-body-lg font-bold text-text-main mb-1">{curso.materia}</h4>
+                      <div className="flex items-center gap-2 text-secondary">
+                        <span className="material-symbols-outlined text-sm">location_city</span>
+                        <span className="text-xs truncate">{curso.escuela}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Vista Previa del Mes y Eventos del Mes (solo desktop) */}
+          <section className="mb-12">
+            <div className="flex justify-between items-center mb-6 px-2">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-accent-violet text-2xl">calendar_month</span>
+                <h3 className="font-headline-md text-headline-md text-accent-violet uppercase tracking-wide">
+                  {MESES[currentMonth]} {currentYear}
+                </h3>
+              </div>
+              <Link className="text-body-sm font-bold text-accent-violet hover:opacity-80 transition-opacity uppercase tracking-wider flex items-center gap-1" href="/agenda">
+                Ver Agenda Completa →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Mini Calendario */}
+              <div className="lg:col-span-5 bg-surface-bg neumorphic-raised rounded-2xl p-6">
+                <div className="text-center font-bold text-text-main text-sm mb-4 uppercase tracking-wider pb-2 border-b border-outline-variant/30">
+                  {MESES[currentMonth]} {currentYear}
                 </div>
-              
-          
-</div>
+                <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                  {DIAS_SEMANA.map((d, i) => (
+                    <span key={i} className="text-[11px] font-bold text-secondary uppercase">{d}</span>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7 gap-1.5 text-center">
+                  {celdasMes.map((dia, idx) => {
+                    if (!dia) return <div key={idx} className="h-8" />;
+                    const esHoy = dia === currentDay;
+                    const tieneEvento = diasConEvento.has(dia);
+                    return (
+                      <div
+                        key={idx}
+                        className={`h-8 rounded-lg flex flex-col items-center justify-center text-xs font-semibold relative transition-all ${
+                          esHoy
+                            ? 'bg-accent-violet text-white font-bold shadow-md'
+                            : tieneEvento
+                            ? 'bg-surface-bg neumorphic-inset text-accent-violet font-bold'
+                            : 'text-text-main hover:bg-white/30'
+                        }`}
+                      >
+                        <span>{dia}</span>
+                        {tieneEvento && !esHoy && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent-violet absolute bottom-0.5" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
 
-<BottomNav></BottomNav>
-</div>)
+              {/* Lista de Eventos del Mes */}
+              <div className="lg:col-span-7 flex flex-col gap-3">
+                <div className="flex justify-between items-center px-1">
+                  <span className="text-xs font-bold text-secondary uppercase tracking-wider">
+                    {eventosMes.length} {eventosMes.length === 1 ? 'evento programado' : 'eventos programados'}
+                  </span>
+                  <Link
+                    href="/agenda"
+                    className="text-xs font-bold text-accent-violet hover:underline flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-sm">add_circle</span> Agendar
+                  </Link>
+                </div>
+
+                {cargandoAgenda && (
+                  <div className="space-y-3">
+                    {[1, 2].map((i) => (
+                      <div key={i} className="bg-surface-bg neumorphic-inset rounded-xl p-4 flex gap-3 animate-pulse">
+                        <div className="w-12 h-12 rounded-lg bg-outline-variant/30 shrink-0" />
+                        <div className="flex-1 space-y-2 py-1">
+                          <div className="h-4 bg-outline-variant/30 rounded w-3/4" />
+                          <div className="h-3 bg-outline-variant/20 rounded w-1/2" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {!cargandoAgenda && eventosMes.length === 0 && (
+                  <div className="bg-surface-bg neumorphic-inset rounded-2xl p-6 text-center flex flex-col items-center gap-2">
+                    <span className="material-symbols-outlined text-3xl text-secondary">event_available</span>
+                    <p className="text-sm font-semibold text-text-main">No hay eventos para {MESES[currentMonth]}</p>
+                    <p className="text-xs text-secondary">Aprovechá para organizar tus clases, entregas y evaluaciones.</p>
+                    <Link
+                      href="/agenda"
+                      className="mt-2 px-4 py-1.5 rounded-xl bg-surface-bg neumorphic-raised text-accent-violet text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
+                    >
+                      Crear evento
+                    </Link>
+                  </div>
+                )}
+
+                {!cargandoAgenda && eventosMes.length > 0 && (
+                  <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1">
+                    {eventosMes.map((ev) => {
+                      const diaNum = Number(ev.fecha.split('T')[0].split('-')[2]);
+                      const esHoy = diaNum === currentDay;
+                      return (
+                        <div
+                          key={ev.id}
+                          className={`bg-surface-bg rounded-xl p-3.5 flex items-center gap-3 transition-transform hover:scale-[1.01] ${
+                            esHoy ? 'neumorphic-inset border-l-4 border-accent-violet' : 'neumorphic-raised'
+                          }`}
+                        >
+                          <div className="w-11 h-11 rounded-lg bg-surface-bg neumorphic-inset flex flex-col items-center justify-center shrink-0">
+                            <span className="text-[10px] font-bold uppercase text-secondary leading-none">Día</span>
+                            <span className="text-sm font-extrabold text-accent-violet leading-tight">{diaNum}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-text-main truncate">{ev.descripcion}</p>
+                            <span className="text-[11px] text-secondary">
+                              {esHoy ? '📌 Hoy' : `${diaNum} de ${MESES[currentMonth]}`}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* Sponsored Banner */}
+          {mostrarAds && (
+            <div className="bg-surface-bg neumorphic-inset rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+              <div className="flex items-center gap-3">
+                <span className="bg-tertiary-fixed-dim text-on-tertiary-fixed text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wide border border-outline-variant/30">Patrocinado</span>
+                <span className="material-symbols-outlined text-accent-violet">school</span>
+                <div className="flex-col">
+                  <h4 className="font-body-lg text-body-lg font-bold text-text-main">Diplomatura en Innovación Educativa 2026</h4>
+                  <p className="font-body-sm text-body-sm text-secondary">Becas del 50% y puntaje docente homologado para todas las provincias.</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <a className="px-4 py-2 rounded-lg bg-surface-bg neumorphic-raised text-accent-violet font-bold text-sm whitespace-nowrap" href="https://www.organizadordocente.com" target="_blank" rel="noopener noreferrer">Ver información</a>
+                <button
+                  onClick={() => setMostrarAds(false)}
+                  className="px-4 py-2 rounded-lg bg-surface-bg neumorphic-raised text-secondary font-bold text-sm whitespace-nowrap flex items-center gap-1 hover:opacity-80 transition-opacity"
+                >
+                  <span className="material-symbols-outlined text-sm">close</span> Quitar ads
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      <BottomNav />
+    </div>
+  );
 }
