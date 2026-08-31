@@ -152,12 +152,6 @@ export default function Menu() {
               <span className="font-body-sm text-body-sm font-bold text-accent-violet">Horarios</span>
             </Link>
 
-            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/horario">
-              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
-                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>bug_report</span>
-              </div>
-              <span className="font-body-sm text-body-sm font-bold text-accent-violet">Ayuda</span>
-            </Link>
 
             <button
               onClick={cerrarSesion}

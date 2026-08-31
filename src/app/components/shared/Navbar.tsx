@@ -19,10 +19,11 @@ type AgendaItem = {
 const API = process.env.NEXT_PUBLIC_API_URL ?? "https://backend-organizador.vercel.app";
 
 const NAV_LINKS = [
-  { label: "Inicio",          href: "/home" },
-  { label: "Agenda",          href: "/agenda" },
-  { label: "Cursos",          href: "/cursos" },
-  { label: "Planificaciones", href: "/planificaciones" },
+  { label: "Inicio",          href: "/home", isExternal: false },
+  { label: "Agenda",          href: "/agenda", isExternal: false },
+  { label: "Cursos",          href: "/cursos", isExternal: false },
+  { label: "Planificaciones", href: "/planificaciones", isExternal: false },
+  { label: "Ayuda",           href: "https://cv-sigma-umber.vercel.app/", isExternal: true },
 ];
 
 export default function Navbar() {
@@ -32,6 +33,11 @@ export default function Navbar() {
   const [eventosHoy, setEventosHoy] = useState<AgendaItem[]>([]);
   const [eventosMañana, setEventosMañana] = useState<AgendaItem[]>([]);
   const pathname = usePathname();
+
+  const cerrarSesion = () => {
+    localStorage.removeItem("token");
+    window.location.replace("/");
+  };
 
   useEffect(() => {
     const fetchUsuario = async () => {
@@ -99,6 +105,19 @@ export default function Navbar() {
           <nav className="flex items-center gap-1">
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;
+              if (link.isExternal) {
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all text-text-main hover:text-primary-container hover:bg-white/20"
+                  >
+                    {link.label}
+                  </a>
+                );
+              }
               return (
                 <Link
                   key={link.href}
@@ -129,8 +148,8 @@ export default function Navbar() {
             )}
           </button>
 
-          {/* User profile */}
-          <div className="flex items-center gap-2.5 pl-3 border-l border-outline-variant/40">
+          {/* User profile & Logout */}
+          <div className="flex items-center gap-2 pl-3 border-l border-outline-variant/40">
             {usuario && (
               <div className="flex flex-col items-end leading-tight">
                 <span className="text-[11px] font-bold text-primary-container tracking-wider uppercase">
@@ -145,12 +164,23 @@ export default function Navbar() {
             <Link
               href="/perfil"
               aria-label="Perfil"
-              className="neumorphic-raised w-9 h-9 rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+              title="Mi Perfil"
+              className="neumorphic-raised w-9 h-9 rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-transform text-primary-container"
             >
-              <span className="material-symbols-outlined text-[20px] text-primary-container" style={{ fontVariationSettings: "'FILL' 1" }}>
+              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                 account_circle
               </span>
             </Link>
+            <button
+              onClick={cerrarSesion}
+              aria-label="Cerrar sesión"
+              title="Cerrar sesión"
+              className="neumorphic-raised w-9 h-9 rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-transform text-text-main hover:text-red-600"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                logout
+              </span>
+            </button>
           </div>
         </div>
 
@@ -171,6 +201,20 @@ export default function Navbar() {
         <div className="md:hidden absolute top-20 left-0 right-0 bg-surface-bg shadow-[0px_8px_20px_rgba(163,177,198,0.4)] z-50 px-margin-page py-3 flex flex-col gap-1.5">
           {NAV_LINKS.map((link) => {
             const isActive = pathname === link.href;
+            if (link.isExternal) {
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                  className="px-3 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-text-main hover:text-primary-container"
+                >
+                  {link.label}
+                </a>
+              );
+            }
             return (
               <Link
                 key={link.href}
@@ -186,6 +230,16 @@ export default function Navbar() {
               </Link>
             );
           })}
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              cerrarSesion();
+            }}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-text-main hover:text-red-600 hover:bg-white/20 transition-all text-left"
+          >
+            <span className="material-symbols-outlined text-sm">logout</span>
+            Cerrar Sesión
+          </button>
         </div>
       )}
     </header>
