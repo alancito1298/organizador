@@ -606,7 +606,7 @@ export default function AlumnosClient() {
                     className="fixed inset-0 z-20"
                     onClick={() => setMenuDescargasAbierto(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-72 bg-surface-bg neumorphic-raised rounded-2xl p-2.5 z-30 flex flex-col gap-1.5 border border-white/60 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+                  <div className="absolute right-0 sm:right-0 max-sm:left-1/2 max-sm:-translate-x-1/2 mt-2 w-72 max-w-[calc(100vw-32px)] bg-surface-bg neumorphic-raised rounded-2xl p-2.5 z-30 flex flex-col gap-1.5 border border-white/60 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
                     <span className="font-label-caps text-secondary text-[10px] uppercase font-bold px-3 pt-1.5 pb-1">
                       Elegir formato de descarga
                     </span>
