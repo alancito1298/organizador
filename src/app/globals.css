@@ -215,21 +215,31 @@ h1, h2, h3, h4, h5, h6,
 .text-display-lg { font-size: 48px; line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; }
 
 /* Neumorphic and glassmorphism utilities */
-.neumorphic-raised {
+.neumorphic-raised, .neu-raised {
+  background: #E0E5EC;
   box-shadow: 6px 6px 12px #A3B1C6, -6px -6px 12px #FFFFFF;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
-.neumorphic-raised:active {
-  box-shadow: inset 2px 2px 5px #B8C6D9, inset -2px -2px 5px #FFFFFF;
+.neumorphic-raised:active, .neu-raised:active, .neu-pressed {
+  background: #E0E5EC;
+  box-shadow: inset 3px 3px 6px #B8C6D9, inset -3px -3px 6px #FFFFFF;
 }
 
-.neumorphic-inset {
-  box-shadow: inset 2px 2px 5px #B8C6D9, inset -2px -2px 5px #FFFFFF;
+.neumorphic-inset, .neu-inset {
+  background: #E0E5EC;
+  box-shadow: inset 3px 3px 6px #B8C6D9, inset -3px -3px 6px #FFFFFF;
 }
 
-.neumorphic-pressed:active {
-  box-shadow: inset 2px 2px 5px #B8C6D9, inset -2px -2px 5px #FFFFFF;
+.neu-header-pill {
+  background: #E0E5EC;
+  box-shadow: 4px 4px 8px #A3B1C6, -4px -4px 8px #FFFFFF;
+}
+
+.neu-subject-card {
+  background: #E0E5EC;
+  box-shadow: 5px 5px 10px #A3B1C6, -5px -5px 10px #FFFFFF;
+  border-left: 4px solid #6D28D9;
 }
 
 .glassmorphism {
