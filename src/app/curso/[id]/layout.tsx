@@ -1,95 +1,9 @@
-'use client';
-
-import { useEffect, useState } from "react";
-import { useParams, usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft } from 'lucide-react';
-
-type Curso = {
-  id: number;
-  escuela: string;
-  anio: string;
-  materia: string;
-};
+import React from "react";
 
 export default function CursoLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { id } = useParams();
-  const pathname = usePathname();
-  const [curso, setCurso] = useState<Curso | null>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchCurso = async () => {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch(
-        `https://backend-organizador.vercel.app/cursos/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-      setCurso(data);
-    };
-
-    if (id) fetchCurso();
-  }, [id]);
-
-  if (!curso) return <p className="text-center mt-10">Cargando...</p>;
-
-  const menuItems = [
-    { name: "Asistencia", path: `/curso/${id}/asistencia` },
-    { name: "Alumnos", path: `/curso/${id}/alumnos` },
-    { name: "Calificaciones", path: `/curso/${id}/calificaciones` },
-  ];
-
-  return (
-    <div className="min-w-screen bg-violet-100">
-      {/* HEADER */}
-      <div className="bg-violet-950 flex flex-row items-center gap-3 text-white text-center">
-        <div>
-          <button
-            onClick={() => router.back()}
-            className="flex flex-row justify-start items-center h-full w-20 text-white"
-          >
-            <ArrowLeft size={35} className="ml-5"/>
-          </button>
-        </div>
-        <div>
-          <h1 className="text-3xl mt-1 ml-1 font-bold">
-            {curso.anio} - {curso.materia}
-          </h1>
-          <p className="uppercase ml-2 mb-4 font-sans font-light">{curso.escuela}</p>
-        </div>
-      </div>
-
-      <nav className="flex w-full bg-violet-300 font-bebas">
-        {menuItems.map((item) => (
-          <Link
-            key={item.path}
-            href={item.path}
-            className={`flex-1 text-center py-3 text-sm font-medium transition
-            ${pathname === item.path
-              ? "bg-violet-700 text-xl border-b-4 text-white font-bold"
-              : "bg-violet-800 border-b border-violet-300 text-violet-100 hover:bg-violet-300"
-            }`}
-          >
-            {item.name}
-          </Link>
-        ))}
-      </nav>
-
-      {/* CONTENIDO */}
-      <div className="w-full flex justify-center">
-        {children}
-      </div>
-    </div>
-  );
+  return <>{children}</>;
 }

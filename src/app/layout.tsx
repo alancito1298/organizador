@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Inter, Roboto_Mono, Bebas_Neue, Atma, Plus_Jakarta_Sans } from "next/font/google";
+import { Mulish, Arima } from "next/font/google";
 import Script from "next/script";
 import GoogleAnalytics from "./components/shared/GoogleAnalytics";
 import ChatbotIA from "./components/shared/ChatbotIA";
@@ -10,32 +10,18 @@ import "./globals.css";
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
-const inter = Inter({
+const mulish = Mulish({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-mulish",
+  display: "swap",
 });
 
-const jakarta = Plus_Jakarta_Sans({
+const arima = Arima({
   subsets: ["latin"],
-  variable: "--font-jakarta",
-});
-
-const bebas = Bebas_Neue({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-bebas",
-});
-
-const atma = Atma({
-  weight: "700", 
-  subsets: ["latin"],
-  variable: "--font-atma",
-});
-
-
-const mono = Roboto_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono", // opcional
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-arima",
+  display: "swap",
 });
 
 const SITE_URL = "https://www.organizadordocente.com";
@@ -111,7 +97,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800&family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Arima+Madurai:wght@400;500;700;800;900&family=Arima:wght@400;500;600;700;800&family=Mulish:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
         <meta name="theme-color" content="#6d28d9" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -125,8 +111,24 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className={`${inter.className} ${jakarta.variable} ${mono.variable} min-h-screen`}>
+      <body className={`${mulish.className} ${mulish.variable} ${arima.variable} font-mulish min-h-screen`}>
         <Script src="https://accounts.google.com/gsi/client?hl=es" strategy="afterInteractive" />
+        <Script id="sw-dev-cleanup" strategy="beforeInteractive">
+          {`
+            if (typeof window !== 'undefined' && 'serviceWorker' in navigator && (location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (var r of registrations) {
+                  r.unregister();
+                }
+              });
+              if ('caches' in window) {
+                caches.keys().then(function(keys) {
+                  keys.forEach(function(k) { caches.delete(k); });
+                });
+              }
+            }
+          `}
+        </Script>
         {GA_MEASUREMENT_ID && (
           <>
             <Script

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import BottomNav from './BottomNav';
+import { getToken } from '@/lib/token';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
@@ -18,6 +19,11 @@ type AgendaItem = {
   id: number;
   fecha: string;
   descripcion: string;
+};
+
+type Usuario = {
+  nombre: string;
+  apellido: string;
 };
 
 const MESES = [
@@ -41,16 +47,83 @@ const iconoPorMateria = (materia: string): string => {
   return 'menu_book';
 };
 
+const formatearGradoCurso = (anio: string | number | undefined) => {
+  if (!anio) return '';
+  const str = String(anio).trim();
+  const lower = str.toLowerCase();
+  if (lower.includes('año') || lower.includes('grado') || lower.includes('to') || lower.includes('do') || lower.includes('ro') || lower.includes('er')) {
+    return str;
+  }
+  const num = parseInt(str, 10);
+  if (!isNaN(num)) {
+    const nombres: Record<number, string> = {
+      1: '1er Año',
+      2: '2do Año',
+      3: '3er Año',
+      4: '4to Año',
+      5: '5to Año',
+      6: '6to Año',
+      7: '7mo Año',
+    };
+    return nombres[num] || `${num}° Año`;
+  }
+  return `${str}° Año`;
+};
+
 export default function Menu() {
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [mostrarAds, setMostrarAds] = useState(true);
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [cargandoCursos, setCargandoCursos] = useState(true);
   const [agenda, setAgenda] = useState<AgendaItem[]>([]);
   const [cargandoAgenda, setCargandoAgenda] = useState(true);
 
+  // Trimestre Activo
+  const [trimestreActivo, setTrimestreActivo] = useState<number>(1);
+  const [modalCerrarTrimestre, setModalCerrarTrimestre] = useState(false);
+
   useEffect(() => {
+    const saved = localStorage.getItem('trimestreActivo');
+    if (saved && [1, 2, 3].includes(Number(saved))) {
+      setTrimestreActivo(Number(saved));
+    } else {
+      setTrimestreActivo(1);
+      localStorage.setItem('trimestreActivo', '1');
+    }
+  }, []);
+
+  const cambiarTrimestre = (t: number) => {
+    setTrimestreActivo(t);
+    localStorage.setItem('trimestreActivo', String(t));
+  };
+
+  const avanzarSiguienteTrimestre = () => {
+    if (trimestreActivo < 3) {
+      cambiarTrimestre(trimestreActivo + 1);
+    } else {
+      cambiarTrimestre(1);
+    }
+    setModalCerrarTrimestre(false);
+  };
+
+  useEffect(() => {
+    const fetchUsuario = async () => {
+      const token = getToken();
+      if (!token) return;
+      try {
+        const res = await fetch(`${API}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        setUsuario(data);
+      } catch (err) {
+        console.error('Error al obtener usuario:', err);
+      }
+    };
+
     const fetchCursos = async () => {
-      const token = localStorage.getItem('token');
+      const token = getToken();
       if (!token) { setCargandoCursos(false); return; }
       try {
         const res = await fetch(`${API}/cursos`, {
@@ -67,7 +140,7 @@ export default function Menu() {
     };
 
     const fetchAgenda = async () => {
-      const token = localStorage.getItem('token');
+      const token = getToken();
       if (!token) { setCargandoAgenda(false); return; }
       try {
         const res = await fetch(`${API}/agenda`, {
@@ -83,6 +156,7 @@ export default function Menu() {
       }
     };
 
+    fetchUsuario();
     fetchCursos();
     fetchAgenda();
   }, []);
@@ -92,6 +166,9 @@ export default function Menu() {
   const currentYear = hoy.getFullYear();
   const currentMonth = hoy.getMonth();
   const currentDay = hoy.getDate();
+  const DIAS_COMPLETOS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const diaSemanaActual = DIAS_COMPLETOS[hoy.getDay()];
+  const anioEscolar = `${currentYear} - ${currentYear + 1}`;
 
   const primerDia = new Date(currentYear, currentMonth, 1);
   const totalDiasMes = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -112,11 +189,29 @@ export default function Menu() {
     eventosMes.map(item => Number(item.fecha.split('T')[0].split('-')[2]))
   );
 
+  const CURSOS_DEFAULT: Curso[] = [
+    { id: 1, materia: 'Historia', anio: '2', escuela: 'E.E.S. N°7 "Mariano Moreno"', ruta: '/cursos' },
+    { id: 2, materia: 'Historia', anio: '2', escuela: 'E.E.S. N°7 "Mariano Moreno"', ruta: '/cursos' },
+    { id: 3, materia: 'Historia', anio: '2', escuela: 'E.E.S. N°7 "Mariano Moreno"', ruta: '/cursos' },
+    { id: 4, materia: 'Historia', anio: '2', escuela: 'E.E.S. N°7 "Mariano Moreno"', ruta: '/cursos' },
+  ];
+
+  const EVENTOS_DEFAULT: AgendaItem[] = [
+    { id: 1, fecha: '2026-08-10T00:00:00', descripcion: '🎓 Jornada institucional - Convivencia escolar' },
+    { id: 2, fecha: '2026-08-25T00:00:00', descripcion: '📝 Examen 2° trimestre Matemática 3°' },
+    { id: 3, fecha: '2026-08-25T00:00:00', descripcion: '📝 Examen 2° trimestre Historia 2°' },
+  ];
+
+  const cursosMobile = cursos.length > 0 ? cursos.slice(0, 4) : CURSOS_DEFAULT;
+  const eventosMobile = eventosMes.length > 0 ? eventosMes.slice(0, 5) : EVENTOS_DEFAULT;
+  const primerNombre = usuario?.nombre ? usuario.nombre.trim().split(' ')[0] : 'Joshua';
+  const nombreFormateado = primerNombre ? (primerNombre.charAt(0).toUpperCase() + primerNombre.slice(1).toLowerCase()) : 'Docente';
+
   return (
     <div className="w-full min-h-screen bg-surface-bg text-text-main flex flex-col antialiased">
-      <main className="flex-grow flex flex-col md:flex-row max-w-[1440px] w-full mx-auto pb-24 md:pb-0 pt-28 md:pt-32 px-4 md:px-margin-page gap-gutter">
-        {/* Vertical Sidebar */}
-        <aside className="hidden md:flex flex-col w-64 flex-shrink-0 bg-surface-bg neumorphic-raised rounded-3xl p-6 h-fit sticky top-24 mb-12">
+      <main className="flex-grow flex flex-col md:flex-row max-w-[1440px] w-full mx-auto pb-24 md:pb-12 pt-32 md:pt-40 px-4 md:px-margin-page gap-gutter">
+        {/* Vertical Sidebar (Desktop) */}
+        <aside className="hidden md:flex flex-col w-64 flex-shrink-0 bg-surface-bg neumorphic-raised rounded-3xl p-6 h-fit sticky top-32 mb-12">
           <h3 className="font-headline-md-mobile text-headline-md-mobile text-accent-violet uppercase mb-6 px-4">Menú</h3>
           <nav className="flex flex-col gap-4">
             <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/agenda">
@@ -149,245 +244,278 @@ export default function Menu() {
           </nav>
         </aside>
 
-        {/* Mobile Menu Grid (solo mobile) */}
-        <div className="flex flex-col md:hidden w-full">
-          {/* Page Header Mobile */}
-          <div className="text-center mb-8">
-            <h1 className="font-headline-md text-headline-md text-accent-violet uppercase mb-4 tracking-wide">¡Hola Docente!</h1>
-            <div className="flex justify-center items-center gap-2">
-              <h2 className="font-display-lg text-accent-violet uppercase" style={{ fontSize: '2rem', fontWeight: 800 }}>Organizador<br />Docente</h2>
+        {/* Mobile View con toda la información solicitada */}
+        <div className="flex flex-col md:hidden w-full gap-6">
+          {/* Header Mobile */}
+          <header className="flex flex-col gap-1.5 pt-2">
+            <h1 className="font-display-lg text-3xl md:text-4xl text-on-surface tracking-tight font-extrabold">
+              Hola {nombreFormateado}
+            </h1>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="font-headline-md text-on-surface text-base font-bold">
+                {diaSemanaActual} / {cursos.length > 0 ? `${formatearGradoCurso(cursos[0].anio).toUpperCase()} • ${cursos[0].materia.toUpperCase()}` : 'MATERIA'}
+              </span>
+              <span className="text-xs text-secondary">{cursos.length > 0 ? `(${cursos[0].escuela})` : ''}</span>
+              <Link className="text-accent-violet text-xs font-bold underline ml-1 hover:opacity-80" href="/horario">
+                Ver horarios →
+              </Link>
             </div>
-          </div>
-
-          {/* Grid de accesos rápidos */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <a href="/agenda" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
-              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>calendar_add_on</span>
-              </div>
-              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Agenda</span>
-            </a>
-            <a href="/cursos" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
-              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>school</span>
-              </div>
-              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Cursos</span>
-            </a>
-            <a href="/planificaciones" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
-              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>edit_document</span>
-              </div>
-              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Planificaciones</span>
-            </a>
-            <a href="/horario" className="bg-surface-bg neumorphic-raised rounded-2xl p-5 flex flex-col items-center gap-3 hover:scale-[1.02] transition-transform active:scale-95">
-              <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>schedule</span>
-              </div>
-              <span className="font-bold text-sm text-accent-violet uppercase tracking-wide">Horarios</span>
-            </a>
-          </div>
-        </div>
-
-        {/* Content Area (solo desktop) */}
-        <div className="hidden md:flex flex-grow w-full max-w-4xl mx-auto md:mx-0 flex-col">
-          {/* Page Header */}
-          <div className="text-center mb-12">
-            <h1 className="font-headline-md text-headline-md text-accent-violet uppercase mb-6 tracking-wide">¡Hola Docente! Tu panel de gestión</h1>
-            <div className="flex justify-center items-center gap-3">
-              <span className="material-symbols-outlined text-display-lg text-accent-violet">history_edu</span>
-              <h2 className="font-display-lg text-display-lg text-accent-violet leading-none uppercase">Organizador<br />Docente</h2>
-            </div>
-          </div>
-
-          {/* Mis Cursos Recientes Section */}
-          <section className="mb-12">
-            <div className="flex justify-between items-center mb-6 px-2">
-              <h3 className="font-headline-md text-headline-md text-accent-violet uppercase tracking-wide">Mis Cursos Recientes</h3>
-              <Link className="text-body-sm font-bold text-accent-violet hover:opacity-80 transition-opacity uppercase tracking-wider" href="/cursos">Ver todos</Link>
+            <div className="flex items-center gap-2 text-xs text-secondary mt-0.5">
+              <span>Año escolar: {anioEscolar}</span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full neumorphic-inset text-[10px] font-bold text-accent-violet">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_3px_#22c55e]"></span>
+                En curso
+              </span>
             </div>
 
-            {/* Skeleton loader */}
-            {cargandoCursos && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="bg-surface-bg neumorphic-inset rounded-2xl p-6 flex flex-col gap-4 animate-pulse">
-                    <div className="flex justify-between items-start">
-                      <div className="w-12 h-12 rounded-xl bg-outline-variant/30" />
-                      <div className="w-10 h-4 rounded bg-outline-variant/30" />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <div className="h-5 w-3/4 rounded bg-outline-variant/30" />
-                      <div className="h-4 w-1/2 rounded bg-outline-variant/20" />
-                    </div>
-                  </div>
-                ))}
+            {/* ── Indicador de Trimestre (Mobile) ── */}
+            <div className="flex flex-wrap items-center gap-2 text-xs text-secondary mt-1">
+              <span className="font-semibold text-secondary">Estás viendo:</span>
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full neumorphic-inset text-xs font-bold text-accent-violet">
+                {trimestreActivo}° Trimestre
               </div>
-            )}
 
-            {/* Sin cursos */}
-            {!cargandoCursos && cursos.length === 0 && (
-              <div className="bg-surface-bg neumorphic-inset rounded-2xl p-10 flex flex-col items-center gap-3 text-center">
-                <span className="material-symbols-outlined text-5xl text-outline-variant">school</span>
-                <p className="font-bold text-text-main">Todavía no tenés cursos cargados</p>
-                <p className="text-sm text-secondary">Creá tu primer curso para empezar a gestionar tu aula.</p>
+              <button
+                onClick={() => setModalCerrarTrimestre(true)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-bg neumorphic-raised text-[11px] font-bold text-amber-800 hover:text-amber-900 active:scale-95 transition-all shadow-sm"
+                title="Cerrar trimestre actual y pasar al siguiente"
+              >
+                <span className="material-symbols-outlined text-xs text-amber-600">lock_reset</span>
+                {trimestreActivo < 3 ? `Cerrar ${trimestreActivo}° Trimestre` : 'Cerrar 3° Trimestre'}
+              </button>
+            </div>
+          </header>
+
+          {/* Cursos Mobile */}
+          <section className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              {cursosMobile.map((curso, idx) => (
                 <Link
-                  href="/cursos"
-                  className="mt-2 px-6 py-2 rounded-xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
+                  key={curso.id || idx}
+                  href={curso.ruta ?? `/sub-menu-curso/${curso.id}`}
+                  className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform"
                 >
-                  Crear curso
+                  <div className="flex justify-between items-start">
+                    <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet">
+                      <span className="material-symbols-outlined text-2xl">{iconoPorMateria(curso.materia)}</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-md neumorphic-inset font-extrabold text-[11px] text-accent-violet">
+                      {formatearGradoCurso(curso.anio)}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
+                    <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
+                      <span className="material-symbols-outlined text-[14px]">domain</span>
+                      {curso.escuela}
+                    </p>
+                  </div>
                 </Link>
-              </div>
-            )}
+              ))}
+            </div>
 
-            {/* Cursos reales (máx 3) */}
-            {!cargandoCursos && cursos.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {cursos.slice(0, 3).map(curso => (
-                  <Link
-                    key={curso.id}
-                    href={curso.ruta ?? `/sub-menu-curso/${curso.id}`}
-                    className="bg-surface-bg neumorphic-raised rounded-2xl p-6 flex flex-col gap-4 group cursor-pointer hover:scale-[1.02] transition-transform"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="w-12 h-12 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center">
-                        <span className="material-symbols-outlined text-accent-violet text-3xl">{iconoPorMateria(curso.materia)}</span>
-                      </div>
-                      <span className="text-xs font-bold text-secondary uppercase tracking-widest">{curso.anio}°</span>
-                    </div>
-                    <div>
-                      <h4 className="font-body-lg font-bold text-text-main mb-1">{curso.materia}</h4>
-                      <div className="flex items-center gap-2 text-secondary">
-                        <span className="material-symbols-outlined text-sm">location_city</span>
-                        <span className="text-xs truncate">{curso.escuela}</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+            <div className="flex justify-end">
+              <Link className="font-label-caps text-accent-violet hover:opacity-80 transition-opacity" href="/cursos">
+                VER TODOS
+              </Link>
+            </div>
           </section>
 
-          {/* Vista Previa del Mes y Eventos del Mes (solo desktop) */}
-          <section className="mb-12">
-            <div className="flex justify-between items-center mb-6 px-2">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-accent-violet text-2xl">calendar_month</span>
-                <h3 className="font-headline-md text-headline-md text-accent-violet uppercase tracking-wide">
-                  {MESES[currentMonth]} {currentYear}
-                </h3>
-              </div>
-              <Link className="text-body-sm font-bold text-accent-violet hover:opacity-80 transition-opacity uppercase tracking-wider flex items-center gap-1" href="/agenda">
-                Ver Agenda Completa →
+          {/* Eventos Programados Mobile */}
+          <section className="flex flex-col gap-4 mt-2">
+            <div className="flex justify-between items-center">
+              <h2 className="font-label-caps text-secondary">
+                {eventosMobile.length} EVENTOS PROGRAMADOS
+              </h2>
+              <Link
+                href="/agenda"
+                className="flex items-center gap-1 text-accent-violet font-bold text-sm hover:opacity-80 transition-opacity"
+              >
+                <span className="material-symbols-outlined text-lg">add_circle</span>
+                Agendar
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Mini Calendario */}
-              <div className="lg:col-span-5 bg-surface-bg neumorphic-raised rounded-2xl p-6">
-                <div className="text-center font-bold text-text-main text-sm mb-4 uppercase tracking-wider pb-2 border-b border-outline-variant/30">
-                  {MESES[currentMonth]} {currentYear}
-                </div>
-                <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                  {DIAS_SEMANA.map((d, i) => (
-                    <span key={i} className="text-[11px] font-bold text-secondary uppercase">{d}</span>
-                  ))}
-                </div>
-                <div className="grid grid-cols-7 gap-1.5 text-center">
-                  {celdasMes.map((dia, idx) => {
-                    if (!dia) return <div key={idx} className="h-8" />;
-                    const esHoy = dia === currentDay;
-                    const tieneEvento = diasConEvento.has(dia);
-                    return (
-                      <div
-                        key={idx}
-                        className={`h-8 rounded-lg flex flex-col items-center justify-center text-xs font-semibold relative transition-all ${
-                          esHoy
-                            ? 'bg-accent-violet text-white font-bold shadow-md'
-                            : tieneEvento
-                            ? 'bg-surface-bg neumorphic-inset text-accent-violet font-bold'
-                            : 'text-text-main hover:bg-white/30'
-                        }`}
-                      >
-                        <span>{dia}</span>
-                        {tieneEvento && !esHoy && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent-violet absolute bottom-0.5" />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Lista de Eventos del Mes */}
-              <div className="lg:col-span-7 flex flex-col gap-3">
-                <div className="flex justify-between items-center px-1">
-                  <span className="text-xs font-bold text-secondary uppercase tracking-wider">
-                    {eventosMes.length} {eventosMes.length === 1 ? 'evento programado' : 'eventos programados'}
-                  </span>
+            <div className="flex flex-col gap-4">
+              {eventosMobile.map((ev, idx) => {
+                const diaNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[2]) : 10;
+                const mesNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[1]) - 1 : currentMonth;
+                const mesNombre = MESES[mesNum] ?? 'Agosto';
+                return (
                   <Link
+                    key={ev.id || idx}
                     href="/agenda"
-                    className="text-xs font-bold text-accent-violet hover:underline flex items-center gap-1"
+                    className="bg-surface-bg rounded-xl p-3 flex items-center gap-4 neumorphic-raised hover:scale-[1.01] active:scale-98 transition-transform"
                   >
-                    <span className="material-symbols-outlined text-sm">add_circle</span> Agendar
+                    <div className="w-12 h-12 rounded-lg neumorphic-inset flex flex-col items-center justify-center text-accent-violet shrink-0">
+                      <span className="text-[10px] font-bold leading-none">DÍA</span>
+                      <span className="text-lg font-bold leading-none">{diaNum}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <h4 className="font-bold text-on-surface text-sm flex items-center gap-2">
+                        {ev.descripcion}
+                      </h4>
+                      <span className="text-xs text-secondary">{diaNum} de {mesNombre}</span>
+                    </div>
                   </Link>
-                </div>
+                );
+              })}
+            </div>
 
-                {cargandoAgenda && (
-                  <div className="space-y-3">
-                    {[1, 2].map((i) => (
-                      <div key={i} className="bg-surface-bg neumorphic-inset rounded-xl p-4 flex gap-3 animate-pulse">
-                        <div className="w-12 h-12 rounded-lg bg-outline-variant/30 shrink-0" />
-                        <div className="flex-1 space-y-2 py-1">
-                          <div className="h-4 bg-outline-variant/30 rounded w-3/4" />
-                          <div className="h-3 bg-outline-variant/20 rounded w-1/2" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            <div className="flex justify-center mt-4 pb-8 border-b border-outline-variant/30">
+              <Link
+                className="font-label-caps text-accent-violet hover:opacity-80 transition-opacity flex items-center gap-2"
+                href="/agenda"
+              >
+                VER AGENDA COMPLETA <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </Link>
+            </div>
+          </section>
+        </div>
 
-                {!cargandoAgenda && eventosMes.length === 0 && (
-                  <div className="bg-surface-bg neumorphic-inset rounded-2xl p-6 text-center flex flex-col items-center gap-2">
-                    <span className="material-symbols-outlined text-3xl text-secondary">event_available</span>
-                    <p className="text-sm font-semibold text-text-main">No hay eventos para {MESES[currentMonth]}</p>
-                    <p className="text-xs text-secondary">Aprovechá para organizar tus clases, entregas y evaluaciones.</p>
-                    <Link
-                      href="/agenda"
-                      className="mt-2 px-4 py-1.5 rounded-xl bg-surface-bg neumorphic-raised text-accent-violet text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
-                    >
-                      Crear evento
-                    </Link>
-                  </div>
-                )}
+        {/* Main Content Area (Desktop & Tablet) */}
+        <div className="hidden md:flex flex-grow w-full max-w-4xl mx-auto md:mx-0 flex-col gap-8">
+          {/* Header */}
+          <header className="flex flex-col gap-1.5">
+            <h1 className="font-display-lg text-4xl md:text-5xl text-on-surface tracking-tight font-extrabold">
+              Hola {nombreFormateado}
+            </h1>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="font-headline-md text-on-surface text-lg font-bold">
+                {diaSemanaActual} / {cursos.length > 0 ? `${formatearGradoCurso(cursos[0].anio).toUpperCase()} • ${cursos[0].materia.toUpperCase()}` : 'MATERIA'}
+              </span>
+              <span className="text-sm text-secondary">{cursos.length > 0 ? `(${cursos[0].escuela})` : ''}</span>
+              <Link className="text-accent-violet text-xs font-bold underline ml-2 hover:opacity-80" href="/horario">
+                Ver horarios →
+              </Link>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-secondary mt-0.5">
+              <span>Año escolar: {anioEscolar}</span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full neumorphic-inset text-[10px] font-bold text-accent-violet">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_3px_#22c55e]"></span>
+                En curso
+              </span>
+            </div>
 
-                {!cargandoAgenda && eventosMes.length > 0 && (
-                  <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1">
-                    {eventosMes.map((ev) => {
-                      const diaNum = Number(ev.fecha.split('T')[0].split('-')[2]);
-                      const esHoy = diaNum === currentDay;
-                      return (
-                        <div
-                          key={ev.id}
-                          className={`bg-surface-bg rounded-xl p-3.5 flex items-center gap-3 transition-transform hover:scale-[1.01] ${
-                            esHoy ? 'neumorphic-inset border-l-4 border-accent-violet' : 'neumorphic-raised'
-                          }`}
-                        >
-                          <div className="w-11 h-11 rounded-lg bg-surface-bg neumorphic-inset flex flex-col items-center justify-center shrink-0">
-                            <span className="text-[10px] font-bold uppercase text-secondary leading-none">Día</span>
-                            <span className="text-sm font-extrabold text-accent-violet leading-tight">{diaNum}</span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-text-main truncate">{ev.descripcion}</p>
-                            <span className="text-[11px] text-secondary">
-                              {esHoy ? '📌 Hoy' : `${diaNum} de ${MESES[currentMonth]}`}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+            {/* ── Indicador de Trimestre (Desktop) ── */}
+            <div className="flex flex-wrap items-center gap-2.5 text-xs text-secondary mt-1">
+              <span className="font-semibold text-secondary">Estás viendo:</span>
+              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full neumorphic-inset text-xs font-bold text-accent-violet">
+                <span className="material-symbols-outlined text-sm">schedule</span>
+                {trimestreActivo}° Trimestre
               </div>
+
+              {/* Selector Rápido */}
+              <div className="flex items-center gap-1 bg-surface-bg neumorphic-inset rounded-full p-0.5">
+                {[1, 2, 3].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => cambiarTrimestre(t)}
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all ${
+                      trimestreActivo === t
+                        ? 'bg-accent-violet text-white shadow-sm'
+                        : 'text-secondary hover:text-accent-violet'
+                    }`}
+                  >
+                    {t}° Trim
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setModalCerrarTrimestre(true)}
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-bg neumorphic-raised text-[11px] font-bold text-amber-800 hover:text-amber-900 active:scale-95 transition-all shadow-sm ml-1"
+                title="Cerrar trimestre actual y pasar al siguiente"
+              >
+                <span className="material-symbols-outlined text-sm text-amber-600">lock_reset</span>
+                {trimestreActivo < 3 ? `Cerrar ${trimestreActivo}° Trimestre y pasar al ${trimestreActivo + 1}°` : 'Cerrar 3° Trimestre'}
+              </button>
+            </div>
+          </header>
+
+          {/* Mis Cursos Section */}
+          <section className="flex flex-col gap-4">
+            <div className="flex justify-between items-center px-1">
+              <h2 className="font-headline-md text-headline-md text-accent-violet uppercase tracking-wide">Mis Cursos</h2>
+              <Link className="font-label-caps text-accent-violet hover:opacity-80 transition-opacity uppercase tracking-wider" href="/cursos">
+                VER TODOS
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {cursosMobile.map((curso, idx) => (
+                <Link
+                  key={curso.id || idx}
+                  href={curso.ruta ?? `/sub-menu-curso/${curso.id}`}
+                  className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet">
+                      <span className="material-symbols-outlined text-2xl">{iconoPorMateria(curso.materia)}</span>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-lg neumorphic-inset font-extrabold text-[11px] text-accent-violet">
+                      {formatearGradoCurso(curso.anio)}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
+                    <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
+                      <span className="material-symbols-outlined text-[14px]">domain</span>
+                      {curso.escuela}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* Agenda Section */}
+          <section className="flex flex-col gap-4 mt-2">
+            <div className="flex justify-between items-center px-1">
+              <h2 className="font-label-caps text-secondary uppercase tracking-wider">
+                {eventosMobile.length} EVENTOS PROGRAMADOS
+              </h2>
+              <Link
+                href="/agenda"
+                className="flex items-center gap-1 text-accent-violet font-bold text-sm hover:opacity-80 transition-opacity"
+              >
+                <span className="material-symbols-outlined text-lg">add_circle</span>
+                Agendar
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {eventosMobile.map((ev, idx) => {
+                const diaNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[2]) : 10;
+                const mesNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[1]) - 1 : currentMonth;
+                const mesNombre = MESES[mesNum] ?? 'Agosto';
+                return (
+                  <Link
+                    key={ev.id || idx}
+                    href="/agenda"
+                    className="bg-surface-bg rounded-xl p-3.5 flex items-center gap-4 neumorphic-raised hover:scale-[1.01] active:scale-98 transition-transform"
+                  >
+                    <div className="w-12 h-12 rounded-lg neumorphic-inset flex flex-col items-center justify-center text-accent-violet shrink-0">
+                      <span className="text-[10px] font-bold leading-none uppercase">DÍA</span>
+                      <span className="text-lg font-bold leading-none mt-0.5">{diaNum}</span>
+                    </div>
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <h4 className="font-bold text-on-surface text-sm truncate">
+                        {ev.descripcion}
+                      </h4>
+                      <span className="text-xs text-secondary mt-0.5">{diaNum} de {mesNombre}</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="flex justify-center mt-4 pb-8 border-b border-outline-variant/30">
+              <Link
+                className="font-label-caps text-accent-violet hover:opacity-80 transition-opacity flex items-center gap-2"
+                href="/agenda"
+              >
+                VER AGENDA COMPLETA <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </Link>
             </div>
           </section>
 
@@ -416,6 +544,60 @@ export default function Menu() {
         </div>
       </main>
 
+      {/* ── Modal de Confirmación para Cerrar Trimestre ── */}
+      {modalCerrarTrimestre && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setModalCerrarTrimestre(false);
+          }}
+        >
+          <div className="bg-surface-bg neumorphic-raised rounded-3xl p-6 w-full max-w-md flex flex-col gap-5 border border-white/60 shadow-2xl font-mulish">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100/80 neumorphic-inset flex items-center justify-center text-amber-700 text-2xl shrink-0">
+                <span className="material-symbols-outlined text-2xl">lock_reset</span>
+              </div>
+              <div>
+                <h3 className="font-headline-md text-xl text-on-surface uppercase font-bold">
+                  {trimestreActivo < 3 ? `Cerrar ${trimestreActivo}° Trimestre` : 'Cerrar 3° Trimestre'}
+                </h3>
+                <p className="text-xs text-secondary">
+                  {trimestreActivo < 3
+                    ? `Avanzarás al ${trimestreActivo + 1}° Trimestre para iniciar la nueva etapa de clases.`
+                    : 'Has concluido el ciclo lectivo. Puedes reiniciar al 1° Trimestre.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-surface-bg neumorphic-inset rounded-2xl p-4 text-xs text-secondary flex flex-col gap-2">
+              <p className="font-bold text-on-surface flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm text-emerald-600">check_circle</span>
+                Tus registros anteriores se conservan para exportar a Excel / PDF.
+              </p>
+              <p className="text-secondary">
+                La vista activa pasará al nuevo trimestre para registrar asistencias y notas desde cero.
+              </p>
+            </div>
+
+            <div className="flex gap-3 mt-2">
+              <button
+                onClick={() => setModalCerrarTrimestre(false)}
+                className="flex-1 py-3 rounded-xl bg-surface-bg neumorphic-raised text-secondary font-bold text-xs uppercase tracking-wider hover:opacity-80 active:scale-95 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={avanzarSiguienteTrimestre}
+                className="flex-1 py-3 rounded-xl bg-accent-violet text-white font-bold text-xs uppercase tracking-wider shadow-md hover:bg-accent-violet/90 active:scale-95 transition-all"
+              >
+                {trimestreActivo < 3 ? `Pasar al ${trimestreActivo + 1}° Trimestre →` : 'Reiniciar al 1° Trimestre'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Nav (Mobile) */}
       <BottomNav />
     </div>
   );

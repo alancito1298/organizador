@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Navbar from "../components/shared/Navbar";
 import ListaCursos from "@/app/components/cursos/Cursos";
 import BottomNav from "../components/shared/BottomNav";
 import Footer from "../components/shared/Footer";
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 export default function MenuCursos() {
   return (
     <>
+      <Navbar />
       <ListaCursos />
       <Footer />
       <BottomNav />

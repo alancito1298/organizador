@@ -8,6 +8,29 @@ type Props = Curso & {
   onEliminar?: (id: number) => void;
 };
 
+const formatearGradoCurso = (anio: string | number | undefined) => {
+  if (!anio) return '';
+  const str = String(anio).trim();
+  const lower = str.toLowerCase();
+  if (lower.includes('año') || lower.includes('grado') || lower.includes('to') || lower.includes('do') || lower.includes('ro') || lower.includes('er')) {
+    return str;
+  }
+  const num = parseInt(str, 10);
+  if (!isNaN(num)) {
+    const nombres: Record<number, string> = {
+      1: '1er Año',
+      2: '2do Año',
+      3: '3er Año',
+      4: '4to Año',
+      5: '5to Año',
+      6: '6to Año',
+      7: '7mo Año',
+    };
+    return nombres[num] || `${num}° Año`;
+  }
+  return `${str}° Año`;
+};
+
 export default function ListaCursos({ id, anio, escuela, materia, ruta, onEliminar }: Props) {
   const [confirmando, setConfirmando] = useState(false);
   const [eliminando, setEliminando] = useState(false);
@@ -38,12 +61,18 @@ export default function ListaCursos({ id, anio, escuela, materia, ruta, onElimin
       <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-md hover:shadow-lg border border-violet-200 overflow-hidden transition-all duration-200 relative group my-2">
         {/* Tarjeta clickeable */}
         <a href={ruta} className="flex items-center p-4 gap-4 pr-12">
-          <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-violet-700 rounded-xl shrink-0 text-white font-extrabold text-2xl sm:text-3xl shadow-sm">
-            {anio}°
+          <div className="flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-violet-700 rounded-xl shrink-0 text-white shadow-sm p-1 text-center">
+            <span className="font-extrabold text-xl sm:text-2xl leading-none">{anio}°</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider opacity-90 mt-0.5">Año</span>
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-xs sm:text-sm text-violet-600 font-bold uppercase tracking-wider truncate mb-0.5">{escuela}</p>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="px-2 py-0.5 rounded bg-violet-100 text-violet-800 text-[11px] font-extrabold uppercase">
+                {formatearGradoCurso(anio)}
+              </span>
+              <p className="text-xs text-violet-600 font-bold uppercase tracking-wider truncate">{escuela}</p>
+            </div>
             <h3 className="text-base sm:text-lg font-bold text-gray-900 uppercase truncate">{materia}</h3>
             <span className="inline-flex items-center gap-1 text-xs text-violet-700 font-semibold mt-1 hover:underline">
               Ingresar al aula →

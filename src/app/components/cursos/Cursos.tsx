@@ -79,7 +79,6 @@ export default function Cursos() {
   if (sinSesion) {
     return (
       <div className="bg-surface-container-low min-h-screen">
-        <Navbar />
         <div className="max-w-xl mx-auto px-4 py-16 text-center">
           <div className="bg-surface rounded-2xl p-8 border border-outline-variant shadow-md">
             <span className="text-5xl mb-4 block">🔑</span>
@@ -100,10 +99,8 @@ export default function Cursos() {
   }
 
   return (
-    <div className="bg-surface-container-low min-h-screen pb-20">
-      <Navbar />
-
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="bg-surface-container-low min-h-screen pb-20 pt-24 md:pt-32">
+      <div className="max-w-4xl mx-auto px-4 py-4">
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-primary uppercase tracking-wide">
             Panel de Cursos y Aulas Escolares

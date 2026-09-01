@@ -3,7 +3,6 @@ import { saveAs } from 'file-saver';
 
 type AlumnoCurso = {
   id: number;
-
   alumno: {
     nombre: string;
     apellido: string;
@@ -18,16 +17,26 @@ type Columna = {
 
 type Props = {
   columnas: Columna[];
-
   datos: string[][];
-
   inscripciones: AlumnoCurso[];
-
   curso?: {
     escuela?: string;
     anio?: string;
     materia?: string;
   };
+};
+
+const formatearTipoEvaluacion = (tipo: string) => {
+  switch (tipo) {
+    case 'trabajo_practico':
+      return 'TP';
+    case 'Examen':
+      return 'Examen';
+    case 'final':
+      return 'Final';
+    default:
+      return tipo || 'Nota';
+  }
 };
 
 export async function exportarExcelCalificaciones({
@@ -36,438 +45,223 @@ export async function exportarExcelCalificaciones({
   inscripciones,
   curso,
 }: Props) {
-
-  const workbook =
-    new ExcelJS.Workbook();
+  const workbook = new ExcelJS.Workbook();
 
   // =====================
-  // AGRUPAR TRIMESTRES
+  // HOJA ÚNICA: TODAS LAS CALIFICACIONES JUNTAS
   // =====================
+  const worksheet = workbook.addWorksheet('Calificaciones');
 
-  for (
-    let trimestre = 1;
-    trimestre <= 3;
-    trimestre++
-  ) {
+  const totalColumnas = Math.max(columnas.length + 5, 8);
+  const ultimaLetraCol = String.fromCharCode(65 + Math.min(totalColumnas - 1, 25));
 
-    const columnasTrimestre =
-      columnas
-        .map((col, index) => ({
-          ...col,
-          originalIndex: index,
-        }))
-        .filter(
-          (col) =>
-            Number(
-              col.trimestre
-            ) === trimestre
-        );
+  // =====================
+  // TÍTULO
+  // =====================
+  worksheet.mergeCells(`A1:${ultimaLetraCol}1`);
+  const titulo = worksheet.getCell('A1');
+  titulo.value = 'PLANILLA GENERAL DE CALIFICACIONES';
+  titulo.font = {
+    bold: true,
+    size: 16,
+    color: { argb: 'FFFFFFFF' },
+  };
+  titulo.alignment = { vertical: 'middle', horizontal: 'center' };
+  titulo.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: '6D28D9' },
+  };
+  worksheet.getRow(1).height = 32;
 
-    const worksheet =
-      workbook.addWorksheet(
-        `${trimestre}° Trimestre`
-      );
+  // =====================
+  // DATOS DEL CURSO
+  // =====================
+  worksheet.addRow([]);
+  worksheet.addRow([`Escuela: ${curso?.escuela || '-'}`]);
+  worksheet.addRow([`Curso: ${curso?.anio || '-'}`]);
+  worksheet.addRow([`Materia: ${curso?.materia || '-'}`]);
+  worksheet.addRow([]);
 
-    // =====================
-    // TITULO
-    // =====================
+  // =====================
+  // ENCABEZADOS DE COLUMNAS
+  // =====================
+  const encabezados = [
+    'Alumno / Estudiante',
+    ...columnas.map((col) => {
+      const tipo = formatearTipoEvaluacion(col.tipo);
+      const trim = col.trimestre ? `${col.trimestre}° Trim` : '';
+      const fecha = col.fecha
+        ? new Date(col.fecha + 'T00:00:00').toLocaleDateString('es-AR', {
+            day: '2-digit',
+            month: '2-digit',
+          })
+        : '';
+      return `${tipo} (${trim}${fecha ? ` - ${fecha}` : ''})`;
+    }),
+    'Prom. 1° Trim',
+    'Prom. 2° Trim',
+    'Prom. 3° Trim',
+    'Promedio Final',
+  ];
 
-    worksheet.mergeCells(
-      'A1:H1'
-    );
+  const headerRow = worksheet.addRow(encabezados);
+  headerRow.height = 28;
 
-    const titulo =
-      worksheet.getCell(
-        'A1'
-      );
+  headerRow.eachCell((cell, colNumber) => {
+    const isAlumno = colNumber === 1;
+    const isPromedio = colNumber > columnas.length + 1;
 
-    titulo.value =
-      `CALIFICACIONES - ${trimestre}° TRIMESTRE`;
-
-    titulo.font = {
+    cell.font = {
       bold: true,
-      size: 18,
-      color: {
-        argb:
-          'FFFFFFFF',
-      },
+      color: { argb: 'FFFFFFFF' },
+      size: 11,
     };
 
-    titulo.alignment = {
-      vertical:
-        'middle',
-
-      horizontal:
-        'center',
-    };
-
-    titulo.fill = {
-      type:
-        'pattern',
-
-      pattern:
-        'solid',
-
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
       fgColor: {
-        argb:
-          '6D28D9',
+        argb: isAlumno ? '4C1D95' : isPromedio ? '1E1B4B' : '7C3AED',
       },
     };
 
-    worksheet.getRow(
-      1
-    ).height = 30;
+    cell.alignment = {
+      horizontal: isAlumno ? 'left' : 'center',
+      vertical: 'middle',
+    };
 
-    // =====================
-    // INFO CURSO
-    // =====================
+    cell.border = {
+      top: { style: 'thin', color: { argb: 'DDD6FE' } },
+      left: { style: 'thin', color: { argb: 'DDD6FE' } },
+      bottom: { style: 'thin', color: { argb: 'DDD6FE' } },
+      right: { style: 'thin', color: { argb: 'DDD6FE' } },
+    };
+  });
 
-    worksheet.addRow([]);
+  // =====================
+  // FILAS DE ALUMNOS CON NOTAS Y PROMEDIOS
+  // =====================
+  inscripciones.forEach((insc, filaIndex) => {
+    const notasAlumno = datos[filaIndex] || [];
 
-    worksheet.addRow([
-      `Escuela: ${curso?.escuela || '-'}`,
-    ]);
+    // Calcular promedios por trimestre y final
+    const notasT1: number[] = [];
+    const notasT2: number[] = [];
+    const notasT3: number[] = [];
+    const todasNotas: number[] = [];
 
-    worksheet.addRow([
-      `Curso: ${curso?.anio || '-'}`,
-    ]);
+    columnas.forEach((col, colIdx) => {
+      const val = parseFloat(notasAlumno[colIdx]);
+      if (!isNaN(val) && val > 0) {
+        todasNotas.push(val);
+        if (col.trimestre === '1') notasT1.push(val);
+        else if (col.trimestre === '2') notasT2.push(val);
+        else if (col.trimestre === '3') notasT3.push(val);
+      }
+    });
 
-    worksheet.addRow([
-      `Materia: ${curso?.materia || '-'}`,
-    ]);
+    const promT1 = notasT1.length > 0 ? (notasT1.reduce((a, b) => a + b, 0) / notasT1.length).toFixed(1) : '-';
+    const promT2 = notasT2.length > 0 ? (notasT2.reduce((a, b) => a + b, 0) / notasT2.length).toFixed(1) : '-';
+    const promT3 = notasT3.length > 0 ? (notasT3.reduce((a, b) => a + b, 0) / notasT3.length).toFixed(1) : '-';
+    const promFinal = todasNotas.length > 0 ? (todasNotas.reduce((a, b) => a + b, 0) / todasNotas.length).toFixed(1) : '-';
 
-    worksheet.addRow([]);
-
-    // =====================
-    // SIN DATOS
-    // =====================
-
-    if (
-      columnasTrimestre.length === 0
-    ) {
-
-      worksheet.addRow([
-        `Sin calificaciones cargadas para el ${trimestre}° trimestre`,
-      ]);
-
-      continue;
-
-    }
-
-    // =====================
-    // HEADERS
-    // =====================
-
-    const headers = [
-
-      'Alumno',
-
-      ...columnasTrimestre.map(
-        (col) =>
-          `${col.tipo}
-${new Date(
-  col.fecha +
-  'T00:00:00'
-).toLocaleDateString(
-  'es-AR'
-)}`
-      ),
-
+    const filaValores = [
+      `${insc.alumno.apellido}, ${insc.alumno.nombre}`,
+      ...columnas.map((_, colIdx) => {
+        const val = notasAlumno[colIdx];
+        return val !== undefined && val !== '' ? val : '-';
+      }),
+      promT1,
+      promT2,
+      promT3,
+      promFinal,
     ];
 
-    const headerRow =
-      worksheet.addRow(
-        headers
-      );
+    worksheet.addRow(filaValores);
+    const row = worksheet.lastRow;
 
-    headerRow.height = 40;
+    if (row) {
+      row.height = 22;
+      row.eachCell((cell, colNumber) => {
+        const isAlumno = colNumber === 1;
+        const isPromFinal = colNumber === filaValores.length;
+        const isPromTrim = colNumber >= filaValores.length - 3;
 
-    headerRow.eachCell(
-      (cell) => {
-
-        cell.font = {
-          bold: true,
-          color: {
-            argb:
-              'FFFFFFFF',
-          },
-        };
-
-        cell.fill = {
-          type:
-            'pattern',
-
-          pattern:
-            'solid',
-
-          fgColor: {
-            argb:
-              '7C3AED',
-          },
-        };
-
-        cell.alignment = {
-          horizontal:
-            'center',
-
-          vertical:
-            'middle',
-
-          wrapText:
-            true,
-        };
-
-        cell.border = {
-          top: {
-            style:
-              'thin',
-          },
-
-          left: {
-            style:
-              'thin',
-          },
-
-          bottom: {
-            style:
-              'thin',
-          },
-
-          right: {
-            style:
-              'thin',
-          },
-        };
-
-      }
-    );
-
-    // =====================
-    // FILAS
-    // =====================
-
-    inscripciones.forEach(
-      (
-        insc,
-        filaIndex
-      ) => {
-
-        const fila = [
-
-          `${insc.alumno.apellido}, ${insc.alumno.nombre}`,
-
-          ...columnasTrimestre.map(
-            (col) =>
-
-              datos[
-                filaIndex
-              ][
-                col.originalIndex
-              ] || '-'
-
-          ),
-
-        ];
-
-        worksheet.addRow(
-          fila
-        );
-
-        const row =
-          worksheet.lastRow;
-
-        if (row) {
-
-          row.eachCell(
-            (
-              cell,
-              colNumber
-            ) => {
-
-              if (
-                colNumber === 1
-              ) {
-
-                cell.font = {
-                  bold: true,
-                };
-
-                return;
-
-              }
-
-              const valor =
-                Number(
-                  cell.value
-                );
-
-              let color =
-                'FFFFFF';
-
-              if (
-                !cell.value ||
-                cell.value === '-'
-              ) {
-
-                color =
-                  'E5E7EB';
-
-              } else if (
-                valor >= 6
-              ) {
-
-                color =
-                  '22C55E';
-
-              } else {
-
-                color =
-                  'EF4444';
-
-              }
-
-              cell.fill = {
-                type:
-                  'pattern',
-
-                pattern:
-                  'solid',
-
-                fgColor: {
-                  argb:
-                    color,
-                },
-              };
-
-              cell.font = {
-                bold: true,
-                color: {
-                  argb:
-                    'FFFFFF',
-                },
-              };
-
-              cell.alignment = {
-                horizontal:
-                  'center',
-
-                vertical:
-                  'middle',
-              };
-
-              cell.border = {
-                top: {
-                  style:
-                    'thin',
-                },
-
-                left: {
-                  style:
-                    'thin',
-                },
-
-                bottom: {
-                  style:
-                    'thin',
-                },
-
-                right: {
-                  style:
-                    'thin',
-                },
-              };
-
-            }
-          );
-
+        if (isAlumno) {
+          cell.font = { bold: true, size: 11 };
+          cell.alignment = { vertical: 'middle', horizontal: 'left' };
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: filaIndex % 2 === 0 ? 'F5F3FF' : 'FFFFFF' },
+          };
+          return;
         }
 
-      }
-    );
+        const valor = parseFloat(String(cell.value));
+        let colorFondo = 'FFFFFF';
+        let colorTexto = '374151';
 
-    // =====================
-    // MENSAJE FINAL
-    // =====================
+        if (!isNaN(valor) && valor > 0) {
+          if (valor >= 6) {
+            colorFondo = isPromFinal ? '15803D' : isPromTrim ? 'BBF7D0' : 'DCFCE7';
+            colorTexto = isPromFinal ? 'FFFFFF' : '166534';
+          } else {
+            colorFondo = isPromFinal ? 'B91C1C' : isPromTrim ? 'FECDD3' : 'FEE2E2';
+            colorTexto = isPromFinal ? 'FFFFFF' : '991B1B';
+          }
+        } else {
+          colorFondo = filaIndex % 2 === 0 ? 'F9FAFB' : 'FFFFFF';
+          colorTexto = '9CA3AF';
+        }
 
-    worksheet.addRow([]);
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colorFondo },
+        };
 
-    const mensajeFinal =
-      worksheet.addRow([
-        'Para ver otros trimestres utiliza las pestañas inferiores 👇',
-      ]);
+        cell.font = {
+          bold: isPromTrim || (!isNaN(valor) && valor >= 6),
+          color: { argb: colorTexto },
+          size: 11,
+        };
 
-    worksheet.mergeCells(
-      `A${mensajeFinal.number}:H${mensajeFinal.number}`
-    );
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
 
-    mensajeFinal.font = {
-      bold: true,
-      italic: true,
-    };
-
-    mensajeFinal.alignment = {
-      horizontal:
-        'center',
-
-      vertical:
-        'middle',
-    };
-
-    // =====================
-    // WIDTHS
-    // =====================
-
-    worksheet.columns.forEach(
-      (column) => {
-
-        column.width = 20;
-
-      }
-    );
-
-  }
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'E5E7EB' } },
+          left: { style: 'thin', color: { argb: 'E5E7EB' } },
+          bottom: { style: 'thin', color: { argb: 'E5E7EB' } },
+          right: { style: 'thin', color: { argb: 'E5E7EB' } },
+        };
+      });
+    }
+  });
 
   // =====================
-  // NOMBRE ARCHIVO
+  // ANCHOS DE COLUMNAS
   // =====================
-
-  const nombreEscuela =
-    String(
-      curso?.escuela ||
-      'escuela'
-    ).replace(/\s/g, '_');
-
-  const nombreCurso =
-    String(
-      curso?.anio ||
-      'curso'
-    ).replace(/\s/g, '_');
-
-  const nombreMateria =
-    String(
-      curso?.materia ||
-      'materia'
-    ).replace(/\s/g, '_');
+  worksheet.columns.forEach((column, index) => {
+    if (index === 0) {
+      column.width = 28;
+    } else {
+      column.width = 18;
+    }
+  });
 
   // =====================
-  // BUFFER
+  // DESCARGAR ARCHIVO
   // =====================
+  const nombreEscuela = String(curso?.escuela || 'escuela').replace(/\s/g, '_');
+  const nombreCurso = String(curso?.anio || 'curso').replace(/\s/g, '_');
+  const nombreMateria = String(curso?.materia || 'materia').replace(/\s/g, '_');
 
-  const buffer =
-    await workbook.xlsx.writeBuffer();
-
-  // =====================
-  // DESCARGAR
-  // =====================
+  const buffer = await workbook.xlsx.writeBuffer();
 
   saveAs(
-
-    new Blob(
-      [buffer]
-    ),
-
+    new Blob([buffer]),
     `calificaciones_${nombreEscuela}_${nombreCurso}_${nombreMateria}.xlsx`
-
   );
-
 }

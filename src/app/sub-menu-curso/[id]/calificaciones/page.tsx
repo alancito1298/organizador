@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Navbar from "@/app/components/shared/Navbar";
 import BottomNav from "../../../components/shared/BottomNav";
 import ListaCalificaciones from "../../../components/calificaciones/ListaCalficaciones";
 import Footer from "../../../components/shared/Footer";
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 export default function CalificacionesPage() {
   return (
     <div className="bg-surface-container-low min-h-screen pb-24">
+      <Navbar />
       <ListaCalificaciones />
       <Footer />
       <BottomNav />

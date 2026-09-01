@@ -20,7 +20,8 @@ interface Props {
   cursoId: number;
   abierto: boolean;
   onCerrar: () => void;
-  onImportacionExitosa: () => void;
+  onImportacionExitosa?: () => void;
+  onImportados?: () => void;
 }
 
 export default function ImportarAlumnosModal({
@@ -28,6 +29,7 @@ export default function ImportarAlumnosModal({
   abierto,
   onCerrar,
   onImportacionExitosa,
+  onImportados,
 }: Props) {
   const [alumnos, setAlumnos] = useState<AlumnoImportado[]>([]);
   const [modoPegar, setModoPegar] = useState(false);
@@ -241,7 +243,8 @@ export default function ImportarAlumnosModal({
 
     setProcesando(false);
     alert(`🎉 ¡Se importaron e inscribieron ${exitosos} alumnos con éxito en el curso!`);
-    onImportacionExitosa();
+    if (onImportacionExitosa) onImportacionExitosa();
+    if (onImportados) onImportados();
     onCerrar();
   };
 

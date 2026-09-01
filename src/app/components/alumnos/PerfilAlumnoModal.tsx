@@ -10,117 +10,321 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  Cell,
 } from 'recharts';
 
 type Props = {
+  abierto?: boolean;
   perfil: any;
   onCerrar: () => void;
 };
 
-export default function PerfilAlumnoModal({ perfil, onCerrar }: Props) {
-  if (!perfil) return null;
+const formatearFecha = (fechaStr: string) => {
+  try {
+    const d = new Date(fechaStr);
+    if (isNaN(d.getTime())) return fechaStr;
+    const dia = d.getUTCDate().toString().padStart(2, '0');
+    const mes = (d.getUTCMonth() + 1).toString().padStart(2, '0');
+    return `${dia}/${mes}`;
+  } catch {
+    return fechaStr;
+  }
+};
 
-  const { alumno, estadisticas, promedios } = perfil;
+const obtenerConfigConcepto = (estado: string) => {
+  switch (estado) {
+    case 'presente_buen_concepto':
+    case 'buen_concepto':
+      return {
+        emoji: '😊',
+        nombre: 'Buen Concepto',
+        borde: 'border-emerald-500',
+        bg: 'bg-emerald-50 text-emerald-700',
+      };
+    case 'regular':
+    case 'presente_regular':
+      return {
+        emoji: '😐',
+        nombre: 'Regular',
+        borde: 'border-amber-500',
+        bg: 'bg-amber-50 text-amber-700',
+      };
+    case 'presente_mal_concepto':
+    case 'mal_concepto':
+      return {
+        emoji: '😞',
+        nombre: 'Mal Concepto',
+        borde: 'border-rose-500',
+        bg: 'bg-rose-50 text-rose-700',
+      };
+    case 'ausente':
+      return {
+        emoji: '❌',
+        nombre: 'Ausente',
+        borde: 'border-red-500',
+        bg: 'bg-red-50 text-red-700',
+      };
+    case 'justificada':
+      return {
+        emoji: '🕐',
+        nombre: 'Justificada',
+        borde: 'border-cyan-500',
+        bg: 'bg-cyan-50 text-cyan-700',
+      };
+    default:
+      return {
+        emoji: '😊',
+        nombre: 'Presente',
+        borde: 'border-emerald-500',
+        bg: 'bg-emerald-50 text-emerald-700',
+      };
+  }
+};
+
+export default function PerfilAlumnoModal({ abierto = true, perfil, onCerrar }: Props) {
+  if (!abierto || !perfil || !perfil.alumno) return null;
+
+  const { alumno, estadisticas, promedios, curso, asistencias } = perfil;
+
+  const stats = estadisticas ?? {
+    presentesBuenConcepto: 0,
+    presentesMalConcepto: 0,
+    ausentes: 0,
+    justificadas: 0,
+    totalAsistencias: 0,
+    totalPresentes: 0,
+    porcentajeAsistencia: 0,
+  };
+
+  const proms = promedios ?? {
+    primerTrimestre: 0,
+    segundoTrimestre: 0,
+    tercerTrimestre: 0,
+    general: 0,
+  };
 
   const datosAsistencia = [
-    { name: 'Buen concepto', value: estadisticas.presentesBuenConcepto, fill: '#22c55e' },
-    { name: 'Mal concepto',  value: estadisticas.presentesMalConcepto,  fill: '#f97316' },
-    { name: 'Ausente',       value: estadisticas.ausentes,               fill: '#ef4444' },
-    { name: 'Justificada',   value: estadisticas.justificadas,           fill: '#06b6d4' },
-  ].filter(d => d.value > 0);
+    { name: 'Buen concepto', value: stats.presentesBuenConcepto || 0, color: '#22C55E' },
+    { name: 'Mal concepto', value: stats.presentesMalConcepto || 0, color: '#F97316' },
+    { name: 'Ausente', value: stats.ausentes || 0, color: '#EF4444' },
+    { name: 'Justificada', value: stats.justificadas || 0, color: '#06B6D4' },
+  ].filter((d) => d.value > 0);
 
   const datosPromedios = [
-    { trimestre: '1°', promedio: promedios.primerTrimestre,  fill: promedios.primerTrimestre  >= 6 ? '#22c55e' : promedios.primerTrimestre  > 0 ? '#ef4444' : '#e5e7eb' },
-    { trimestre: '2°', promedio: promedios.segundoTrimestre, fill: promedios.segundoTrimestre >= 6 ? '#22c55e' : promedios.segundoTrimestre > 0 ? '#ef4444' : '#e5e7eb' },
-    { trimestre: '3°', promedio: promedios.tercerTrimestre,  fill: promedios.tercerTrimestre  >= 6 ? '#22c55e' : promedios.tercerTrimestre  > 0 ? '#ef4444' : '#e5e7eb' },
+    { trimestre: '1° Trim', promedio: proms.primerTrimestre || 0 },
+    { trimestre: '2° Trim', promedio: proms.segundoTrimestre || 0 },
+    { trimestre: '3° Trim', promedio: proms.tercerTrimestre || 0 },
   ];
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-y-auto h-7/9">
+  // Línea de tiempo ordenada de más reciente a más antigua
+  const asistenciasOrdenadas = Array.isArray(asistencias) && asistencias.length > 0
+    ? [...asistencias].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
+    : [];
 
-        {/* HEADER */}
-        <div className="flex justify-between items-center p-5 pb-0 my-4 mx-4 ">
-          <div>
-            <h3 className="text-xl uppercase font-light text-violet-900">
-              {alumno.apellido}, {alumno.nombre}
-            </h3>
-            {alumno.contacto && (
-              <p className="text-xs text-gray-400">{alumno.contacto}</p>
-            )}
+  return (
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCerrar();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+    >
+      <div className="bg-surface-bg neumorphic-raised rounded-3xl p-5 md:p-7 w-full max-w-md max-h-[92vh] overflow-y-auto flex flex-col gap-5 border border-white/60 shadow-2xl font-mulish">
+        
+        {/* ── HEADER ── */}
+        <div className="flex justify-between items-start gap-3 pb-4 border-b border-outline-variant/30">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-12 h-12 rounded-2xl neumorphic-inset flex items-center justify-center text-accent-violet font-bold text-lg shrink-0">
+              {alumno.nombre?.charAt(0)}{alumno.apellido?.charAt(0)}
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-headline-md text-xl md:text-2xl text-on-surface uppercase truncate leading-tight">
+                {alumno.apellido}, {alumno.nombre}
+              </h3>
+              {alumno.contacto ? (
+                <p className="text-xs text-secondary flex items-center gap-1 mt-0.5 truncate">
+                  <span className="material-symbols-outlined text-[14px]">call</span>
+                  {alumno.contacto}
+                </p>
+              ) : (
+                <p className="text-xs text-secondary mt-0.5 truncate">
+                  {curso?.materia ? `${curso.materia} (${curso.escuela})` : 'Estudiante'}
+                </p>
+              )}
+            </div>
           </div>
+
           <button
             onClick={onCerrar}
-            className="text-red-400 font-bold hover:text-red-600 text-2xl leading-none"
+            className="w-9 h-9 rounded-full neumorphic-raised flex items-center justify-center text-secondary hover:text-red-500 active:scale-95 transition-all shrink-0"
+            title="Cerrar ventana"
           >
-            ✕
+            <span className="material-symbols-outlined text-lg font-bold">close</span>
           </button>
         </div>
 
-        <div className="p-5 space-y-4 m-4">
-
-          {/* PORCENTAJE ASISTENCIA */}
-          <div className="bg-violet-100 rounded-xl  flex items-center justify-between">
-            <div className='m-1'>
-              <p className="text-lg font-bold text-violet-700 uppercase">Asistencia</p>
-              <p className="text-6xl font-extralight text-violet-900">{estadisticas.porcentajeAsistencia}%</p>
-              <p className="text-xs text-violet-400">{estadisticas.totalPresentes} presentes de {estadisticas.totalAsistencias}</p>
-            </div>
-            <div className="text-right text-xs m-1 text-violet-500 space-y-1">
-              <p>❌ Ausentes: <strong>{estadisticas.ausentes}</strong></p>
-              <p>🕐 Justificadas: <strong>{estadisticas.justificadas}</strong></p>
-            </div>
+        {/* ── RESUMEN ASISTENCIA ── */}
+        <div className="bg-surface-bg neumorphic-inset rounded-2xl p-4 flex items-center justify-between gap-4">
+          <div>
+            <span className="font-label-caps text-secondary text-xs uppercase font-bold block mb-1">
+              Asistencia General
+            </span>
+            <p className="text-4xl md:text-5xl font-extrabold text-accent-violet">
+              {stats.porcentajeAsistencia}%
+            </p>
+            <p className="text-xs text-secondary mt-1">
+              {stats.totalPresentes} presentes de {stats.totalAsistencias} clases
+            </p>
           </div>
 
-          {/* GRÁFICO ASISTENCIA — Donut */}
-          {datosAsistencia.length > 0 && (
-            <div className="bg-violet-50 rounded-xl h-auto ">
-              <p className="text-xs font-bold text-violet-700 uppercase mb-2">Distribución de asistencias</p>
-              <div className='m-2'>
-                <ResponsiveContainer width="100%" height={250}>
+          <div className="flex flex-col gap-1.5 text-right text-xs font-semibold text-secondary">
+            <span className="inline-flex items-center justify-end gap-1 text-red-500">
+              <span className="material-symbols-outlined text-sm">cancel</span> Ausentes: <b>{stats.ausentes}</b>
+            </span>
+            <span className="inline-flex items-center justify-end gap-1 text-cyan-600">
+              <span className="material-symbols-outlined text-sm">schedule</span> Justificadas: <b>{stats.justificadas}</b>
+            </span>
+          </div>
+        </div>
+
+        {/* ── LÍNEA DE TIEMPO COMPACTA (MÁS RECIENTES PRIMERO) ── */}
+        <div className="bg-surface-bg neumorphic-raised rounded-2xl p-3.5 flex flex-col gap-2.5">
+          <div className="flex justify-between items-center px-1">
+            <span className="font-label-caps text-secondary text-xs uppercase font-bold flex items-center gap-1.5">
+              <span>📅</span> Historial de Clases
+            </span>
+            <span className="text-[10px] font-bold text-accent-violet">
+              Recientes → Antiguas ({asistenciasOrdenadas.length})
+            </span>
+          </div>
+
+          {asistenciasOrdenadas.length === 0 ? (
+            <div className="bg-surface-bg neumorphic-inset rounded-xl p-3 text-center">
+              <p className="text-xs text-secondary italic">
+                Aún no hay registros de asistencia o concepto para este alumno.
+              </p>
+            </div>
+          ) : (
+            <div className="relative bg-surface-bg neumorphic-inset rounded-xl p-2.5">
+              <div className="flex items-center gap-2.5 overflow-x-auto py-1 px-1 scrollbar-thin">
+                {asistenciasOrdenadas.map((asist, idx) => {
+                  const config = obtenerConfigConcepto(asist.estado);
+                  return (
+                    <div
+                      key={`timeline-${asist.id || idx}`}
+                      className="flex flex-col items-center shrink-0 min-w-[50px] group"
+                    >
+                      {/* Fecha arriba */}
+                      <span className="text-[10px] font-extrabold text-secondary mb-1 tracking-tight group-hover:text-accent-violet transition-colors">
+                        {formatearFecha(asist.fecha)}
+                      </span>
+
+                      {/* Carita / Ícono central más compacto */}
+                      <div className="relative flex items-center justify-center">
+                        <div
+                          className={`w-9 h-9 rounded-xl bg-surface-bg neumorphic-raised flex items-center justify-center text-lg border ${config.borde} shadow-sm group-hover:scale-110 transition-transform`}
+                          title={`${config.nombre} - ${formatearFecha(asist.fecha)}`}
+                        >
+                          {config.emoji}
+                        </div>
+                      </div>
+
+                      {/* Nombre del estado abajo */}
+                      <span className="text-[9px] font-bold text-secondary mt-1 text-center leading-tight truncate max-w-[52px]">
+                        {config.nombre}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ── GRÁFICO DE ASISTENCIA (DONUT) ── */}
+        {datosAsistencia.length > 0 && (
+          <div className="bg-surface-bg neumorphic-raised rounded-2xl p-4 flex flex-col gap-2">
+            <span className="font-label-caps text-secondary text-xs uppercase font-bold px-1">
+              Distribución de Asistencias
+            </span>
+            <div className="h-52 w-full">
+              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={datosAsistencia}
                     cx="50%"
                     cy="50%"
                     innerRadius={45}
-                    outerRadius={75}
-                    paddingAngle={3}
+                    outerRadius={70}
+                    paddingAngle={4}
                     dataKey="value"
+                  >
+                    {datosAsistencia.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value: any) => [`${value} clases`, 'Total']}
+                    contentStyle={{
+                      backgroundColor: '#E0E5EC',
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '4px 4px 10px #A3B1C6, -4px -4px 10px #FFFFFF',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                    }}
                   />
-                  <Tooltip formatter={(value) => [`${value} clases`, '']} />
-                  <Legend iconType="circle" iconSize={8} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', fontWeight: '600' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            </div>
+          </div>
+        )}
 
-          )}
+        {/* ── GRÁFICO DE CALIFICACIONES (BARRA) ── */}
+        <div className="bg-surface-bg neumorphic-raised rounded-2xl p-4 flex flex-col gap-3">
+          <div className="flex justify-between items-center px-1">
+            <span className="font-label-caps text-secondary text-xs uppercase font-bold">
+              Calificaciones por Trimestre
+            </span>
+            <span className="text-xs font-bold text-accent-violet">
+              Promedio General: <b className="text-base">{proms.general > 0 ? proms.general : '-'}</b>
+            </span>
+          </div>
 
-          {/* GRÁFICO PROMEDIOS — Bar */}
-          <div className="bg-violet-50 rounded-xl p-4">
-            <p className="text-xs font-bold text-violet-700 uppercase mb-1">Promedio por trimestre</p>
-            <p className="text-2xl font-bold text-violet-900 mb-3">
-              Gral: {promedios.general}
-            </p>
-            <ResponsiveContainer width="100%" height={150}>
-              <BarChart data={datosPromedios} barSize={40}>
-                <XAxis dataKey="trimestre" tick={{ fontSize: 12 }} />
-                <YAxis domain={[0, 10]} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(value) => [`${value}`, 'Promedio']} />
-                <Bar dataKey="promedio" radius={[6, 6, 0, 0]} />
+          <div className="h-40 w-full pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={datosPromedios} barSize={36}>
+                <XAxis dataKey="trimestre" tick={{ fontSize: 11, fontWeight: 600, fill: '#595F65' }} axisLine={false} tickLine={false} />
+                <YAxis domain={[0, 10]} tick={{ fontSize: 10, fill: '#595F65' }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  formatter={(value: any) => [`${value > 0 ? value : 'Sin nota'}`, 'Nota']}
+                  contentStyle={{
+                    backgroundColor: '#E0E5EC',
+                    borderRadius: '12px',
+                    border: 'none',
+                    boxShadow: '4px 4px 10px #A3B1C6, -4px -4px 10px #FFFFFF',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                  }}
+                />
+                <Bar
+                  dataKey="promedio"
+                  fill="#6D28D9"
+                  radius={[8, 8, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
-
-          <button
-            onClick={onCerrar}
-            className="w-full py-2 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition font-medium"
-          >
-            Cerrar
-          </button>
-
         </div>
+
+        {/* ── BOTÓN CERRAR ── */}
+        <button
+          onClick={onCerrar}
+          className="w-full py-3 rounded-xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all mt-1"
+        >
+          Cerrar Perfil
+        </button>
+
       </div>
     </div>
   );
