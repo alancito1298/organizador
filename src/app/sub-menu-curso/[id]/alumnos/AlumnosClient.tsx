@@ -208,24 +208,14 @@ export default function AlumnosClient() {
   // Cálculo del Hero (Top 2 Asistencias y Top 2 Calificaciones)
   const heroAlumnos = useMemo(() => {
     if (alumnos.length === 0) {
-      // Mock data matching mockup if no students loaded yet
-      return {
-        topAsistencias: [
-          { id: -1, alumnoCursoId: -1, nombre: 'CESAR', apellido: 'DURAN', asistenciaPorcentaje: 70, primerTrimestre: 8, promedioGeneral: 8 },
-          { id: -2, alumnoCursoId: -2, nombre: 'CHARLIE', apellido: 'ESPERANCITO', asistenciaPorcentaje: 70, primerTrimestre: 8, promedioGeneral: 8 },
-        ],
-        topCalificaciones: [
-          { id: -3, alumnoCursoId: -3, nombre: 'MIA', apellido: 'WALLACE', asistenciaPorcentaje: 85, primerTrimestre: 9, promedioGeneral: 9 },
-          { id: -4, alumnoCursoId: -4, nombre: 'VINCENT', apellido: 'VEGA', asistenciaPorcentaje: 60, primerTrimestre: 6, promedioGeneral: 6 },
-        ]
-      };
+      return { topAsistencias: [], topCalificaciones: [] };
     }
 
     // Ordenados por asistencia desc
     const sortedByAsistencia = [...alumnos].sort((a, b) => b.asistenciaPorcentaje - a.asistenciaPorcentaje);
     const topAsistencias = sortedByAsistencia.slice(0, 2);
 
-    // Ordenados por calificación general desc (excluyendo o priorizando los de mejores notas)
+    // Ordenados por calificación general desc
     const sortedByNotas = [...alumnos].sort((a, b) => (b.promedioGeneral || b.primerTrimestre) - (a.promedioGeneral || a.primerTrimestre));
     const topCalificaciones = sortedByNotas.slice(0, 2);
 
@@ -713,113 +703,158 @@ export default function AlumnosClient() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Fila 1: Top 2 Asistencias */}
-              {heroAlumnos.topAsistencias.map((alumno, idx) => (
-                <div
-                  key={`hero-asist-${alumno.id}-${idx}`}
-                  className="bg-surface-bg neumorphic-raised rounded-2xl p-6 flex flex-col justify-between hover:scale-[1.01] transition-transform"
-                >
-                  <div>
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="font-headline-md text-on-surface uppercase leading-tight">
-                        {alumno.nombre}<br />{alumno.apellido}
-                      </h3>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full neumorphic-inset text-[11px] font-bold text-emerald-600">
-                        <span className="material-symbols-outlined text-sm">event_available</span> Top Asistencia
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center mb-6 text-center">
-                      <div className="flex flex-col items-center">
-                        <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                          Calificación<br />1er Trimestre
-                        </span>
-                        <span className="font-headline-md text-accent-violet font-bold mt-1">
-                          {alumno.primerTrimestre > 0 ? alumno.primerTrimestre : '-'}<span className="text-sm font-normal text-secondary">/10</span>
-                        </span>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                          Promedio de<br />asistencia
-                        </span>
-                        <span className="font-headline-md text-accent-violet font-bold mt-1">
-                          {alumno.asistenciaPorcentaje}%
-                        </span>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                          Calificación<br />Total
-                        </span>
-                        <span className="font-headline-md text-accent-violet font-bold mt-1">
-                          {alumno.promedioGeneral > 0 ? alumno.promedioGeneral : '-'}<span className="text-sm font-normal text-secondary">/10</span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => abrirPerfil(alumno.alumnoCursoId)}
-                    className="w-full py-3 rounded-full bg-surface-bg neumorphic-raised text-accent-violet font-label-caps uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all font-bold text-xs"
+            {cargandoAlumnos ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={`hero-load-${i}`}
+                    className="bg-surface-bg neumorphic-raised rounded-2xl p-6 flex flex-col justify-between gap-6 animate-pulse"
                   >
-                    VER ALUMNO
-                  </button>
-                </div>
-              ))}
-
-              {/* Fila 2: Top 2 Calificaciones */}
-              {heroAlumnos.topCalificaciones.map((alumno, idx) => (
-                <div
-                  key={`hero-notas-${alumno.id}-${idx}`}
-                  className="bg-surface-bg neumorphic-raised rounded-2xl p-6 flex flex-col justify-between hover:scale-[1.01] transition-transform"
-                >
-                  <div>
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="font-headline-md text-on-surface uppercase leading-tight">
-                        {alumno.nombre}<br />{alumno.apellido}
-                      </h3>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full neumorphic-inset text-[11px] font-bold text-accent-violet">
-                        <span className="material-symbols-outlined text-sm">workspace_premium</span> Top Notas
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center mb-6 text-center">
-                      <div className="flex flex-col items-center">
-                        <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                          Calificación<br />1er Trimestre
-                        </span>
-                        <span className="font-headline-md text-accent-violet font-bold mt-1">
-                          {alumno.primerTrimestre > 0 ? alumno.primerTrimestre : '-'}<span className="text-sm font-normal text-secondary">/10</span>
-                        </span>
+                    <div className="flex justify-between items-start">
+                      <div className="flex flex-col gap-2">
+                        <div className="h-4 bg-outline-variant/30 rounded w-28"></div>
+                        <div className="h-4 bg-outline-variant/30 rounded w-36"></div>
                       </div>
-                      <div className="flex flex-col items-center">
-                        <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                          Promedio de<br />asistencia
-                        </span>
-                        <span className="font-headline-md text-accent-violet font-bold mt-1">
-                          {alumno.asistenciaPorcentaje}%
-                        </span>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                          Calificación<br />Total
-                        </span>
-                        <span className="font-headline-md text-accent-violet font-bold mt-1">
-                          {alumno.promedioGeneral > 0 ? alumno.promedioGeneral : '-'}<span className="text-sm font-normal text-secondary">/10</span>
-                        </span>
+                      <div className="w-9 h-9 rounded-xl neumorphic-inset flex items-center justify-center">
+                        <div className="w-4 h-4 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
                       </div>
                     </div>
+
+                    <div className="flex justify-between items-center py-2 px-2">
+                      <div className="flex flex-col items-center gap-1.5">
+                        <div className="h-2.5 bg-outline-variant/20 rounded w-16"></div>
+                        <div className="h-6 bg-outline-variant/30 rounded w-10"></div>
+                      </div>
+                      <div className="flex flex-col items-center gap-1.5">
+                        <div className="h-2.5 bg-outline-variant/20 rounded w-16"></div>
+                        <div className="h-6 bg-outline-variant/30 rounded w-10"></div>
+                      </div>
+                      <div className="flex flex-col items-center gap-1.5">
+                        <div className="h-2.5 bg-outline-variant/20 rounded w-16"></div>
+                        <div className="h-6 bg-outline-variant/30 rounded w-10"></div>
+                      </div>
+                    </div>
+
+                    <div className="h-10 bg-outline-variant/20 rounded-full w-full"></div>
                   </div>
-
-                  <button
-                    onClick={() => abrirPerfil(alumno.alumnoCursoId)}
-                    className="w-full py-3 rounded-full bg-surface-bg neumorphic-raised text-accent-violet font-label-caps uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all font-bold text-xs"
+                ))}
+              </div>
+            ) : alumnos.length === 0 ? (
+              <div className="bg-surface-bg neumorphic-inset rounded-2xl p-6 text-center">
+                <span className="material-symbols-outlined text-3xl text-secondary mb-1">person_search</span>
+                <p className="text-xs text-secondary italic">
+                  Aún no hay alumnos inscriptos para calcular destacados de asistencia y notas.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Fila 1: Top 2 Asistencias */}
+                {heroAlumnos.topAsistencias.map((alumno, idx) => (
+                  <div
+                    key={`hero-asist-${alumno.id}-${idx}`}
+                    className="bg-surface-bg neumorphic-raised rounded-2xl p-6 flex flex-col justify-between hover:scale-[1.01] transition-transform"
                   >
-                    VER ALUMNO
-                  </button>
-                </div>
-              ))}
-            </div>
+                    <div>
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="font-headline-md text-on-surface uppercase leading-tight">
+                          {alumno.nombre}<br />{alumno.apellido}
+                        </h3>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full neumorphic-inset text-[11px] font-bold text-emerald-600">
+                          <span className="material-symbols-outlined text-sm">event_available</span> Top Asistencia
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center mb-6 text-center">
+                        <div className="flex flex-col items-center">
+                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
+                            Calificación<br />1er Trimestre
+                          </span>
+                          <span className="font-headline-md text-accent-violet font-bold mt-1">
+                            {alumno.primerTrimestre > 0 ? alumno.primerTrimestre : '-'}<span className="text-sm font-normal text-secondary">/10</span>
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
+                            Promedio de<br />asistencia
+                          </span>
+                          <span className="font-headline-md text-accent-violet font-bold mt-1">
+                            {alumno.asistenciaPorcentaje}%
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
+                            Calificación<br />Total
+                          </span>
+                          <span className="font-headline-md text-accent-violet font-bold mt-1">
+                            {alumno.promedioGeneral > 0 ? alumno.promedioGeneral : '-'}<span className="text-sm font-normal text-secondary">/10</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => abrirPerfil(alumno.alumnoCursoId)}
+                      className="w-full py-3 rounded-full bg-surface-bg neumorphic-raised text-accent-violet font-label-caps uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all font-bold text-xs"
+                    >
+                      VER ALUMNO
+                    </button>
+                  </div>
+                ))}
+
+                {/* Fila 2: Top 2 Calificaciones */}
+                {heroAlumnos.topCalificaciones.map((alumno, idx) => (
+                  <div
+                    key={`hero-notas-${alumno.id}-${idx}`}
+                    className="bg-surface-bg neumorphic-raised rounded-2xl p-6 flex flex-col justify-between hover:scale-[1.01] transition-transform"
+                  >
+                    <div>
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="font-headline-md text-on-surface uppercase leading-tight">
+                          {alumno.nombre}<br />{alumno.apellido}
+                        </h3>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full neumorphic-inset text-[11px] font-bold text-accent-violet">
+                          <span className="material-symbols-outlined text-sm">workspace_premium</span> Top Notas
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center mb-6 text-center">
+                        <div className="flex flex-col items-center">
+                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
+                            Calificación<br />1er Trimestre
+                          </span>
+                          <span className="font-headline-md text-accent-violet font-bold mt-1">
+                            {alumno.primerTrimestre > 0 ? alumno.primerTrimestre : '-'}<span className="text-sm font-normal text-secondary">/10</span>
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
+                            Promedio de<br />asistencia
+                          </span>
+                          <span className="font-headline-md text-accent-violet font-bold mt-1">
+                            {alumno.asistenciaPorcentaje}%
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
+                            Calificación<br />Total
+                          </span>
+                          <span className="font-headline-md text-accent-violet font-bold mt-1">
+                            {alumno.promedioGeneral > 0 ? alumno.promedioGeneral : '-'}<span className="text-sm font-normal text-secondary">/10</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => abrirPerfil(alumno.alumnoCursoId)}
+                      className="w-full py-3 rounded-full bg-surface-bg neumorphic-raised text-accent-violet font-label-caps uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all font-bold text-xs"
+                    >
+                      VER ALUMNO
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         )}
 

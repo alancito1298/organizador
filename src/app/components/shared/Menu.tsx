@@ -189,21 +189,6 @@ export default function Menu() {
     eventosMes.map(item => Number(item.fecha.split('T')[0].split('-')[2]))
   );
 
-  const CURSOS_DEFAULT: Curso[] = [
-    { id: 1, materia: 'Historia', anio: '2', escuela: 'E.E.S. N°7 "Mariano Moreno"', ruta: '/cursos' },
-    { id: 2, materia: 'Historia', anio: '2', escuela: 'E.E.S. N°7 "Mariano Moreno"', ruta: '/cursos' },
-    { id: 3, materia: 'Historia', anio: '2', escuela: 'E.E.S. N°7 "Mariano Moreno"', ruta: '/cursos' },
-    { id: 4, materia: 'Historia', anio: '2', escuela: 'E.E.S. N°7 "Mariano Moreno"', ruta: '/cursos' },
-  ];
-
-  const EVENTOS_DEFAULT: AgendaItem[] = [
-    { id: 1, fecha: '2026-08-10T00:00:00', descripcion: '🎓 Jornada institucional - Convivencia escolar' },
-    { id: 2, fecha: '2026-08-25T00:00:00', descripcion: '📝 Examen 2° trimestre Matemática 3°' },
-    { id: 3, fecha: '2026-08-25T00:00:00', descripcion: '📝 Examen 2° trimestre Historia 2°' },
-  ];
-
-  const cursosMobile = cursos.length > 0 ? cursos.slice(0, 4) : CURSOS_DEFAULT;
-  const eventosMobile = eventosMes.length > 0 ? eventosMes.slice(0, 5) : EVENTOS_DEFAULT;
   const primerNombre = usuario?.nombre ? usuario.nombre.trim().split(' ')[0] : 'Joshua';
   const nombreFormateado = primerNombre ? (primerNombre.charAt(0).toUpperCase() + primerNombre.slice(1).toLowerCase()) : 'Docente';
 
@@ -288,44 +273,73 @@ export default function Menu() {
 
           {/* Cursos Mobile */}
           <section className="flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              {cursosMobile.map((curso, idx) => (
-                <Link
-                  key={curso.id || idx}
-                  href={curso.ruta ?? `/sub-menu-curso/${curso.id}`}
-                  className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet">
-                      <span className="material-symbols-outlined text-2xl">{iconoPorMateria(curso.materia)}</span>
+            {cargandoCursos ? (
+              <div className="grid grid-cols-2 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={`curso-load-mob-${i}`} className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised animate-pulse">
+                    <div className="flex justify-between items-start">
+                      <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                      <div className="w-12 h-5 rounded-md neumorphic-inset"></div>
                     </div>
-                    <span className="px-2 py-0.5 rounded-md neumorphic-inset font-extrabold text-[11px] text-accent-violet">
-                      {formatearGradoCurso(curso.anio)}
-                    </span>
+                    <div className="flex flex-col gap-2 mt-1">
+                      <div className="h-4 bg-outline-variant/30 rounded w-3/4"></div>
+                      <div className="h-3 bg-outline-variant/20 rounded w-full"></div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
-                    <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
-                      <span className="material-symbols-outlined text-[14px]">domain</span>
-                      {curso.escuela}
-                    </p>
-                  </div>
+                ))}
+              </div>
+            ) : cursos.length === 0 ? (
+              <div className="bg-surface-bg neumorphic-inset rounded-2xl p-6 text-center flex flex-col items-center gap-2">
+                <span className="material-symbols-outlined text-3xl text-secondary">school</span>
+                <p className="text-xs text-secondary font-medium">Aún no tenés cursos creados.</p>
+                <Link href="/cursos" className="px-4 py-1.5 rounded-xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider">
+                  + Crear Curso
                 </Link>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                {cursos.slice(0, 4).map((curso, idx) => (
+                  <Link
+                    key={curso.id || idx}
+                    href={curso.ruta ?? `/sub-menu-curso/${curso.id}`}
+                    className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet">
+                        <span className="material-symbols-outlined text-2xl">{iconoPorMateria(curso.materia)}</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-md neumorphic-inset font-extrabold text-[11px] text-accent-violet">
+                        {formatearGradoCurso(curso.anio)}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
+                      <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
+                        <span className="material-symbols-outlined text-[14px]">domain</span>
+                        {curso.escuela}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
 
-            <div className="flex justify-end">
-              <Link className="font-label-caps text-accent-violet hover:opacity-80 transition-opacity" href="/cursos">
-                VER TODOS
-              </Link>
-            </div>
+            {cursos.length > 0 && (
+              <div className="flex justify-end">
+                <Link className="font-label-caps text-accent-violet hover:opacity-80 transition-opacity" href="/cursos">
+                  VER TODOS
+                </Link>
+              </div>
+            )}
           </section>
 
           {/* Eventos Programados Mobile */}
           <section className="flex flex-col gap-4 mt-2">
             <div className="flex justify-between items-center">
               <h2 className="font-label-caps text-secondary">
-                {eventosMobile.length} EVENTOS PROGRAMADOS
+                {eventosMes.length} EVENTOS PROGRAMADOS
               </h2>
               <Link
                 href="/agenda"
@@ -336,33 +350,54 @@ export default function Menu() {
               </Link>
             </div>
 
-            <div className="flex flex-col gap-4">
-              {eventosMobile.map((ev, idx) => {
-                const diaNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[2]) : 10;
-                const mesNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[1]) - 1 : currentMonth;
-                const mesNombre = MESES[mesNum] ?? 'Agosto';
-                return (
-                  <Link
-                    key={ev.id || idx}
-                    href="/agenda"
-                    className="bg-surface-bg rounded-xl p-3 flex items-center gap-4 neumorphic-raised hover:scale-[1.01] active:scale-98 transition-transform"
-                  >
-                    <div className="w-12 h-12 rounded-lg neumorphic-inset flex flex-col items-center justify-center text-accent-violet shrink-0">
-                      <span className="text-[10px] font-bold leading-none">DÍA</span>
-                      <span className="text-lg font-bold leading-none">{diaNum}</span>
+            {cargandoAgenda ? (
+              <div className="flex flex-col gap-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={`agenda-load-mob-${i}`} className="bg-surface-bg rounded-xl p-3.5 flex items-center gap-4 neumorphic-raised animate-pulse">
+                    <div className="w-12 h-12 rounded-lg neumorphic-inset flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
                     </div>
-                    <div className="flex flex-col">
-                      <h4 className="font-bold text-on-surface text-sm flex items-center gap-2">
-                        {ev.descripcion}
-                      </h4>
-                      <span className="text-xs text-secondary">{diaNum} de {mesNombre}</span>
+                    <div className="flex-1 flex flex-col gap-2">
+                      <div className="h-4 bg-outline-variant/30 rounded w-2/3"></div>
+                      <div className="h-3 bg-outline-variant/20 rounded w-1/3"></div>
                     </div>
-                  </Link>
-                );
-              })}
-            </div>
+                  </div>
+                ))}
+              </div>
+            ) : eventosMes.length === 0 ? (
+              <div className="bg-surface-bg neumorphic-inset rounded-2xl p-5 text-center">
+                <span className="material-symbols-outlined text-3xl text-secondary mb-1">event_available</span>
+                <p className="text-xs text-secondary font-medium">No hay eventos agendados para este mes.</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {eventosMes.slice(0, 5).map((ev, idx) => {
+                  const diaNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[2]) : 10;
+                  const mesNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[1]) - 1 : currentMonth;
+                  const mesNombre = MESES[mesNum] ?? 'Agosto';
+                  return (
+                    <Link
+                      key={ev.id || idx}
+                      href="/agenda"
+                      className="bg-surface-bg rounded-xl p-3.5 flex items-center gap-4 neumorphic-raised hover:scale-[1.01] active:scale-98 transition-transform"
+                    >
+                      <div className="w-12 h-12 rounded-lg neumorphic-inset flex flex-col items-center justify-center text-accent-violet shrink-0">
+                        <span className="text-[10px] font-bold leading-none uppercase">DÍA</span>
+                        <span className="text-lg font-bold leading-none mt-0.5">{diaNum}</span>
+                      </div>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <h4 className="font-bold text-on-surface text-sm truncate">
+                          {ev.descripcion}
+                        </h4>
+                        <span className="text-xs text-secondary mt-0.5">{diaNum} de {mesNombre}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
 
-            <div className="flex justify-center mt-4 pb-8 border-b border-outline-variant/30">
+            <div className="flex justify-center mt-2 pb-6 border-b border-outline-variant/30">
               <Link
                 className="font-label-caps text-accent-violet hover:opacity-80 transition-opacity flex items-center gap-2"
                 href="/agenda"
@@ -433,46 +468,76 @@ export default function Menu() {
             </div>
           </header>
 
-          {/* Mis Cursos Section */}
+          {/* Mis Cursos Section (Desktop) */}
           <section className="flex flex-col gap-4">
             <div className="flex justify-between items-center px-1">
               <h2 className="font-headline-md text-headline-md text-accent-violet uppercase tracking-wide">Mis Cursos</h2>
-              <Link className="font-label-caps text-accent-violet hover:opacity-80 transition-opacity uppercase tracking-wider" href="/cursos">
-                VER TODOS
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {cursosMobile.map((curso, idx) => (
-                <Link
-                  key={curso.id || idx}
-                  href={curso.ruta ?? `/sub-menu-curso/${curso.id}`}
-                  className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet">
-                      <span className="material-symbols-outlined text-2xl">{iconoPorMateria(curso.materia)}</span>
-                    </div>
-                    <span className="px-2.5 py-1 rounded-lg neumorphic-inset font-extrabold text-[11px] text-accent-violet">
-                      {formatearGradoCurso(curso.anio)}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
-                    <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
-                      <span className="material-symbols-outlined text-[14px]">domain</span>
-                      {curso.escuela}
-                    </p>
-                  </div>
+              {cursos.length > 0 && (
+                <Link className="font-label-caps text-accent-violet hover:opacity-80 transition-opacity uppercase tracking-wider" href="/cursos">
+                  VER TODOS
                 </Link>
-              ))}
+              )}
             </div>
+
+            {cargandoCursos ? (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={`curso-load-desk-${i}`} className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised animate-pulse">
+                    <div className="flex justify-between items-start">
+                      <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                      <div className="w-12 h-5 rounded-md neumorphic-inset"></div>
+                    </div>
+                    <div className="flex flex-col gap-2 mt-1">
+                      <div className="h-4 bg-outline-variant/30 rounded w-3/4"></div>
+                      <div className="h-3 bg-outline-variant/20 rounded w-full"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : cursos.length === 0 ? (
+              <div className="bg-surface-bg neumorphic-inset rounded-2xl p-8 text-center flex flex-col items-center gap-2">
+                <span className="material-symbols-outlined text-4xl text-secondary">school</span>
+                <p className="text-sm text-secondary font-medium">Aún no tenés cursos creados.</p>
+                <Link href="/cursos" className="px-5 py-2 rounded-xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider hover:scale-105 active:scale-95 transition-all">
+                  + Crear Curso
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {cursos.slice(0, 4).map((curso, idx) => (
+                  <Link
+                    key={curso.id || idx}
+                    href={curso.ruta ?? `/sub-menu-curso/${curso.id}`}
+                    className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet">
+                        <span className="material-symbols-outlined text-2xl">{iconoPorMateria(curso.materia)}</span>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-lg neumorphic-inset font-extrabold text-[11px] text-accent-violet">
+                        {formatearGradoCurso(curso.anio)}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
+                      <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
+                        <span className="material-symbols-outlined text-[14px]">domain</span>
+                        {curso.escuela}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </section>
 
-          {/* Agenda Section */}
+          {/* Agenda Section (Desktop) */}
           <section className="flex flex-col gap-4 mt-2">
             <div className="flex justify-between items-center px-1">
               <h2 className="font-label-caps text-secondary uppercase tracking-wider">
-                {eventosMobile.length} EVENTOS PROGRAMADOS
+                {eventosMes.length} EVENTOS PROGRAMADOS
               </h2>
               <Link
                 href="/agenda"
@@ -483,31 +548,52 @@ export default function Menu() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {eventosMobile.map((ev, idx) => {
-                const diaNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[2]) : 10;
-                const mesNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[1]) - 1 : currentMonth;
-                const mesNombre = MESES[mesNum] ?? 'Agosto';
-                return (
-                  <Link
-                    key={ev.id || idx}
-                    href="/agenda"
-                    className="bg-surface-bg rounded-xl p-3.5 flex items-center gap-4 neumorphic-raised hover:scale-[1.01] active:scale-98 transition-transform"
-                  >
-                    <div className="w-12 h-12 rounded-lg neumorphic-inset flex flex-col items-center justify-center text-accent-violet shrink-0">
-                      <span className="text-[10px] font-bold leading-none uppercase">DÍA</span>
-                      <span className="text-lg font-bold leading-none mt-0.5">{diaNum}</span>
+            {cargandoAgenda ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={`agenda-load-desk-${i}`} className="bg-surface-bg rounded-xl p-3.5 flex items-center gap-4 neumorphic-raised animate-pulse">
+                    <div className="w-12 h-12 rounded-lg neumorphic-inset flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
                     </div>
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <h4 className="font-bold text-on-surface text-sm truncate">
-                        {ev.descripcion}
-                      </h4>
-                      <span className="text-xs text-secondary mt-0.5">{diaNum} de {mesNombre}</span>
+                    <div className="flex-1 flex flex-col gap-2">
+                      <div className="h-4 bg-outline-variant/30 rounded w-2/3"></div>
+                      <div className="h-3 bg-outline-variant/20 rounded w-1/3"></div>
                     </div>
-                  </Link>
-                );
-              })}
-            </div>
+                  </div>
+                ))}
+              </div>
+            ) : eventosMes.length === 0 ? (
+              <div className="bg-surface-bg neumorphic-inset rounded-2xl p-6 text-center">
+                <span className="material-symbols-outlined text-3xl text-secondary mb-1">event_available</span>
+                <p className="text-xs text-secondary font-medium">No hay eventos agendados para este mes.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {eventosMes.slice(0, 6).map((ev, idx) => {
+                  const diaNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[2]) : 10;
+                  const mesNum = ev.fecha ? Number(ev.fecha.split('T')[0].split('-')[1]) - 1 : currentMonth;
+                  const mesNombre = MESES[mesNum] ?? 'Agosto';
+                  return (
+                    <Link
+                      key={ev.id || idx}
+                      href="/agenda"
+                      className="bg-surface-bg rounded-xl p-3.5 flex items-center gap-4 neumorphic-raised hover:scale-[1.01] active:scale-98 transition-transform"
+                    >
+                      <div className="w-12 h-12 rounded-lg neumorphic-inset flex flex-col items-center justify-center text-accent-violet shrink-0">
+                        <span className="text-[10px] font-bold leading-none uppercase">DÍA</span>
+                        <span className="text-lg font-bold leading-none mt-0.5">{diaNum}</span>
+                      </div>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <h4 className="font-bold text-on-surface text-sm truncate">
+                          {ev.descripcion}
+                        </h4>
+                        <span className="text-xs text-secondary mt-0.5">{diaNum} de {mesNombre}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
 
             <div className="flex justify-center mt-4 pb-8 border-b border-outline-variant/30">
               <Link
