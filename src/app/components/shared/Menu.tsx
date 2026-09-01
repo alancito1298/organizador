@@ -82,6 +82,33 @@ export default function Menu() {
   const [trimestreActivo, setTrimestreActivo] = useState<number>(1);
   const [modalCerrarTrimestre, setModalCerrarTrimestre] = useState(false);
 
+  // Eliminar Curso
+  const [cursoAEliminar, setCursoAEliminar] = useState<Curso | null>(null);
+  const [eliminandoCurso, setEliminandoCurso] = useState(false);
+
+  const handleEliminarCurso = async () => {
+    if (!cursoAEliminar) return;
+    setEliminandoCurso(true);
+    const token = getToken();
+    try {
+      const res = await fetch(`${API}/cursos/${cursoAEliminar.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setCursos((prev) => prev.filter((c) => c.id !== cursoAEliminar.id));
+        setCursoAEliminar(null);
+      } else {
+        alert('❌ No se pudo eliminar el curso');
+      }
+    } catch (err) {
+      console.error('Error al eliminar curso:', err);
+      alert('❌ Error al eliminar el curso');
+    } finally {
+      setEliminandoCurso(false);
+    }
+  };
+
   useEffect(() => {
     const saved = localStorage.getItem('trimestreActivo');
     if (saved && [1, 2, 3].includes(Number(saved))) {
@@ -301,27 +328,41 @@ export default function Menu() {
             ) : (
               <div className="grid grid-cols-2 gap-4">
                 {cursos.slice(0, 4).map((curso, idx) => (
-                  <Link
-                    key={curso.id || idx}
-                    href={curso.ruta ?? `/sub-menu-curso/${curso.id}/alumnos`}
-                    className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet">
-                        <span className="material-symbols-outlined text-2xl">{iconoPorMateria(curso.materia)}</span>
+                  <div key={curso.id || idx} className="relative group">
+                    <Link
+                      href={curso.ruta ?? `/sub-menu-curso/${curso.id}/alumnos`}
+                      className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform w-full h-full"
+                    >
+                      <div className="flex justify-between items-start pr-6">
+                        <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet">
+                          <span className="material-symbols-outlined text-2xl">{iconoPorMateria(curso.materia)}</span>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-md neumorphic-inset font-extrabold text-[11px] text-accent-violet">
+                          {formatearGradoCurso(curso.anio)}
+                        </span>
                       </div>
-                      <span className="px-2 py-0.5 rounded-md neumorphic-inset font-extrabold text-[11px] text-accent-violet">
-                        {formatearGradoCurso(curso.anio)}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
-                      <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
-                        <span className="material-symbols-outlined text-[14px]">domain</span>
-                        {curso.escuela}
-                      </p>
-                    </div>
-                  </Link>
+                      <div>
+                        <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
+                        <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
+                          <span className="material-symbols-outlined text-[14px]">domain</span>
+                          {curso.escuela}
+                        </p>
+                      </div>
+                    </Link>
+
+                    {/* Botón Borrar Curso */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setCursoAEliminar(curso);
+                      }}
+                      className="absolute top-2.5 right-2.5 w-7 h-7 rounded-lg bg-surface-bg neumorphic-raised flex items-center justify-center text-secondary hover:text-red-600 active:scale-90 transition-all opacity-60 hover:opacity-100 z-10"
+                      title="Eliminar este curso"
+                    >
+                      <span className="material-symbols-outlined text-[15px]">delete</span>
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -507,27 +548,41 @@ export default function Menu() {
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {cursos.slice(0, 4).map((curso, idx) => (
-                  <Link
-                    key={curso.id || idx}
-                    href={curso.ruta ?? `/sub-menu-curso/${curso.id}/alumnos`}
-                    className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet">
-                        <span className="material-symbols-outlined text-2xl">{iconoPorMateria(curso.materia)}</span>
+                  <div key={curso.id || idx} className="relative group">
+                    <Link
+                      href={curso.ruta ?? `/sub-menu-curso/${curso.id}/alumnos`}
+                      className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform w-full h-full"
+                    >
+                      <div className="flex justify-between items-start pr-6">
+                        <div className="w-10 h-10 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet">
+                          <span className="material-symbols-outlined text-2xl">{iconoPorMateria(curso.materia)}</span>
+                        </div>
+                        <span className="px-2.5 py-1 rounded-lg neumorphic-inset font-extrabold text-[11px] text-accent-violet">
+                          {formatearGradoCurso(curso.anio)}
+                        </span>
                       </div>
-                      <span className="px-2.5 py-1 rounded-lg neumorphic-inset font-extrabold text-[11px] text-accent-violet">
-                        {formatearGradoCurso(curso.anio)}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
-                      <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
-                        <span className="material-symbols-outlined text-[14px]">domain</span>
-                        {curso.escuela}
-                      </p>
-                    </div>
-                  </Link>
+                      <div>
+                        <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
+                        <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
+                          <span className="material-symbols-outlined text-14px">domain</span>
+                          {curso.escuela}
+                        </p>
+                      </div>
+                    </Link>
+
+                    {/* Botón Borrar Curso Desktop */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setCursoAEliminar(curso);
+                      }}
+                      className="absolute top-2.5 right-2.5 w-7 h-7 rounded-lg bg-surface-bg neumorphic-raised flex items-center justify-center text-secondary hover:text-red-600 active:scale-90 transition-all opacity-0 group-hover:opacity-100 z-10 shadow-sm"
+                      title="Eliminar este curso"
+                    >
+                      <span className="material-symbols-outlined text-[15px]">delete</span>
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -677,6 +732,65 @@ export default function Menu() {
                 className="flex-1 py-3 rounded-xl bg-accent-violet text-white font-bold text-xs uppercase tracking-wider shadow-md hover:bg-accent-violet/90 active:scale-95 transition-all"
               >
                 {trimestreActivo < 3 ? `Pasar al ${trimestreActivo + 1}° Trimestre →` : 'Reiniciar al 1° Trimestre'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal de Confirmación para Borrar Curso ── */}
+      {cursoAEliminar && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setCursoAEliminar(null);
+          }}
+        >
+          <div className="bg-surface-bg neumorphic-raised rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4 border border-white/60 shadow-2xl font-mulish">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-red-100/80 neumorphic-inset flex items-center justify-center text-red-600 text-2xl shrink-0">
+                <span className="material-symbols-outlined text-2xl">delete_forever</span>
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-headline-md text-lg text-on-surface uppercase font-bold truncate">
+                  ¿Eliminar curso?
+                </h3>
+                <p className="text-xs text-secondary truncate">
+                  {cursoAEliminar.materia} ({formatearGradoCurso(cursoAEliminar.anio)})
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-surface-bg neumorphic-inset rounded-2xl p-4 text-xs text-secondary flex flex-col gap-1.5">
+              <p className="font-bold text-red-600 flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">warning</span> Acción irreversible
+              </p>
+              <p className="text-secondary leading-relaxed">
+                Se eliminará el aula <b>{cursoAEliminar.materia}</b> de {cursoAEliminar.escuela}.
+              </p>
+            </div>
+
+            <div className="flex gap-3 mt-1">
+              <button
+                onClick={() => setCursoAEliminar(null)}
+                disabled={eliminandoCurso}
+                className="flex-1 py-3 rounded-xl bg-surface-bg neumorphic-raised text-secondary font-bold text-xs uppercase tracking-wider hover:opacity-80 active:scale-95 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleEliminarCurso}
+                disabled={eliminandoCurso}
+                className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:bg-red-700 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                {eliminandoCurso ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Borrando...</span>
+                  </>
+                ) : (
+                  'Eliminar'
+                )}
               </button>
             </div>
           </div>

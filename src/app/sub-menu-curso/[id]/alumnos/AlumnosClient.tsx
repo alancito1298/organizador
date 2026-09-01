@@ -82,6 +82,32 @@ export default function AlumnosClient() {
   const [trimestreActivo, setTrimestreActivo] = useState<number>(1);
   const [modalCerrarTrimestre, setModalCerrarTrimestre] = useState(false);
 
+  // Eliminar Curso
+  const [modalEliminarCurso, setModalEliminarCurso] = useState(false);
+  const [eliminandoCurso, setEliminandoCurso] = useState(false);
+
+  const handleEliminarCurso = async () => {
+    if (!cursoId) return;
+    setEliminandoCurso(true);
+    const token = getToken();
+    try {
+      const res = await fetch(`${API}/cursos/${cursoId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        window.location.href = '/cursos';
+      } else {
+        alert('❌ No se pudo eliminar el curso');
+      }
+    } catch (err) {
+      console.error('Error al eliminar curso:', err);
+      alert('❌ Error al eliminar el curso');
+    } finally {
+      setEliminandoCurso(false);
+    }
+  };
+
   useEffect(() => {
     const saved = localStorage.getItem('trimestreActivo');
     if (saved && [1, 2, 3].includes(Number(saved))) {
@@ -510,12 +536,24 @@ export default function AlumnosClient() {
             <span className="font-bold text-on-surface">{materiaNombre}</span>
             <span className="text-secondary">— {escuelaNombre}</span>
           </p>
-          <div className="flex items-center gap-2 text-xs text-secondary mt-0.5">
-            <span>Año escolar: 2026 - 2027</span>
-            <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full neumorphic-inset text-[10px] font-bold text-accent-violet">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_3px_#22c55e]"></span>
-              En curso
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2 text-xs text-secondary mt-0.5">
+              <span>Año escolar: 2026 - 2027</span>
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full neumorphic-inset text-[10px] font-bold text-accent-violet">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_3px_#22c55e]"></span>
+                En curso
+              </div>
             </div>
+
+            {/* Botón Borrar este Curso */}
+            <button
+              onClick={() => setModalEliminarCurso(true)}
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-bg neumorphic-raised text-[11px] font-bold text-red-600 hover:text-red-700 active:scale-95 transition-all shadow-sm"
+              title="Eliminar este curso"
+            >
+              <span className="material-symbols-outlined text-xs">delete</span>
+              Eliminar Curso
+            </button>
           </div>
 
           {/* ── Indicador de Trimestre Activo + Cerrar Trimestre ── */}
@@ -1097,6 +1135,66 @@ export default function AlumnosClient() {
         </div>
       )}
 
+      {/* ── Modal de Confirmación para Borrar Curso ── */}
+      {modalEliminarCurso && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setModalEliminarCurso(false);
+          }}
+        >
+          <div className="bg-surface-bg neumorphic-raised rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4 border border-white/60 shadow-2xl font-mulish">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-red-100/80 neumorphic-inset flex items-center justify-center text-red-600 text-2xl shrink-0">
+                <span className="material-symbols-outlined text-2xl">delete_forever</span>
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-headline-md text-lg text-on-surface uppercase font-bold truncate">
+                  ¿Eliminar este curso?
+                </h3>
+                <p className="text-xs text-secondary truncate">
+                  {materiaNombre} ({cursoInfo?.anio ? formatearGradoCurso(cursoInfo.anio) : ''})
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-surface-bg neumorphic-inset rounded-2xl p-4 text-xs text-secondary flex flex-col gap-1.5">
+              <p className="font-bold text-red-600 flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">warning</span> Acción irreversible
+              </p>
+              <p className="text-secondary leading-relaxed">
+                Se eliminarán permanentemente los alumnos, asistencias y notas asociadas a este curso.
+              </p>
+            </div>
+
+            <div className="flex gap-3 mt-1">
+              <button
+                onClick={() => setModalEliminarCurso(false)}
+                disabled={eliminandoCurso}
+                className="flex-1 py-3 rounded-xl bg-surface-bg neumorphic-raised text-secondary font-bold text-xs uppercase tracking-wider hover:opacity-80 active:scale-95 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleEliminarCurso}
+                disabled={eliminandoCurso}
+                className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:bg-red-700 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                {eliminandoCurso ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Borrando...</span>
+                  </>
+                ) : (
+                  'Eliminar'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer y Nav */}
       <Footer />
       <BottomNav />
 
