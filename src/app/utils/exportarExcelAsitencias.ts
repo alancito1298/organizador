@@ -15,7 +15,7 @@ type Asistencia = {
 };
 
 type Props = {
-  curso: {
+  curso?: {
     escuela?: string;
     anio?: string;
     materia?: string;

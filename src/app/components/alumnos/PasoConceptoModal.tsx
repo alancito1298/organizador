@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { getToken } from '@/lib/token';
-import type { AlumnoConStats } from './AlumnosClient';
+import type { AlumnoConStats } from '@/app/types/alumnos';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 

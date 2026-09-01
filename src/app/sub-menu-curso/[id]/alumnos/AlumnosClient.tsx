@@ -15,23 +15,10 @@ import { exportarExcelAsistencias } from "@/app/utils/exportarExcelAsitencias";
 import { exportarExcelCalificaciones } from "@/app/utils/exportarExcelCalificaciones";
 import { exportarInformeCursoPdf } from "@/app/utils/exportarInformePdf";
 import { getToken } from "@/lib/token";
+import type { Alumno, AlumnoConStats } from "@/app/types/alumnos";
+export type { Alumno, AlumnoConStats };
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
-
-export type Alumno = {
-  id: number;
-  alumnoCursoId: number;
-  nombre: string;
-  apellido: string;
-  contacto?: string;
-  dni?: string;
-};
-
-export type AlumnoConStats = Alumno & {
-  asistenciaPorcentaje: number;
-  primerTrimestre: number;
-  promedioGeneral: number;
-};
 
 const formatearGradoCurso = (anio: string | number | undefined) => {
   if (!anio) return '';
@@ -166,7 +153,7 @@ export default function AlumnosClient() {
 
       if (Array.isArray(dataInscripciones)) {
         const alumnosConStats: AlumnoConStats[] = dataInscripciones
-          .map((i: any, idx: number) => {
+          .map((i: any): AlumnoConStats | null => {
             const alum = i.alumno;
             if (!alum) return null;
 
@@ -207,7 +194,7 @@ export default function AlumnosClient() {
               promedioGeneral: promGeneral,
             };
           })
-          .filter((a): a is AlumnoConStats => a !== null);
+          .filter((a): a is AlumnoConStats => Boolean(a));
 
         setAlumnos(alumnosConStats);
       }
@@ -461,7 +448,7 @@ export default function AlumnosClient() {
         columnas: cols,
         datos: matrizDatos,
         inscripciones: inscripcionesData || [],
-        curso: cursoInfo || undefined,
+        curso: cursoInfo ? cursoInfo : undefined,
       });
     } catch (err) {
       console.error("Error al exportar calificaciones:", err);
