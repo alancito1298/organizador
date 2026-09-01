@@ -303,7 +303,7 @@ export default function Menu() {
                 {cursos.slice(0, 4).map((curso, idx) => (
                   <Link
                     key={curso.id || idx}
-                    href={curso.ruta ?? `/sub-menu-curso/${curso.id}`}
+                    href={curso.ruta ?? `/sub-menu-curso/${curso.id}/alumnos`}
                     className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform"
                   >
                     <div className="flex justify-between items-start">
@@ -509,7 +509,7 @@ export default function Menu() {
                 {cursos.slice(0, 4).map((curso, idx) => (
                   <Link
                     key={curso.id || idx}
-                    href={curso.ruta ?? `/sub-menu-curso/${curso.id}`}
+                    href={curso.ruta ?? `/sub-menu-curso/${curso.id}/alumnos`}
                     className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform"
                   >
                     <div className="flex justify-between items-start">
