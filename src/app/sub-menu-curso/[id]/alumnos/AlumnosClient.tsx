@@ -604,22 +604,30 @@ export default function AlumnosClient() {
           </div>
         </section>
 
-        {/* ── Botones de Acción (Asistencia, Concepto, Importar, Crear, Planillas y Descargas) ── */}
+        {/* ── Botones de Acción (Asistencia destacada a lo ancho + grid 2x2 + Descargas) ── */}
         <section className="flex flex-col gap-3 mb-8">
-          {/* En mobile: grid de 2 columnas. En desktop: barra horizontal flex */}
+          {/* En mobile: Asistencia a lo ancho (col-span-2), luego 2 filas de 2x2, y Descargas. En desktop: barra horizontal flex */}
           <div className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
             <div className="contents sm:flex sm:flex-wrap sm:items-center sm:gap-2.5">
-              {/* Botón 1: Asistencia (MÁS DESTACADO) */}
+              {/* Fila 1 en mobile: Asistencia destacada a lo ancho (ocupa 2 columnas) */}
               <button
                 onClick={() => setAsistenciaModalAbierto(true)}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-accent-violet hover:bg-accent-violet/90 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-violet-500/25 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all"
+                className="col-span-2 sm:col-auto w-full sm:w-auto px-4 py-3 sm:py-2.5 rounded-2xl bg-gradient-to-r from-violet-700 via-indigo-700 to-purple-800 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-between sm:justify-center gap-2.5 shadow-md shadow-violet-500/25 hover:scale-[1.01] sm:hover:scale-105 active:scale-95 transition-all"
                 title="Pasar asistencia rápida a los alumnos"
               >
-                <span className="material-symbols-outlined text-base">how_to_reg</span>
-                <span className="truncate">Asistencia</span>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-white/20 flex items-center justify-center text-white shrink-0 shadow-inner">
+                    <span className="material-symbols-outlined text-lg sm:text-base" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>
+                  </div>
+                  <span className="text-xs sm:text-xs font-extrabold tracking-wide">Pasar Asistencia</span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-bold tracking-wider uppercase text-white/95 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Principal
+                </span>
               </button>
 
-              {/* Botón 2: Concepto */}
+              {/* Fila 2 en mobile: Concepto & Importar */}
               <button
                 onClick={() => setConceptoModalAbierto(true)}
                 className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-amber-700 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
@@ -629,7 +637,6 @@ export default function AlumnosClient() {
                 <span className="truncate">Concepto</span>
               </button>
 
-              {/* Botón 3: Importar Alumnos Unificado (Excel, Foto o Texto) */}
               <button
                 onClick={() => {
                   setModoImportarInicial('excel');
@@ -642,7 +649,7 @@ export default function AlumnosClient() {
                 <span className="truncate">Importar</span>
               </button>
 
-              {/* Botón 4: Nuevo Alumno */}
+              {/* Fila 3 en mobile: Nuevo Alumno & Ver Planillas */}
               <button
                 onClick={() => setModalAgregar(true)}
                 className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
@@ -651,7 +658,6 @@ export default function AlumnosClient() {
                 <span className="truncate">Nuevo Alumno</span>
               </button>
 
-              {/* Botón 5: Ver Planillas */}
               <Link
                 href={`/sub-menu-curso/${cursoId}/planilla`}
                 className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
@@ -661,8 +667,8 @@ export default function AlumnosClient() {
               </Link>
             </div>
 
-            {/* Botón 6: Descargas con Dropdown */}
-            <div className="relative w-full sm:w-auto">
+            {/* Fila 4 en mobile: Descargas */}
+            <div className="relative col-span-2 sm:col-auto w-full sm:w-auto">
               <button
                 onClick={() => setMenuDescargasAbierto(!menuDescargasAbierto)}
                 className="w-full sm:w-auto px-3.5 sm:px-4 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
