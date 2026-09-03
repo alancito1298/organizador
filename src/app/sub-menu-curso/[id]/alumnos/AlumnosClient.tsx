@@ -604,12 +604,32 @@ export default function AlumnosClient() {
           </div>
         </section>
 
-        {/* ── Botones de Acción (Importar, Crear, Planillas y Descargas) ── */}
+        {/* ── Botones de Acción (Asistencia, Concepto, Importar, Crear, Planillas y Descargas) ── */}
         <section className="flex flex-col gap-3 mb-8">
           {/* En mobile: grid de 2 columnas. En desktop: barra horizontal flex */}
           <div className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
             <div className="contents sm:flex sm:flex-wrap sm:items-center sm:gap-2.5">
-              {/* Botón 1: Importar Alumnos Unificado (Excel, Foto o Texto) */}
+              {/* Botón 1: Asistencia (MÁS DESTACADO) */}
+              <button
+                onClick={() => setAsistenciaModalAbierto(true)}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-accent-violet hover:bg-accent-violet/90 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-violet-500/25 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all"
+                title="Pasar asistencia rápida a los alumnos"
+              >
+                <span className="material-symbols-outlined text-base">how_to_reg</span>
+                <span className="truncate">Asistencia</span>
+              </button>
+
+              {/* Botón 2: Concepto */}
+              <button
+                onClick={() => setConceptoModalAbierto(true)}
+                className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-amber-700 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
+                title="Evaluar concepto diario con caritas"
+              >
+                <span className="text-base">😊</span>
+                <span className="truncate">Concepto</span>
+              </button>
+
+              {/* Botón 3: Importar Alumnos Unificado (Excel, Foto o Texto) */}
               <button
                 onClick={() => {
                   setModoImportarInicial('excel');
@@ -619,10 +639,10 @@ export default function AlumnosClient() {
                 title="Importar alumnos con Excel, Foto con IA o Copiar y Pegar"
               >
                 <Upload className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="truncate">Importar Alumnos</span>
+                <span className="truncate">Importar</span>
               </button>
 
-              {/* Botón 2: Nuevo Alumno */}
+              {/* Botón 4: Nuevo Alumno */}
               <button
                 onClick={() => setModalAgregar(true)}
                 className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
@@ -631,7 +651,7 @@ export default function AlumnosClient() {
                 <span className="truncate">Nuevo Alumno</span>
               </button>
 
-              {/* Botón 3: Ver Planillas */}
+              {/* Botón 5: Ver Planillas */}
               <Link
                 href={`/sub-menu-curso/${cursoId}/planilla`}
                 className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
@@ -641,7 +661,7 @@ export default function AlumnosClient() {
               </Link>
             </div>
 
-            {/* Botón 4: Descargas con Dropdown */}
+            {/* Botón 6: Descargas con Dropdown */}
             <div className="relative w-full sm:w-auto">
               <button
                 onClick={() => setMenuDescargasAbierto(!menuDescargasAbierto)}
@@ -764,24 +784,6 @@ export default function AlumnosClient() {
                   ⭐ Destacados del Curso
                 </h2>
                 <span className="text-xs text-secondary font-medium">Top Asistencias & Mejores Calificaciones</span>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  onClick={() => setConceptoModalAbierto(true)}
-                  className="px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-amber-700 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95 transition-all"
-                  title="Cargar y evaluar concepto diario con caritas"
-                >
-                  <span className="text-base">😊</span>
-                  Cargar Concepto
-                </button>
-                <button
-                  onClick={() => setAsistenciaModalAbierto(true)}
-                  className="px-4 py-2.5 rounded-2xl bg-accent-violet text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-md hover:bg-accent-violet/90 active:scale-95 transition-all"
-                >
-                  <span className="material-symbols-outlined text-base">how_to_reg</span>
-                  Pasar Asistencia
-                </button>
               </div>
             </div>
 

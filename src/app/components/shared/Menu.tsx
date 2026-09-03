@@ -98,26 +98,6 @@ export default function Menu() {
   const [trimestreActivo, setTrimestreActivo] = useState<number>(1);
   const [modalCerrarTrimestre, setModalCerrarTrimestre] = useState(false);
 
-  // Modal selector de curso para Asistencia o Concepto
-  const [modalSelectorAccion, setModalSelectorAccion] = useState<'asistencia' | 'concepto' | null>(null);
-
-  const handleAbrirAccion = (tipo: 'asistencia' | 'concepto') => {
-    if (cursos.length === 0) {
-      window.location.href = '/cursos';
-      return;
-    }
-    if (cursos.length === 1) {
-      const cId = cursos[0].id;
-      if (tipo === 'asistencia') {
-        window.location.href = `/sub-menu-curso/${cId}/asistencia`;
-      } else {
-        window.location.href = `/sub-menu-curso/${cId}/alumnos?abrirConcepto=true`;
-      }
-      return;
-    }
-    setModalSelectorAccion(tipo);
-  };
-
   useEffect(() => {
     const saved = localStorage.getItem('trimestreActivo');
     if (saved && [1, 2, 3].includes(Number(saved))) {
@@ -489,61 +469,30 @@ export default function Menu() {
         {/* Vertical Sidebar (Desktop) */}
         <aside className="hidden md:flex flex-col w-64 flex-shrink-0 bg-surface-bg neumorphic-raised rounded-3xl p-6 h-fit sticky top-32 mb-12">
           <h3 className="font-headline-md-mobile text-headline-md-mobile text-accent-violet uppercase mb-6 px-4">Menú</h3>
-          <nav className="flex flex-col gap-3">
-            {/* ASISTENCIAS (MÁS DESTACADO) */}
-            <button
-              onClick={() => handleAbrirAccion('asistencia')}
-              className="flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-violet-700 via-indigo-700 to-purple-800 text-white font-extrabold text-sm shadow-lg shadow-violet-500/25 hover:scale-105 active:scale-95 transition-all text-left group w-full"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0 shadow-inner">
-                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>
-                </div>
-                <div className="flex flex-col items-start leading-tight">
-                  <span className="font-bold tracking-wide">Asistencias</span>
-                  <span className="text-[10px] text-violet-200 font-medium">Toma diaria</span>
-                </div>
-              </div>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] animate-pulse"></span>
-            </button>
-
-            {/* CONCEPTO */}
-            <button
-              onClick={() => handleAbrirAccion('concepto')}
-              className="flex items-center gap-4 p-3.5 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-amber-600 transition-colors text-left w-full"
-            >
-              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform text-xl shrink-0">
-                😊
-              </div>
-              <div className="flex flex-col items-start leading-tight">
-                <span className="font-body-sm text-body-sm font-bold text-accent-violet group-hover:text-amber-600 transition-colors">Concepto</span>
-                <span className="text-[10px] text-secondary">Evaluación diaria</span>
-              </div>
-            </button>
-
-            <Link className="flex items-center gap-4 p-3.5 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/agenda">
-              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+          <nav className="flex flex-col gap-4">
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/agenda">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
                 <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>calendar_add_on</span>
               </div>
               <span className="font-body-sm text-body-sm font-bold text-accent-violet">Agenda</span>
             </Link>
 
-            <Link className="flex items-center gap-4 p-3.5 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/cursos">
-              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/cursos">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
                 <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>school</span>
               </div>
               <span className="font-body-sm text-body-sm font-bold text-accent-violet">Cursos</span>
             </Link>
 
-            <Link className="flex items-center gap-4 p-3.5 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/planificaciones">
-              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/planificaciones">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
                 <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>edit_document</span>
               </div>
               <span className="font-body-sm text-body-sm font-bold text-accent-violet">Planificaciones</span>
             </Link>
 
-            <Link className="flex items-center gap-4 p-3.5 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/horario">
-              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+            <Link className="flex items-center gap-4 p-4 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-colors" href="/horario">
+              <div className="w-10 h-10 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center group-hover:scale-105 transition-transform">
                 <span className="material-symbols-outlined text-2xl text-accent-violet" style={{ fontVariationSettings: "'FILL' 0" }}>schedule</span>
               </div>
               <span className="font-body-sm text-body-sm font-bold text-accent-violet">Horarios</span>
@@ -586,48 +535,13 @@ export default function Menu() {
             </div>
           </header>
 
-          {/* Menú Mobile (Acceso a las secciones principales con Asistencias destacada) */}
+          {/* Menú Mobile (Acceso a las 4 secciones principales) */}
           <section className="bg-surface-bg neumorphic-raised rounded-2xl p-3.5 w-full">
             <h3 className="font-headline-md-mobile text-xs font-extrabold text-accent-violet uppercase mb-2.5 px-1 flex items-center gap-1.5">
               <span className="material-symbols-outlined text-lg">menu</span>
               Menú
             </h3>
             <nav className="flex flex-col gap-2">
-              {/* ASISTENCIAS (MÁS DESTACADO) */}
-              <button
-                onClick={() => handleAbrirAccion('asistencia')}
-                className="flex items-center justify-between p-2.5 px-3 rounded-xl bg-gradient-to-r from-violet-700 via-indigo-700 to-purple-800 text-white font-extrabold text-xs shadow-md shadow-violet-500/25 active:scale-95 transition-all text-left group w-full"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white shrink-0 shadow-inner">
-                    <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>
-                  </div>
-                  <div className="flex flex-col items-start leading-tight">
-                    <span className="font-extrabold text-xs tracking-wide">Asistencias</span>
-                    <span className="text-[9px] text-violet-200 font-medium">Toma diaria de lista</span>
-                  </div>
-                </div>
-                <span className="px-2 py-0.5 rounded-full bg-white/20 text-[9px] font-bold tracking-wider uppercase text-white/90 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Principal
-                </span>
-              </button>
-
-              {/* CONCEPTO */}
-              <button
-                onClick={() => handleAbrirAccion('concepto')}
-                className="flex items-center gap-3 p-2.5 px-3 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-amber-600 transition-all active:scale-95 shadow-sm text-left w-full"
-              >
-                <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center text-amber-600 shrink-0 text-base">
-                  😊
-                </div>
-                <div className="flex flex-col items-start leading-tight">
-                  <span className="font-extrabold text-xs text-accent-violet group-hover:text-amber-600 transition-colors">Concepto</span>
-                  <span className="text-[9px] text-secondary">Evaluación diaria</span>
-                </div>
-              </button>
-
-              {/* AGENDA */}
               <Link className="flex items-center gap-3 p-2.5 px-3 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/agenda">
                 <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
                   <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0" }}>calendar_add_on</span>
@@ -635,7 +549,6 @@ export default function Menu() {
                 <span className="font-extrabold text-xs text-accent-violet">Agenda</span>
               </Link>
 
-              {/* CURSOS */}
               <Link className="flex items-center gap-3 p-2.5 px-3 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/cursos">
                 <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
                   <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0" }}>school</span>
@@ -643,7 +556,6 @@ export default function Menu() {
                 <span className="font-extrabold text-xs text-accent-violet">Cursos</span>
               </Link>
 
-              {/* PLANIFICACIONES */}
               <Link className="flex items-center gap-3 p-2.5 px-3 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/planificaciones">
                 <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
                   <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0" }}>edit_document</span>
@@ -651,7 +563,6 @@ export default function Menu() {
                 <span className="font-extrabold text-xs text-accent-violet truncate">Planificaciones</span>
               </Link>
 
-              {/* HORARIOS */}
               <Link className="flex items-center gap-3 p-2.5 px-3 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/horario">
                 <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
                   <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0" }}>schedule</span>
@@ -1079,74 +990,6 @@ export default function Menu() {
                   'Eliminar'
                 )}
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Selector de Curso para Asistencia o Concepto */}
-      {modalSelectorAccion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-surface-bg rounded-3xl neumorphic-raised p-6 max-w-md w-full flex flex-col gap-4 border border-violet-100 shadow-2xl">
-            <div className="flex items-center justify-between pb-2 border-b border-violet-100">
-              <div className="flex items-center gap-2.5">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white ${
-                  modalSelectorAccion === 'asistencia' ? 'bg-gradient-to-r from-violet-600 to-indigo-600' : 'bg-gradient-to-r from-amber-500 to-orange-500'
-                }`}>
-                  {modalSelectorAccion === 'asistencia' ? (
-                    <span className="material-symbols-outlined text-2xl">how_to_reg</span>
-                  ) : (
-                    <span className="text-xl">😊</span>
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-bold text-on-surface text-base">
-                    {modalSelectorAccion === 'asistencia' ? 'Tomar Asistencia' : 'Evaluar Concepto'}
-                  </h3>
-                  <p className="text-xs text-secondary">Elegí el curso al que deseás ingresar:</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setModalSelectorAccion(null)}
-                className="w-8 h-8 rounded-full bg-surface-bg neumorphic-inset flex items-center justify-center text-secondary hover:text-on-surface"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
-              {cursos.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => {
-                    const cId = c.id;
-                    setModalSelectorAccion(null);
-                    if (modalSelectorAccion === 'asistencia') {
-                      window.location.href = `/sub-menu-curso/${cId}/asistencia`;
-                    } else {
-                      window.location.href = `/sub-menu-curso/${cId}/alumnos?abrirConcepto=true`;
-                    }
-                  }}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-surface-bg neumorphic-raised hover:scale-[1.02] active:scale-95 transition-all text-left group"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
-                      <span className="material-symbols-outlined text-xl">{iconoPorMateria(c.materia)}</span>
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="font-bold text-xs text-on-surface truncate group-hover:text-accent-violet transition-colors">
-                        {c.materia}
-                      </h4>
-                      <p className="text-[10px] text-secondary truncate">
-                        {formatearGradoCurso(c.anio)} {c.escuela ? `— ${c.escuela}` : ''}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="material-symbols-outlined text-secondary group-hover:text-accent-violet transition-colors">
-                    chevron_right
-                  </span>
-                </button>
-              ))}
             </div>
           </div>
         </div>
