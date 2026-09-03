@@ -74,6 +74,10 @@ export default function AlumnosClient() {
   const [asistenciaModalAbierto, setAsistenciaModalAbierto] = useState(false);
   const [conceptoModalAbierto, setConceptoModalAbierto] = useState(false);
 
+  // Estado de Asistencia del día corriente (cargando, pendiente, cargadas, sin_clases)
+  type EstadoAsistenciaHoy = 'cargando' | 'pendiente' | 'cargadas' | 'sin_clases';
+  const [estadoAsistenciaHoy, setEstadoAsistenciaHoy] = useState<EstadoAsistenciaHoy>('cargando');
+
   // Estados de Descarga
   const [descargandoAsistencias, setDescargandoAsistencias] = useState(false);
   const [descargandoCalificaciones, setDescargandoCalificaciones] = useState(false);
@@ -179,15 +183,79 @@ export default function AlumnosClient() {
     const token = getToken();
     const headers = { Authorization: `Bearer ${token}` };
     try {
-      const [resInscripciones, resAsistencias, resCalificaciones] = await Promise.all([
+      const [resInscripciones, resAsistencias, resCalificaciones, resHorarios] = await Promise.all([
         fetch(`${API}/inscripciones/curso/${cursoId}`, { headers }),
         fetch(`${API}/asistencias/curso/${cursoId}`, { headers }),
         fetch(`${API}/calificaciones/curso/${cursoId}`, { headers }),
+        fetch(`${API}/horarios`, { headers }),
       ]);
 
       const dataInscripciones = resInscripciones.ok ? await resInscripciones.json() : [];
       const dataAsistencias = resAsistencias.ok ? await resAsistencias.json() : [];
       const dataCalificaciones = resCalificaciones.ok ? await resCalificaciones.json() : [];
+      const dataHorarios = resHorarios.ok ? await resHorarios.json() : [];
+
+      // ── Detectar si en el día corriente hay clases y si ya fueron cargadas ──
+      const hoy = new Date();
+      const yyyy = hoy.getFullYear();
+      const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+      const dd = String(hoy.getDate()).padStart(2, '0');
+      const fechaHoyStr = `${yyyy}-${mm}-${dd}`;
+
+      // Comprobar si ya se registraron asistencias hoy en este curso
+      const asistenciasRegistradasHoy = Array.isArray(dataAsistencias) && dataAsistencias.some((a: any) => {
+        return a.fecha && a.fecha.startsWith(fechaHoyStr);
+      });
+
+      const diasSemanaMap: Record<number, string[]> = {
+        1: ['lunes'],
+        2: ['martes'],
+        3: ['miercoles', 'miércoles'],
+        4: ['jueves'],
+        5: ['viernes'],
+        6: ['sabado', 'sábado'],
+        0: ['domingo'],
+      };
+      const nombresDiaHoy = diasSemanaMap[hoy.getDay()] || [];
+
+      // Filtrar horarios que correspondan a este curso
+      const horariosEsteCurso = Array.isArray(dataHorarios)
+        ? dataHorarios.filter((h: any) => {
+            if (!h.descripcion) return false;
+            try {
+              const parsed = JSON.parse(h.descripcion);
+              if (parsed.cursoId && Number(parsed.cursoId) === Number(cursoId)) return true;
+              if (cursoInfo?.materia && parsed.materia && parsed.materia.toLowerCase().trim() === cursoInfo.materia.toLowerCase().trim()) return true;
+            } catch {
+              if (cursoInfo?.materia && h.descripcion.toLowerCase().includes(cursoInfo.materia.toLowerCase().trim())) return true;
+            }
+            return false;
+          })
+        : [];
+
+      const hayClaseHoy = horariosEsteCurso.some((h: any) => {
+        const diaH = (h.dia || '').toLowerCase().trim();
+        return nombresDiaHoy.some((d) => diaH.includes(d));
+      });
+
+      if (asistenciasRegistradasHoy) {
+        setEstadoAsistenciaHoy('cargadas');
+      } else {
+        if (horariosEsteCurso.length > 0) {
+          if (hayClaseHoy) {
+            setEstadoAsistenciaHoy('pendiente');
+          } else {
+            setEstadoAsistenciaHoy('sin_clases');
+          }
+        } else {
+          // Si no tiene horarios configurados en el sistema, considerar días hábiles de semana (Lunes a Viernes)
+          if (hoy.getDay() >= 1 && hoy.getDay() <= 5) {
+            setEstadoAsistenciaHoy('pendiente');
+          } else {
+            setEstadoAsistenciaHoy('sin_clases');
+          }
+        }
+      }
 
       if (Array.isArray(dataInscripciones)) {
         const alumnosConStats: AlumnoConStats[] = dataInscripciones
@@ -529,6 +597,49 @@ export default function AlumnosClient() {
     }
   };
 
+  // Componente con estado que renderiza el badge dinámico de asistencia hoy
+  const renderBadgeEstadoAsistencia = () => {
+    if (estadoAsistenciaHoy === 'cargadas') {
+      return (
+        <span
+          className="px-2.5 py-0.5 rounded-full bg-emerald-500/30 border border-emerald-400/60 text-[10px] font-extrabold tracking-wider uppercase text-emerald-100 flex items-center gap-1.5 shadow-sm"
+          title="Asistencias de hoy cargadas con éxito"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]"></span>
+          Cargadas
+        </span>
+      );
+    }
+    if (estadoAsistenciaHoy === 'pendiente') {
+      return (
+        <span
+          className="px-2.5 py-0.5 rounded-full bg-amber-400/30 border border-amber-300/60 text-[10px] font-extrabold tracking-wider uppercase text-amber-100 flex items-center gap-1.5 shadow-sm animate-pulse"
+          title="Hay clase hoy y la asistencia aún no fue registrada"
+        >
+          <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_6px_#fbbf24]"></span>
+          Pendiente
+        </span>
+      );
+    }
+    if (estadoAsistenciaHoy === 'sin_clases') {
+      return (
+        <span
+          className="px-2.5 py-0.5 rounded-full bg-white/15 border border-white/20 text-[10px] font-bold tracking-wider uppercase text-white/80 flex items-center gap-1.5"
+          title="No hay clases programadas para este curso en el día de hoy"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+          Sin clases hoy
+        </span>
+      );
+    }
+    return (
+      <span className="px-2 py-0.5 rounded-full bg-white/10 text-[9px] font-bold tracking-wider uppercase text-white/70 flex items-center gap-1">
+        <div className="w-2 h-2 border border-white/60 border-t-transparent rounded-full animate-spin"></div>
+        Verificando
+      </span>
+    );
+  };
+
   return (
     <div className="w-full min-h-screen bg-surface-bg text-text-main flex flex-col font-mulish antialiased">
       <Navbar />
@@ -621,10 +732,7 @@ export default function AlumnosClient() {
                   </div>
                   <span className="text-xs sm:text-xs font-extrabold tracking-wide">Pasar Asistencia</span>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-bold tracking-wider uppercase text-white/95 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Principal
-                </span>
+                {renderBadgeEstadoAsistencia()}
               </button>
 
               {/* Fila 2 en mobile: Concepto & Importar */}
