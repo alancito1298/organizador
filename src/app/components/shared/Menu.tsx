@@ -536,36 +536,36 @@ export default function Menu() {
           </header>
 
           {/* Menú Mobile (Acceso a las 4 secciones principales) */}
-          <section className="bg-surface-bg neumorphic-raised rounded-3xl p-5 w-full">
-            <h3 className="font-headline-md-mobile text-sm font-extrabold text-accent-violet uppercase mb-4 px-1 flex items-center gap-2">
-              <span className="material-symbols-outlined text-xl">menu</span>
+          <section className="bg-surface-bg neumorphic-raised rounded-2xl p-3.5 w-full">
+            <h3 className="font-headline-md-mobile text-xs font-extrabold text-accent-violet uppercase mb-2.5 px-1 flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-lg">menu</span>
               Menú
             </h3>
-            <nav className="grid grid-cols-2 gap-3.5">
-              <Link className="flex items-center gap-3 p-3.5 rounded-2xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/agenda">
-                <div className="w-10 h-10 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
-                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>calendar_add_on</span>
+            <nav className="flex flex-col gap-2">
+              <Link className="flex items-center gap-3 p-2.5 px-3 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/agenda">
+                <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0" }}>calendar_add_on</span>
                 </div>
                 <span className="font-extrabold text-xs text-accent-violet">Agenda</span>
               </Link>
 
-              <Link className="flex items-center gap-3 p-3.5 rounded-2xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/cursos">
-                <div className="w-10 h-10 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
-                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>school</span>
+              <Link className="flex items-center gap-3 p-2.5 px-3 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/cursos">
+                <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0" }}>school</span>
                 </div>
                 <span className="font-extrabold text-xs text-accent-violet">Cursos</span>
               </Link>
 
-              <Link className="flex items-center gap-3 p-3.5 rounded-2xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/planificaciones">
-                <div className="w-10 h-10 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
-                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>edit_document</span>
+              <Link className="flex items-center gap-3 p-2.5 px-3 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/planificaciones">
+                <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0" }}>edit_document</span>
                 </div>
                 <span className="font-extrabold text-xs text-accent-violet truncate">Planificaciones</span>
               </Link>
 
-              <Link className="flex items-center gap-3 p-3.5 rounded-2xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/horario">
-                <div className="w-10 h-10 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
-                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>schedule</span>
+              <Link className="flex items-center gap-3 p-2.5 px-3 rounded-xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/horario">
+                <div className="w-8 h-8 rounded-lg bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 0" }}>schedule</span>
                 </div>
                 <span className="font-extrabold text-xs text-accent-violet">Horarios</span>
               </Link>

@@ -41,14 +41,14 @@ export default function ImportarAlumnosModal({
 
   if (!abierto) return null;
 
-  // Descargar plantilla Excel modelo de ejemplo
+  // Descargar plantilla Excel modelo de ejemplo (2 columnas: Nombre y Apellido)
   const descargarPlantilla = () => {
     const wsData = [
-      ['Apellido', 'Nombre', 'DNI', 'Contacto'],
-      ['García', 'Mateo', '45123456', '1123456789'],
-      ['Rodríguez', 'Sofía', '46789012', '1134567890'],
-      ['Fernández', 'Lucas', '47111222', '1145678901'],
-      ['López', 'Valentina', '48333444', '1156789012'],
+      ['Nombre', 'Apellido'],
+      ['Mateo', 'García'],
+      ['Sofía', 'Rodríguez'],
+      ['Lucas', 'Fernández'],
+      ['Valentina', 'López'],
     ];
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -112,8 +112,8 @@ export default function ImportarAlumnosModal({
 
     primeraFila.forEach((col, idx) => {
       if (col.includes('apellido') && col.includes('nombre')) colCompuesto = idx;
-      else if (col.includes('apellido')) colApellido = idx;
       else if (col.includes('nombre') || col.includes('estudiante') || col.includes('alumno')) colNombre = idx;
+      else if (col.includes('apellido')) colApellido = idx;
       else if (col.includes('dni') || col.includes('documento') || col.includes('cedula')) colDni = idx;
       else if (col.includes('contacto') || col.includes('telefono') || col.includes('celular') || col.includes('mail')) colContacto = idx;
     });
@@ -139,12 +139,12 @@ export default function ImportarAlumnosModal({
           nombre = parts.slice(1).join(' ').trim();
         } else {
           const parts = full.split(/\s+/);
-          apellido = parts[0] || '';
-          nombre = parts.slice(1).join(' ') || '';
+          nombre = parts[0] || '';
+          apellido = parts.slice(1).join(' ') || '';
         }
       } else if (colApellido !== -1 && colNombre !== -1) {
-        apellido = String(row[colApellido] || '').trim();
         nombre = String(row[colNombre] || '').trim();
+        apellido = String(row[colApellido] || '').trim();
       } else if (row.length === 1) {
         const full = String(row[0]).trim();
         if (full.includes(',')) {
@@ -153,13 +153,13 @@ export default function ImportarAlumnosModal({
           nombre = parts.slice(1).join(' ').trim();
         } else {
           const parts = full.split(/\s+/);
-          apellido = parts[0] || '';
-          nombre = parts.slice(1).join(' ') || '';
+          nombre = parts[0] || '';
+          apellido = parts.slice(1).join(' ') || '';
         }
       } else {
-        // Asignación por posición estándar: Col 0: Apellido, Col 1: Nombre, Col 2: DNI, Col 3: Contacto
-        apellido = String(row[0] || '').trim();
-        nombre = String(row[1] || '').trim();
+        // Asignación estándar de 2 columnas: Columna 1 (0) = Nombre, Columna 2 (1) = Apellido
+        nombre = String(row[0] || '').trim();
+        apellido = String(row[1] || '').trim();
       }
 
       if (colDni !== -1 && row[colDni]) dni = String(row[colDni]).trim();
@@ -270,6 +270,13 @@ export default function ImportarAlumnosModal({
     );
   };
 
+  const handleDescartar = () => {
+    setAlumnos([]);
+    setTextoPegado('');
+    setErrorMsg(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-violet-100">
@@ -281,7 +288,9 @@ export default function ImportarAlumnosModal({
             </div>
             <div>
               <h3 className="text-xl font-bold">Importar Alumnos desde Excel / CSV</h3>
-              <p className="text-xs text-violet-300">Carga nóminas completas de estudiantes en segundos</p>
+              <p className="text-xs text-violet-300">
+                {alumnos.length > 0 ? 'Paso 2: Vista previa y verificación de datos' : 'Carga nóminas (Columna 1: Nombre, Columna 2: Apellido)'}
+              </p>
             </div>
           </div>
           <button
@@ -325,27 +334,27 @@ export default function ImportarAlumnosModal({
                       Arrastrá tu archivo Excel o hacé clic para buscar
                     </p>
                     <p className="text-xs text-violet-600 mt-1">
-                      Formatos soportados: .xlsx, .xls, .csv (detecta columnas de Apellido, Nombre y DNI automáticamente)
+                      Formatos soportados: .xlsx, .xls, .csv (2 columnas estándar: 1ª Nombre, 2ª Apellido. Sin necesidad de formato de tabla)
                     </p>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-violet-950">
-                    Pegá las filas copiadas directamente de tu planilla de Excel:
+                    Pegá las filas copiadas de tu planilla de Excel (Columna 1: Nombre, Columna 2: Apellido):
                   </label>
                   <textarea
                     rows={6}
                     value={textoPegado}
                     onChange={(e) => setTextoPegado(e.target.value)}
-                    placeholder="García, Mateo&#10;Rodríguez, Sofía&#10;Fernández Lucas&#10;López Valentina"
+                    placeholder="Mateo&#9;García&#10;Sofía&#9;Rodríguez&#10;Lucas&#9;Fernández&#10;Valentina&#9;López"
                     className="w-full p-4 rounded-2xl border border-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-600 text-sm font-mono"
                   />
                   <button
                     onClick={handleParseTextoPegado}
                     className="bg-violet-950 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-violet-900 transition-colors"
                   >
-                    Analizar Alumnos
+                    Ver Vista Previa
                   </button>
                 </div>
               )}
@@ -366,34 +375,43 @@ export default function ImportarAlumnosModal({
                   className="inline-flex items-center gap-2 text-xs font-semibold text-violet-800 bg-violet-100 hover:bg-violet-200 px-3.5 py-2 rounded-xl transition-colors"
                 >
                   <Download className="w-4 h-4" />
-                  Descargar Plantilla de Ejemplo (.xlsx)
+                  Descargar Plantilla de Ejemplo (2 Columnas) (.xlsx)
                 </button>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
+              {/* Banner informativo de vista previa */}
+              <div className="bg-amber-50 border border-amber-200 text-amber-900 p-4 rounded-2xl flex items-start gap-3 text-xs leading-relaxed">
+                <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold block text-sm text-amber-950 mb-0.5">👁️ Vista Previa de Verificación</span>
+                  <span>
+                    Revisá que las columnas de <strong>Nombre</strong> y <strong>Apellido</strong> se hayan leído correctamente. Podés editar cualquier dato manualmente o desmarcar alumnos. Si los datos están bien, presioná <strong>Aceptar e Importar</strong>. Si no son correctos, hacé clic en <strong>Descartar</strong>.
+                  </span>
+                </div>
+              </div>
+
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-violet-950">Vista Previa de Alumnos Detectados</h4>
+                  <h4 className="font-bold text-violet-950">Estudiantes Detectados ({alumnos.length})</h4>
                   <p className="text-xs text-gray-500">
-                    Se encontraron {alumnos.length} estudiantes ({alumnos.filter((a) => a.seleccionado).length} seleccionados para importar)
+                    {alumnos.filter((a) => a.seleccionado && a.valido).length} listos para importar
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={toggleSeleccionarTodos}
-                    className="text-xs font-semibold text-violet-700 hover:text-violet-950 px-3 py-1.5 rounded-lg border border-violet-200"
+                    className="text-xs font-semibold text-violet-700 hover:text-violet-950 px-3 py-1.5 rounded-lg border border-violet-200 hover:bg-violet-50 transition-colors"
                   >
-                    Seleccionar Todos
+                    {alumnos.every((a) => a.seleccionado) ? 'Desmarcar Todos' : 'Seleccionar Todos'}
                   </button>
                   <button
-                    onClick={() => {
-                      setAlumnos([]);
-                      setTextoPegado('');
-                    }}
-                    className="text-xs font-semibold text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg border border-gray-200"
+                    onClick={handleDescartar}
+                    className="text-xs font-semibold text-red-600 hover:text-red-700 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 transition-colors flex items-center gap-1"
                   >
-                    Cambiar archivo
+                    <X className="w-3.5 h-3.5" />
+                    Descartar datos
                   </button>
                 </div>
               </div>
@@ -404,8 +422,8 @@ export default function ImportarAlumnosModal({
                   <thead className="bg-violet-50 text-violet-950 uppercase font-bold sticky top-0 border-b border-violet-200">
                     <tr>
                       <th className="p-3 w-10 text-center">✓</th>
-                      <th className="p-3">Apellido</th>
-                      <th className="p-3">Nombre</th>
+                      <th className="p-3">Nombre (Col. 1)</th>
+                      <th className="p-3">Apellido (Col. 2)</th>
                       <th className="p-3">DNI (Opcional)</th>
                       <th className="p-3">Contacto / Tel</th>
                     </tr>
@@ -427,18 +445,18 @@ export default function ImportarAlumnosModal({
                         <td className="p-2">
                           <input
                             type="text"
-                            value={a.apellido}
-                            onChange={(e) => handleEditarAlumno(a.idTemp, 'apellido', e.target.value)}
-                            placeholder="Apellido..."
+                            value={a.nombre}
+                            onChange={(e) => handleEditarAlumno(a.idTemp, 'nombre', e.target.value)}
+                            placeholder="Nombre..."
                             className="w-full p-1.5 rounded border border-gray-200 text-xs focus:border-violet-500 focus:outline-none"
                           />
                         </td>
                         <td className="p-2">
                           <input
                             type="text"
-                            value={a.nombre}
-                            onChange={(e) => handleEditarAlumno(a.idTemp, 'nombre', e.target.value)}
-                            placeholder="Nombre..."
+                            value={a.apellido}
+                            onChange={(e) => handleEditarAlumno(a.idTemp, 'apellido', e.target.value)}
+                            placeholder="Apellido..."
                             className="w-full p-1.5 rounded border border-gray-200 text-xs focus:border-violet-500 focus:outline-none"
                           />
                         </td>
@@ -471,19 +489,32 @@ export default function ImportarAlumnosModal({
 
         {/* Footer */}
         <div className="bg-gray-50 p-6 border-t border-gray-100 flex items-center justify-between">
-          <button
-            onClick={onCerrar}
-            disabled={procesando}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:text-gray-800 transition-colors"
-          >
-            Cancelar
-          </button>
+          {alumnos.length > 0 ? (
+            <button
+              type="button"
+              onClick={handleDescartar}
+              disabled={procesando}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-red-600 hover:text-red-800 hover:bg-red-50 transition-colors flex items-center gap-1.5"
+            >
+              <X className="w-4 h-4" />
+              Descartar y volver a intentar
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onCerrar}
+              disabled={procesando}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              Cancelar
+            </button>
+          )}
 
           {alumnos.length > 0 && (
             <button
               onClick={handleGuardarLote}
               disabled={procesando || alumnos.filter((a) => a.seleccionado && a.valido).length === 0}
-              className="bg-violet-950 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-violet-900 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
             >
               {procesando ? (
                 <>
@@ -491,12 +522,12 @@ export default function ImportarAlumnosModal({
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                   </svg>
-                  Importando ({progreso.actual} de {progreso.total})...
+                  Cargando ({progreso.actual} de {progreso.total})...
                 </>
               ) : (
                 <>
-                  <Check className="w-4 h-4" />
-                  Guardar e Inscribir ({alumnos.filter((a) => a.seleccionado && a.valido).length}) Alumnos
+                  <Check className="w-4.5 h-4.5" />
+                  Aceptar e Importar ({alumnos.filter((a) => a.seleccionado && a.valido).length}) Alumnos
                 </>
               )}
             </button>
