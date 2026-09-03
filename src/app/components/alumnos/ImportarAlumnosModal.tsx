@@ -30,7 +30,7 @@ interface Props {
  * Si la imagen es HEIC o el navegador tarda en decodificar, salta al fallback de inmediato
  * garantizando que NUNCA quede colgado.
  */
-function comprimirImagenParaIA(file: File, maxDimension = 1400, calidad = 0.8): Promise<{ base64: string; mimeType: string }> {
+function comprimirImagenParaIA(file: File, maxDimension = 1000, calidad = 0.72): Promise<{ base64: string; mimeType: string }> {
   return new Promise((resolve) => {
     let terminado = false;
 
@@ -121,11 +121,15 @@ export default function ImportarAlumnosModal({
   const [textoPegado, setTextoPegado] = useState('');
   const [procesando, setProcesando] = useState(false);
   const [analizandoFoto, setAnalizandoFoto] = useState(false);
+  const [progresoFoto, setProgresoFoto] = useState(0);
+  const [faseAnalisis, setFaseAnalisis] = useState('Iniciando...');
+  const [segundosTranscurridos, setSegundosTranscurridos] = useState(0);
   const [progreso, setProgreso] = useState({ actual: 0, total: 0 });
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const intervaloProgresoRef = useRef<NodeJS.Timeout | null>(null);
 
   if (!abierto) return null;
 
@@ -175,7 +179,13 @@ export default function ImportarAlumnosModal({
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
     }
+    if (intervaloProgresoRef.current) {
+      clearInterval(intervaloProgresoRef.current);
+      intervaloProgresoRef.current = null;
+    }
     setAnalizandoFoto(false);
+    setProgresoFoto(0);
+    setSegundosTranscurridos(0);
   };
 
   // Procesar imagen / foto de nómina con Inteligencia Artificial
@@ -185,22 +195,56 @@ export default function ImportarAlumnosModal({
     if (!file) return;
 
     setAnalizandoFoto(true);
+    setProgresoFoto(12);
+    setFaseAnalisis('Cargando y optimizando imagen...');
+    setSegundosTranscurridos(0);
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    // Timeout de 20s para la llamada completa
+    // Iniciar temporizador de progreso visual constante
+    let segundos = 0;
+    if (intervaloProgresoRef.current) clearInterval(intervaloProgresoRef.current);
+
+    intervaloProgresoRef.current = setInterval(() => {
+      segundos += 1;
+      setSegundosTranscurridos(segundos);
+
+      setProgresoFoto((prev) => {
+        if (segundos <= 2) {
+          setFaseAnalisis('Optimizando imagen y ajustando nitidez...');
+          return Math.min(prev + 12, 35);
+        } else if (segundos <= 5) {
+          setFaseAnalisis('Enviando imagen a la Inteligencia Artificial...');
+          return Math.min(prev + 8, 60);
+        } else if (segundos <= 9) {
+          setFaseAnalisis('Escaneando nómina y leyendo renglones...');
+          return Math.min(prev + 6, 80);
+        } else if (segundos <= 14) {
+          setFaseAnalisis('Separando Nombres y Apellidos de cada estudiante...');
+          return Math.min(prev + 3, 93);
+        } else {
+          setFaseAnalisis('Finalizando extracción y ordenando lista...');
+          return Math.min(prev + 1, 97);
+        }
+      });
+    }, 1000);
+
+    // Timeout de 28s para la llamada completa
     const timeoutId = setTimeout(() => {
       controller.abort();
-    }, 20000);
+    }, 28000);
 
     try {
       // 1. Optimizar imagen
-      const { base64, mimeType } = await comprimirImagenParaIA(file, 1400, 0.8);
+      const { base64, mimeType } = await comprimirImagenParaIA(file, 1000, 0.72);
 
       if (!base64) {
         throw new Error('No se pudo procesar la imagen seleccionada.');
       }
+
+      setProgresoFoto((p) => Math.max(p, 40));
+      setFaseAnalisis('Analizando fotografía con IA...');
 
       // 2. Enviar a la API con timeout
       const res = await fetch('/api/alumnos/extraer-foto', {
@@ -229,6 +273,15 @@ export default function ImportarAlumnosModal({
         throw new Error(data?.error || 'No se pudo leer la lista. Asegúrate de que los nombres estén bien enfocados.');
       }
 
+      // Éxito: Llevar barra al 100%
+      setProgresoFoto(100);
+      setFaseAnalisis('¡Listo! Mostrando vista previa...');
+
+      if (intervaloProgresoRef.current) {
+        clearInterval(intervaloProgresoRef.current);
+        intervaloProgresoRef.current = null;
+      }
+
       const lista: AlumnoImportado[] = (data.alumnos || []).map((a: any, idx: number) => {
         const nombre = (a.nombre || '').trim();
         const apellido = (a.apellido || '').trim();
@@ -249,6 +302,8 @@ export default function ImportarAlumnosModal({
       if (lista.length === 0) {
         setErrorMsg('No se detectaron nombres legibles en la imagen. Intenta enfocar más de cerca la lista.');
       } else {
+        // Pausa breve de 350ms para que el usuario aprecie el 100%
+        await new Promise((r) => setTimeout(r, 350));
         setAlumnos(lista);
       }
     } catch (err: any) {
@@ -260,6 +315,10 @@ export default function ImportarAlumnosModal({
       }
     } finally {
       clearTimeout(timeoutId);
+      if (intervaloProgresoRef.current) {
+        clearInterval(intervaloProgresoRef.current);
+        intervaloProgresoRef.current = null;
+      }
       setAnalizandoFoto(false);
       abortControllerRef.current = null;
       e.target.value = '';
@@ -611,23 +670,61 @@ export default function ImportarAlumnosModal({
                   />
 
                   {analizandoFoto ? (
-                    <div className="border-2 border-violet-300 bg-violet-50/70 rounded-3xl p-10 text-center flex flex-col items-center justify-center gap-4 animate-in fade-in duration-200">
-                      <div className="w-16 h-16 rounded-2xl bg-violet-200 flex items-center justify-center text-accent-violet animate-bounce">
-                        <Sparkles className="w-8 h-8 text-violet-700" />
+                    <div className="border border-violet-200 bg-gradient-to-b from-violet-50/80 to-purple-50/50 rounded-3xl p-6 sm:p-8 flex flex-col gap-5 shadow-sm animate-in fade-in duration-200">
+                      {/* Cabecera con estado activo y porcentaje */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                          </span>
+                          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full">
+                            Escaneando en vivo
+                          </span>
+                        </div>
+                        <span className="text-xl font-extrabold text-violet-950 font-mono">
+                          {progresoFoto}%
+                        </span>
                       </div>
-                      <div>
-                        <h4 className="font-extrabold text-lg text-violet-950">Analizando foto con Inteligencia Artificial...</h4>
-                        <p className="text-xs text-violet-700 mt-1">
-                          Leyendo la lista y reconociendo nombres y apellidos automáticamente.
-                        </p>
+
+                      {/* Barra de Progreso animada */}
+                      <div className="w-full bg-violet-200/70 h-4 rounded-full overflow-hidden p-0.5 shadow-inner">
+                        <div
+                          className="bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 h-full rounded-full transition-all duration-300 relative overflow-hidden"
+                          style={{ width: `${Math.max(5, progresoFoto)}%` }}
+                        >
+                          <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                        </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={cancelarAnalisisFoto}
-                        className="mt-2 text-xs font-bold text-red-600 hover:text-red-800 bg-white px-4 py-2 rounded-xl border border-red-200 hover:bg-red-50 transition-colors shadow-sm"
-                      >
-                        Cancelar análisis
-                      </button>
+
+                      {/* Información de fase y tiempo */}
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-violet-600 shrink-0 animate-spin" style={{ animationDuration: '3s' }} />
+                          <p className="text-sm font-bold text-violet-950 truncate">
+                            {faseAnalisis}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-xs text-violet-700 font-medium px-0.5">
+                          <span>⏱️ Tiempo transcurrido: <strong>{segundosTranscurridos}s</strong></span>
+                          <span>Espera estimada: <strong>~6 a 12s</strong></span>
+                        </div>
+                      </div>
+
+                      {/* Botón de Cancelación */}
+                      <div className="pt-2 border-t border-violet-100 flex items-center justify-between">
+                        <span className="text-[11px] text-gray-500">
+                          {segundosTranscurridos < 15 ? 'El sistema está procesando activamente...' : 'Demorando más de lo habitual...'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={cancelarAnalisisFoto}
+                          className="text-xs font-bold text-red-600 hover:text-red-800 bg-white hover:bg-red-50 px-3.5 py-1.5 rounded-xl border border-red-200 transition-colors shadow-sm flex items-center gap-1.5 active:scale-95"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          Cancelar análisis
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
