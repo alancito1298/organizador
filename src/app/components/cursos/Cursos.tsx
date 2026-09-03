@@ -140,12 +140,12 @@ export default function Cursos() {
           {/* Botón Agregar */}
           <button
             type="button"
-            onClick={() => setMostrarFormulario((prev) => !prev)}
-            className="w-full max-w-xl flex items-center justify-center gap-2 py-4 px-6 bg-primary text-white hover:bg-primary/90 font-bold rounded-2xl shadow-md transition-all hover:scale-[1.01] my-4"
+            onClick={() => setMostrarFormulario(true)}
+            className="w-full max-w-xl flex items-center justify-center gap-2 py-4 px-6 neu-raised text-accent-violet hover:brightness-95 font-extrabold rounded-2xl shadow-lg transition-all active:scale-98 my-4"
           >
-            <span className="text-2xl font-bold">+</span>
-            <span className="text-sm uppercase tracking-wider">
-              {mostrarFormulario ? 'Ocultar Formulario' : 'Agregar Nuevo Curso'}
+            <span className="material-symbols-outlined text-xl text-accent-violet">add</span>
+            <span className="text-xs uppercase tracking-wider font-extrabold text-accent-violet">
+              Agregar Nuevo Curso
             </span>
           </button>
 
@@ -155,6 +155,7 @@ export default function Cursos() {
                 setCursos((prev) => [...prev, nuevoCurso]);
                 setMostrarFormulario(false);
               }}
+              onCerrar={() => setMostrarFormulario(false)}
             />
           )}
         </div>

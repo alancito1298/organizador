@@ -70,44 +70,33 @@ const formatearGradoCurso = (anio: string | number | undefined) => {
   return `${str}° Año`;
 };
 
+type ActividadHoy = {
+  id: number;
+  hora: string;
+  materia: string;
+  curso: string;
+  escuela: string;
+  cursoId?: number | null;
+};
+
 export default function Menu() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [mostrarAds, setMostrarAds] = useState(true);
   const [cursos, setCursos] = useState<Curso[]>([]);
-  const [cargandoCursos, setCargandoCursos] = useState(true);
   const [agenda, setAgenda] = useState<AgendaItem[]>([]);
+  const [actividadesHoy, setActividadesHoy] = useState<ActividadHoy[]>([]);
+  const [cargandoHorarios, setCargandoHorarios] = useState(true);
+  const [cargandoUsuario, setCargandoUsuario] = useState(true);
+  const [cargandoCursos, setCargandoCursos] = useState(true);
   const [cargandoAgenda, setCargandoAgenda] = useState(true);
 
-  // Trimestre Activo
-  const [trimestreActivo, setTrimestreActivo] = useState<number>(1);
-  const [modalCerrarTrimestre, setModalCerrarTrimestre] = useState(false);
-
-  // Eliminar Curso
+  // Modal para eliminar curso
   const [cursoAEliminar, setCursoAEliminar] = useState<Curso | null>(null);
   const [eliminandoCurso, setEliminandoCurso] = useState(false);
 
-  const handleEliminarCurso = async () => {
-    if (!cursoAEliminar) return;
-    setEliminandoCurso(true);
-    const token = getToken();
-    try {
-      const res = await fetch(`${API}/cursos/${cursoAEliminar.id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        setCursos((prev) => prev.filter((c) => c.id !== cursoAEliminar.id));
-        setCursoAEliminar(null);
-      } else {
-        alert('❌ No se pudo eliminar el curso');
-      }
-    } catch (err) {
-      console.error('Error al eliminar curso:', err);
-      alert('❌ Error al eliminar el curso');
-    } finally {
-      setEliminandoCurso(false);
-    }
-  };
+  // Modal cerrar trimestre
+  const [trimestreActivo, setTrimestreActivo] = useState<number>(1);
+  const [modalCerrarTrimestre, setModalCerrarTrimestre] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('trimestreActivo');
@@ -136,7 +125,10 @@ export default function Menu() {
   useEffect(() => {
     const fetchUsuario = async () => {
       const token = getToken();
-      if (!token) return;
+      if (!token) {
+        setCargandoUsuario(false);
+        return;
+      }
       try {
         const res = await fetch(`${API}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -146,21 +138,26 @@ export default function Menu() {
         setUsuario(data);
       } catch (err) {
         console.error('Error al obtener usuario:', err);
+      } finally {
+        setCargandoUsuario(false);
       }
     };
 
-    const fetchCursos = async () => {
+    const fetchCursos = async (): Promise<Curso[]> => {
       const token = getToken();
-      if (!token) { setCargandoCursos(false); return; }
+      if (!token) { setCargandoCursos(false); return []; }
       try {
         const res = await fetch(`${API}/cursos`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) { setCursos([]); return; }
+        if (!res.ok) { setCursos([]); return []; }
         const data = await res.json();
-        setCursos(Array.isArray(data) ? data : []);
+        const lista = Array.isArray(data) ? data : [];
+        setCursos(lista);
+        return lista;
       } catch {
         setCursos([]);
+        return [];
       } finally {
         setCargandoCursos(false);
       }
@@ -183,10 +180,124 @@ export default function Menu() {
       }
     };
 
-    fetchUsuario();
-    fetchCursos();
-    fetchAgenda();
+    const fetchHorarios = async (cursosList: Curso[] = []) => {
+      const token = getToken();
+      if (!token) { setCargandoHorarios(false); return; }
+      try {
+        const res = await fetch(`${API}/horarios`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) { setActividadesHoy([]); return; }
+        const data = await res.json();
+        if (!Array.isArray(data)) { setActividadesHoy([]); return; }
+
+        const mapaDiasSemana: Record<number, string> = {
+          1: 'Lunes',
+          2: 'Martes',
+          3: 'Miercoles',
+          4: 'Jueves',
+          5: 'Viernes',
+        };
+
+        const diaHoy = mapaDiasSemana[new Date().getDay()];
+        if (!diaHoy) {
+          setActividadesHoy([]);
+          return;
+        }
+
+        const deHoy = data.filter((h: any) => h.dia === diaHoy);
+
+        const parseadas: ActividadHoy[] = deHoy.map((h: any) => {
+          let materia = '';
+          let curso = '';
+          let escuela = '';
+          let cursoId: number | null = null;
+
+          if (h.descripcion) {
+            try {
+              const parsed = JSON.parse(h.descripcion);
+              if (parsed && typeof parsed === 'object') {
+                materia = parsed.materia || '';
+                curso = parsed.curso || '';
+                escuela = parsed.escuela || '';
+                cursoId = parsed.cursoId ? Number(parsed.cursoId) : null;
+              }
+            } catch {
+              materia = h.descripcion.trim();
+            }
+          }
+
+          if (!cursoId && materia) {
+            const matLower = materia.toLowerCase().trim();
+            const encontrado = cursosList.find(
+              (c) =>
+                c.materia.trim().toLowerCase() === matLower ||
+                matLower.includes(c.materia.trim().toLowerCase())
+            );
+            if (encontrado) {
+              cursoId = encontrado.id;
+              if (!curso) curso = encontrado.anio;
+              if (!escuela) escuela = encontrado.escuela;
+            }
+          }
+
+          return {
+            id: h.id,
+            hora: (h.hora || '').replace(/\s+/g, ' ').trim(),
+            materia: materia || 'Clase',
+            curso,
+            escuela,
+            cursoId,
+          };
+        });
+
+        parseadas.sort((a, b) => {
+          const numA = parseFloat(a.hora.replace(':', '.'));
+          const numB = parseFloat(b.hora.replace(':', '.'));
+          return isNaN(numA) || isNaN(numB) ? a.hora.localeCompare(b.hora) : numA - numB;
+        });
+
+        setActividadesHoy(parseadas);
+      } catch (err) {
+        console.error('Error al cargar horarios de hoy:', err);
+        setActividadesHoy([]);
+      } finally {
+        setCargandoHorarios(false);
+      }
+    };
+
+    const cargarDatos = async () => {
+      fetchUsuario();
+      const cursosList = await fetchCursos();
+      fetchAgenda();
+      fetchHorarios(cursosList);
+    };
+
+    cargarDatos();
   }, []);
+
+  const handleEliminarCurso = async () => {
+    if (!cursoAEliminar) return;
+    setEliminandoCurso(true);
+    const token = getToken();
+    try {
+      const res = await fetch(`${API}/cursos/${cursoAEliminar.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setCursos((prev) => prev.filter((c) => c.id !== cursoAEliminar.id));
+        setCursoAEliminar(null);
+      } else {
+        alert('❌ No se pudo eliminar el curso');
+      }
+    } catch (err) {
+      console.error('Error al eliminar curso:', err);
+      alert('❌ Error al eliminar el curso');
+    } finally {
+      setEliminandoCurso(false);
+    }
+  };
 
   // Cálculo del mes actual y eventos
   const hoy = new Date();
@@ -194,7 +305,12 @@ export default function Menu() {
   const currentMonth = hoy.getMonth();
   const currentDay = hoy.getDate();
   const DIAS_COMPLETOS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const MESES_NOMBRES = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
   const diaSemanaActual = DIAS_COMPLETOS[hoy.getDay()];
+  const mesActualNombre = MESES_NOMBRES[currentMonth];
   const anioEscolar = `${currentYear} - ${currentYear + 1}`;
 
   const primerDia = new Date(currentYear, currentMonth, 1);
@@ -216,8 +332,136 @@ export default function Menu() {
     eventosMes.map(item => Number(item.fecha.split('T')[0].split('-')[2]))
   );
 
-  const primerNombre = usuario?.nombre ? usuario.nombre.trim().split(' ')[0] : 'Joshua';
+  const primerNombre = usuario?.nombre ? usuario.nombre.trim().split(' ')[0] : '';
   const nombreFormateado = primerNombre ? (primerNombre.charAt(0).toUpperCase() + primerNombre.slice(1).toLowerCase()) : 'Docente';
+
+  const renderStickersActividades = () => {
+    if (cargandoHorarios) {
+      return (
+        <div className="flex gap-3 overflow-x-auto pb-1 pt-1 no-scrollbar">
+          {[1, 2].map((i) => (
+            <div key={`stk-load-${i}`} className="w-56 shrink-0 h-24 rounded-2xl bg-surface-bg neumorphic-raised animate-pulse p-3 flex flex-col justify-between">
+              <div className="h-4 bg-outline-variant/30 rounded w-1/2"></div>
+              <div className="h-5 bg-outline-variant/25 rounded w-3/4"></div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (actividadesHoy.length === 0) {
+      return (
+        <div className="p-3.5 rounded-2xl bg-surface-bg neumorphic-inset flex items-center justify-between gap-3 text-xs text-secondary font-semibold">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">☕</span>
+            <span>Hoy ({diaSemanaActual}) no tenés clases programadas en tu horario.</span>
+          </div>
+          <Link href="/horario" className="text-accent-violet hover:underline text-[11px] font-extrabold shrink-0">
+            Ver horario →
+          </Link>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-2.5 pt-1">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-[11px] font-extrabold uppercase tracking-wider text-accent-violet flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-base">sticky_note_2</span>
+            Recordatorio de Hoy ({diaSemanaActual})
+          </span>
+          <span className="text-[10px] font-extrabold text-accent-violet px-2 py-0.5 rounded-full neumorphic-inset">
+            {actividadesHoy.length} {actividadesHoy.length === 1 ? 'clase' : 'clases'}
+          </span>
+        </div>
+
+        {/* Stickers carrusel horizontal */}
+        <div className="flex overflow-x-auto no-scrollbar gap-3 pb-2 -mx-1 px-1 snap-x">
+          {actividadesHoy.map((act, index) => {
+            const borderColors = [
+              'border-l-accent-violet',
+              'border-l-emerald-600',
+              'border-l-indigo-600',
+              'border-l-amber-600',
+            ];
+            const borderClass = borderColors[index % borderColors.length];
+
+            return (
+              <div
+                key={`stk-act-${act.id}-${index}`}
+                className={`snap-start shrink-0 w-[240px] sm:w-[260px] bg-surface-bg rounded-2xl p-3.5 neumorphic-raised border-l-[5px] ${borderClass} flex flex-col justify-between hover:scale-[1.02] hover:-rotate-1 active:scale-98 transition-all shadow-md group`}
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-1 mb-1.5">
+                    <span className="font-extrabold text-xs text-accent-violet flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">schedule</span>
+                      {act.hora}
+                    </span>
+                    {act.curso && (
+                      <span className="px-2 py-0.5 rounded-md neumorphic-inset font-extrabold text-[10px] text-accent-violet truncate max-w-[90px]">
+                        {formatearGradoCurso(act.curso)}
+                      </span>
+                    )}
+                  </div>
+
+                  <h4 className="font-extrabold text-sm text-on-surface uppercase truncate leading-tight">
+                    {act.materia}
+                  </h4>
+                  {act.escuela && (
+                    <p className="text-[11px] text-secondary font-medium truncate flex items-center gap-1 mt-0.5">
+                      <span className="material-symbols-outlined text-[13px]">domain</span>
+                      <span className="truncate">{act.escuela}</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Botón con enlace para ir al curso del sticker */}
+                <div className="mt-3 pt-2 border-t border-outline-variant/30">
+                  <Link
+                    href={act.cursoId ? `/sub-menu-curso/${act.cursoId}/alumnos` : '/cursos'}
+                    className="w-full py-1.5 px-3 rounded-xl bg-surface-bg neumorphic-raised text-accent-violet hover:brightness-95 font-extrabold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 active:scale-95 shadow-sm transition-all"
+                  >
+                    <span>Ir al curso</span>
+                    <span className="material-symbols-outlined text-xs font-extrabold">arrow_forward</span>
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const AlmanaqueDiario = () => (
+    <div
+      className="shrink-0 flex flex-col items-center bg-surface-bg neumorphic-raised rounded-2xl overflow-hidden border border-white/60 shadow-md w-20 sm:w-24 text-center select-none hover:scale-105 active:scale-95 transition-transform"
+      title="Almanaque del día de hoy"
+    >
+      {/* Cabecera del almanaque con anillas / fijaciones */}
+      <div className="w-full bg-accent-violet text-white py-1 px-2 flex flex-col items-center relative">
+        <div className="flex justify-around w-full px-2 mb-0.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-white/70 shadow-inner"></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-white/70 shadow-inner"></span>
+        </div>
+        <span className="font-extrabold text-[10px] uppercase tracking-widest leading-none">
+          {mesActualNombre.slice(0, 3)}
+        </span>
+      </div>
+      {/* Hoja del día */}
+      <div className="p-2 flex flex-col items-center justify-center w-full bg-gradient-to-b from-white/30 to-transparent">
+        <span className="font-extrabold text-2xl sm:text-3xl text-on-surface leading-tight tracking-tighter">
+          {String(currentDay).padStart(2, '0')}
+        </span>
+        <span className="font-extrabold text-[10px] text-accent-violet uppercase tracking-wider leading-tight">
+          {diaSemanaActual}
+        </span>
+        <span className="text-[9px] font-bold text-secondary mt-0.5">
+          {currentYear}
+        </span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="w-full min-h-screen bg-surface-bg text-text-main flex flex-col antialiased">
@@ -259,44 +503,74 @@ export default function Menu() {
         {/* Mobile View con toda la información solicitada */}
         <div className="flex flex-col md:hidden w-full gap-6">
           {/* Header Mobile */}
-          <header className="flex flex-col gap-1.5 pt-2">
-            <h1 className="font-display-lg text-3xl md:text-4xl text-on-surface tracking-tight font-extrabold">
-              Hola {nombreFormateado}
-            </h1>
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="font-headline-md text-on-surface text-base font-bold">
-                {diaSemanaActual} / {cursos.length > 0 ? `${formatearGradoCurso(cursos[0].anio).toUpperCase()} • ${cursos[0].materia.toUpperCase()}` : 'MATERIA'}
-              </span>
-              <span className="text-xs text-secondary">{cursos.length > 0 ? `(${cursos[0].escuela})` : ''}</span>
-              <Link className="text-accent-violet text-xs font-bold underline ml-1 hover:opacity-80" href="/horario">
-                Ver horarios →
-              </Link>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-secondary mt-0.5">
-              <span>Año escolar: {anioEscolar}</span>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full neumorphic-inset text-[10px] font-bold text-accent-violet">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_3px_#22c55e]"></span>
-                En curso
-              </span>
-            </div>
-
-            {/* ── Indicador de Trimestre (Mobile) ── */}
-            <div className="flex flex-wrap items-center gap-2 text-xs text-secondary mt-1">
-              <span className="font-semibold text-secondary">Estás viendo:</span>
-              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full neumorphic-inset text-xs font-bold text-accent-violet">
-                {trimestreActivo}° Trimestre
+          <header className="flex flex-col gap-2 pt-2">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col gap-1 min-w-0">
+                <h1 className="font-display-lg text-2xl sm:text-3xl text-on-surface tracking-tight font-extrabold flex items-center gap-2.5">
+                  {cargandoUsuario ? (
+                    <span className="flex items-center gap-2">
+                      <span>Hola</span>
+                      <span className="w-5 h-5 border-2 border-accent-violet border-t-transparent rounded-full animate-spin inline-block"></span>
+                    </span>
+                  ) : (
+                    `Hola ${nombreFormateado}`
+                  )}
+                </h1>
+                <div className="flex items-center gap-2 text-xs text-secondary mt-0.5">
+                  <span>Año escolar: {anioEscolar}</span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full neumorphic-inset text-[9px] font-bold text-accent-violet">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_3px_#22c55e]"></span>
+                    En curso
+                  </span>
+                </div>
               </div>
 
-              <button
-                onClick={() => setModalCerrarTrimestre(true)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-bg neumorphic-raised text-[11px] font-bold text-amber-800 hover:text-amber-900 active:scale-95 transition-all shadow-sm"
-                title="Cerrar trimestre actual y pasar al siguiente"
-              >
-                <span className="material-symbols-outlined text-xs text-amber-600">lock_reset</span>
-                {trimestreActivo < 3 ? `Cerrar ${trimestreActivo}° Trimestre` : 'Cerrar 3° Trimestre'}
-              </button>
+              {/* Almanaque de Día a Día */}
+              <AlmanaqueDiario />
+            </div>
+
+            {/* Stickers de Actividades de Hoy (Mobile) */}
+            <div className="mt-2">
+              {renderStickersActividades()}
             </div>
           </header>
+
+          {/* Menú Mobile (Acceso a las 4 secciones principales) */}
+          <section className="bg-surface-bg neumorphic-raised rounded-3xl p-5 w-full">
+            <h3 className="font-headline-md-mobile text-sm font-extrabold text-accent-violet uppercase mb-4 px-1 flex items-center gap-2">
+              <span className="material-symbols-outlined text-xl">menu</span>
+              Menú
+            </h3>
+            <nav className="grid grid-cols-2 gap-3.5">
+              <Link className="flex items-center gap-3 p-3.5 rounded-2xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/agenda">
+                <div className="w-10 h-10 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>calendar_add_on</span>
+                </div>
+                <span className="font-extrabold text-xs text-accent-violet">Agenda</span>
+              </Link>
+
+              <Link className="flex items-center gap-3 p-3.5 rounded-2xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/cursos">
+                <div className="w-10 h-10 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>school</span>
+                </div>
+                <span className="font-extrabold text-xs text-accent-violet">Cursos</span>
+              </Link>
+
+              <Link className="flex items-center gap-3 p-3.5 rounded-2xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/planificaciones">
+                <div className="w-10 h-10 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>edit_document</span>
+                </div>
+                <span className="font-extrabold text-xs text-accent-violet truncate">Planificaciones</span>
+              </Link>
+
+              <Link className="flex items-center gap-3 p-3.5 rounded-2xl bg-surface-bg neumorphic-raised group cursor-pointer hover:text-accent-violet transition-all active:scale-95 shadow-sm" href="/horario">
+                <div className="w-10 h-10 rounded-xl bg-surface-bg neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>schedule</span>
+                </div>
+                <span className="font-extrabold text-xs text-accent-violet">Horarios</span>
+              </Link>
+            </nav>
+          </section>
 
           {/* Cursos Mobile */}
           <section className="flex flex-col gap-4">
@@ -330,7 +604,7 @@ export default function Menu() {
                 {cursos.slice(0, 4).map((curso, idx) => (
                   <div key={curso.id || idx} className="relative group">
                     <Link
-                      href={curso.ruta ?? `/sub-menu-curso/${curso.id}/alumnos`}
+                      href={curso.ruta || (curso.id ? `/sub-menu-curso/${curso.id}/alumnos` : `/curso/${curso.id}`)}
                       className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform w-full h-full"
                     >
                       <div className="flex justify-between items-start pr-6">
@@ -452,60 +726,35 @@ export default function Menu() {
         {/* Main Content Area (Desktop & Tablet) */}
         <div className="hidden md:flex flex-grow w-full max-w-4xl mx-auto md:mx-0 flex-col gap-8">
           {/* Header */}
-          <header className="flex flex-col gap-1.5">
-            <h1 className="font-display-lg text-4xl md:text-5xl text-on-surface tracking-tight font-extrabold">
-              Hola {nombreFormateado}
-            </h1>
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="font-headline-md text-on-surface text-lg font-bold">
-                {diaSemanaActual} / {cursos.length > 0 ? `${formatearGradoCurso(cursos[0].anio).toUpperCase()} • ${cursos[0].materia.toUpperCase()}` : 'MATERIA'}
-              </span>
-              <span className="text-sm text-secondary">{cursos.length > 0 ? `(${cursos[0].escuela})` : ''}</span>
-              <Link className="text-accent-violet text-xs font-bold underline ml-2 hover:opacity-80" href="/horario">
-                Ver horarios →
-              </Link>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-secondary mt-0.5">
-              <span>Año escolar: {anioEscolar}</span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full neumorphic-inset text-[10px] font-bold text-accent-violet">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_3px_#22c55e]"></span>
-                En curso
-              </span>
-            </div>
-
-            {/* ── Indicador de Trimestre (Desktop) ── */}
-            <div className="flex flex-wrap items-center gap-2.5 text-xs text-secondary mt-1">
-              <span className="font-semibold text-secondary">Estás viendo:</span>
-              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full neumorphic-inset text-xs font-bold text-accent-violet">
-                <span className="material-symbols-outlined text-sm">schedule</span>
-                {trimestreActivo}° Trimestre
+          <header className="flex flex-col gap-3">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-1.5 min-w-0">
+                <h1 className="font-display-lg text-4xl md:text-5xl text-on-surface tracking-tight font-extrabold flex items-center gap-3">
+                  {cargandoUsuario ? (
+                    <span className="flex items-center gap-3">
+                      <span>Hola</span>
+                      <span className="w-7 h-7 border-2 border-accent-violet border-t-transparent rounded-full animate-spin inline-block"></span>
+                    </span>
+                  ) : (
+                    `Hola ${nombreFormateado}`
+                  )}
+                </h1>
+                <div className="flex items-center gap-2 text-xs text-secondary mt-1">
+                  <span>Año escolar: {anioEscolar}</span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full neumorphic-inset text-[10px] font-bold text-accent-violet">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_3px_#22c55e]"></span>
+                    En curso
+                  </span>
+                </div>
               </div>
 
-              {/* Selector Rápido */}
-              <div className="flex items-center gap-1 bg-surface-bg neumorphic-inset rounded-full p-0.5">
-                {[1, 2, 3].map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => cambiarTrimestre(t)}
-                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all ${
-                      trimestreActivo === t
-                        ? 'bg-accent-violet text-white shadow-sm'
-                        : 'text-secondary hover:text-accent-violet'
-                    }`}
-                  >
-                    {t}° Trim
-                  </button>
-                ))}
-              </div>
+              {/* Almanaque de Día a Día */}
+              <AlmanaqueDiario />
+            </div>
 
-              <button
-                onClick={() => setModalCerrarTrimestre(true)}
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-bg neumorphic-raised text-[11px] font-bold text-amber-800 hover:text-amber-900 active:scale-95 transition-all shadow-sm ml-1"
-                title="Cerrar trimestre actual y pasar al siguiente"
-              >
-                <span className="material-symbols-outlined text-sm text-amber-600">lock_reset</span>
-                {trimestreActivo < 3 ? `Cerrar ${trimestreActivo}° Trimestre y pasar al ${trimestreActivo + 1}°` : 'Cerrar 3° Trimestre'}
-              </button>
+            {/* Stickers de Actividades de Hoy (Desktop) */}
+            <div className="mt-3">
+              {renderStickersActividades()}
             </div>
           </header>
 
@@ -550,7 +799,7 @@ export default function Menu() {
                 {cursos.slice(0, 4).map((curso, idx) => (
                   <div key={curso.id || idx} className="relative group">
                     <Link
-                      href={curso.ruta ?? `/sub-menu-curso/${curso.id}/alumnos`}
+                      href={curso.ruta || (curso.id ? `/sub-menu-curso/${curso.id}/alumnos` : `/curso/${curso.id}`)}
                       className="bg-surface-bg rounded-2xl p-4 flex flex-col gap-3 neumorphic-raised hover:scale-[1.02] active:scale-95 transition-transform w-full h-full"
                     >
                       <div className="flex justify-between items-start pr-6">
@@ -685,58 +934,7 @@ export default function Menu() {
         </div>
       </main>
 
-      {/* ── Modal de Confirmación para Cerrar Trimestre ── */}
-      {modalCerrarTrimestre && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-150"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setModalCerrarTrimestre(false);
-          }}
-        >
-          <div className="bg-surface-bg neumorphic-raised rounded-3xl p-6 w-full max-w-md flex flex-col gap-5 border border-white/60 shadow-2xl font-mulish">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-100/80 neumorphic-inset flex items-center justify-center text-amber-700 text-2xl shrink-0">
-                <span className="material-symbols-outlined text-2xl">lock_reset</span>
-              </div>
-              <div>
-                <h3 className="font-headline-md text-xl text-on-surface uppercase font-bold">
-                  {trimestreActivo < 3 ? `Cerrar ${trimestreActivo}° Trimestre` : 'Cerrar 3° Trimestre'}
-                </h3>
-                <p className="text-xs text-secondary">
-                  {trimestreActivo < 3
-                    ? `Avanzarás al ${trimestreActivo + 1}° Trimestre para iniciar la nueva etapa de clases.`
-                    : 'Has concluido el ciclo lectivo. Puedes reiniciar al 1° Trimestre.'}
-                </p>
-              </div>
-            </div>
 
-            <div className="bg-surface-bg neumorphic-inset rounded-2xl p-4 text-xs text-secondary flex flex-col gap-2">
-              <p className="font-bold text-on-surface flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-sm text-emerald-600">check_circle</span>
-                Tus registros anteriores se conservan para exportar a Excel / PDF.
-              </p>
-              <p className="text-secondary">
-                La vista activa pasará al nuevo trimestre para registrar asistencias y notas desde cero.
-              </p>
-            </div>
-
-            <div className="flex gap-3 mt-2">
-              <button
-                onClick={() => setModalCerrarTrimestre(false)}
-                className="flex-1 py-3 rounded-xl bg-surface-bg neumorphic-raised text-secondary font-bold text-xs uppercase tracking-wider hover:opacity-80 active:scale-95 transition-all"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={avanzarSiguienteTrimestre}
-                className="flex-1 py-3 rounded-xl bg-accent-violet text-white font-bold text-xs uppercase tracking-wider shadow-md hover:bg-accent-violet/90 active:scale-95 transition-all"
-              >
-                {trimestreActivo < 3 ? `Pasar al ${trimestreActivo + 1}° Trimestre →` : 'Reiniciar al 1° Trimestre'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Modal de Confirmación para Borrar Curso ── */}
       {cursoAEliminar && (

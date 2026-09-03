@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import Cargando from '../shared/Cargando';
 import { getToken } from '@/lib/token';
+import { Curso } from '../cursos/Cursos';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
@@ -24,44 +26,145 @@ type HorarioItem = {
   descripcion: string | null;
 };
 
-type Celda = { id: number | null; descripcion: string };
-type Fila = { hora: string; celdas: Record<Dia, Celda> };
+export type CeldaData = {
+  id: number | null;
+  materia: string;
+  curso: string;
+  escuela: string;
+  cursoId?: number | null;
+};
 
-const celdaVacia = (): Celda => ({ id: null, descripcion: '' });
+type Fila = { hora: string; celdas: Record<Dia, CeldaData> };
+
+const normalizarHora = (h: string): string => {
+  return (h || '').replace(/\s+/g, ' ').trim();
+};
+
+export const parsearDescripcion = (
+  desc: string | null | undefined,
+  cursos: Curso[] = []
+): Omit<CeldaData, 'id'> => {
+  if (!desc || !desc.trim()) {
+    return { materia: '', curso: '', escuela: '', cursoId: null };
+  }
+
+  const raw = desc.trim();
+
+  // 1. Intentar parsear como JSON estructurado
+  try {
+    const parsed = JSON.parse(raw);
+    if (typeof parsed === 'object' && parsed !== null) {
+      return {
+        materia: parsed.materia ?? '',
+        curso: parsed.curso ?? '',
+        escuela: parsed.escuela ?? '',
+        cursoId: parsed.cursoId ?? null,
+      };
+    }
+  } catch {
+    // Si no es JSON, es texto plano
+  }
+
+  // 2. Si era texto plano antiguo, buscar coincidencia con cursos creados del docente
+  const lower = raw.toLowerCase();
+  const cursoEncontrado = cursos.find((c) => {
+    const matNorm = (c.materia || '').trim().toLowerCase();
+    return matNorm && (matNorm === lower || lower.includes(matNorm));
+  });
+
+  if (cursoEncontrado) {
+    return {
+      materia: cursoEncontrado.materia,
+      curso: cursoEncontrado.anio,
+      escuela: cursoEncontrado.escuela,
+      cursoId: cursoEncontrado.id,
+    };
+  }
+
+  // 3. Si tiene líneas separadas o guión "Curso - Materia"
+  const partes = raw.split(/\r?\n| - | — /);
+  if (partes.length >= 2) {
+    return {
+      materia: partes[0].trim(),
+      curso: partes[1].trim(),
+      escuela: partes.slice(2).join(' ').trim(),
+      cursoId: null,
+    };
+  }
+
+  return {
+    materia: raw,
+    curso: '',
+    escuela: '',
+    cursoId: null,
+  };
+};
+
+export const serializarDescripcion = (celda: CeldaData): string => {
+  const { materia, curso, escuela, cursoId } = celda;
+  if (!materia.trim() && !curso.trim() && !escuela.trim()) {
+    return '';
+  }
+  return JSON.stringify({
+    materia: materia.trim(),
+    curso: curso.trim(),
+    escuela: escuela.trim(),
+    cursoId: cursoId ?? null,
+  });
+};
+
+const celdaVacia = (): CeldaData => ({
+  id: null,
+  materia: '',
+  curso: '',
+  escuela: '',
+  cursoId: null,
+});
+
+const celdaTieneDatos = (c: CeldaData): boolean =>
+  Boolean(c.materia?.trim() || c.curso?.trim() || c.escuela?.trim());
 
 const nuevaFila = (hora = ''): Fila => ({
-  hora,
-  celdas: Object.fromEntries(DIAS.map((d) => [d, celdaVacia()])) as Record<Dia, Celda>,
+  hora: normalizarHora(hora),
+  celdas: Object.fromEntries(DIAS.map((d) => [d, celdaVacia()])) as Record<Dia, CeldaData>,
 });
 
 const parsearHora = (h: string) => {
   if (!h) return { inicio: '08:00', fin: '09:20' };
-  const parts = h.split(/\s*(?:a|-)\s*/i);
+  const clean = normalizarHora(h);
+  const parts = clean.split(/\s*(?:a|-)\s*/i);
   if (parts.length >= 2) {
     return { inicio: parts[0].trim(), fin: parts[1].trim() };
   }
-  return { inicio: h.trim(), fin: '' };
+  return { inicio: clean, fin: '' };
 };
 
 export default function Horario() {
   const [filas, setFilas] = useState<Fila[]>([nuevaFila()]);
+  const [cursosDocente, setCursosDocente] = useState<Curso[]>([]);
   const [guardando, setGuardando] = useState(false);
   const [ok, setOk] = useState(false);
   const [cargando, setCargando] = useState(true);
-  
-  // Día seleccionado en móvil (por defecto Lunes o día actual si es día de semana)
+
+  // Día seleccionado en móvil
   const [diaActivo, setDiaActivo] = useState<Dia>('Lunes');
 
-  // Modal para editar/personalizar hora
+  // Modal para editar hora
   const [editandoHoraIndex, setEditandoHoraIndex] = useState<number | null>(null);
   const [tempHoraInicio, setTempHoraInicio] = useState('');
   const [tempHoraFin, setTempHoraFin] = useState('');
+
+  // Modal para editar celda (Materia, Curso, Escuela)
+  const [editandoCelda, setEditandoCelda] = useState<{ filaIndex: number; dia: Dia } | null>(null);
+  const [tempMateria, setTempMateria] = useState('');
+  const [tempCurso, setTempCurso] = useState('');
+  const [tempEscuela, setTempEscuela] = useState('');
+  const [tempCursoId, setTempCursoId] = useState<number | null>(null);
 
   // Menú de opciones de bloque en móvil
   const [menuOpcionesFila, setMenuOpcionesFila] = useState<number | null>(null);
 
   useEffect(() => {
-    // Detectar día actual de la semana si es lunes-viernes
     const hoyNum = new Date().getDay();
     const mapaDias: Record<number, Dia> = {
       1: 'Lunes',
@@ -74,56 +177,89 @@ export default function Horario() {
       setDiaActivo(mapaDias[hoyNum]);
     }
 
-    fetchHorarios();
+    inicializarDatos();
   }, []);
 
-  const fetchHorarios = async () => {
+  const inicializarDatos = async () => {
     setCargando(true);
     try {
       const token = getToken();
       if (!token) {
-        setFilas([nuevaFila()]);
-        setCargando(false);
-        return;
-      }
-
-      const res = await fetch(`${API}/horarios`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) {
-        setFilas([nuevaFila()]);
-        setCargando(false);
-        return;
-      }
-
-      const data: HorarioItem[] = await res.json();
-
-      if (!Array.isArray(data) || data.length === 0) {
         setFilas([
+          nuevaFila('08:00 a 09:20'),
+          nuevaFila('09:30 a 10:50'),
+          nuevaFila('11:00 a 12:20'),
           nuevaFila('12:20 a 13:40'),
           nuevaFila('14:20 a 15:50'),
-          nuevaFila('19:00 a 20:00'),
-          nuevaFila('20:00 a 21:00'),
-          nuevaFila('21:00 a 22:00'),
         ]);
         setCargando(false);
         return;
       }
 
-      const horasSet = new Set(data.map((h) => h.hora));
+      // 1. Obtener Cursos
+      let listaCursos: Curso[] = [];
+      try {
+        const resC = await fetch(`${API}/cursos`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (resC.ok) {
+          const dataC = await resC.json();
+          if (Array.isArray(dataC)) {
+            listaCursos = dataC;
+            setCursosDocente(dataC);
+          }
+        }
+      } catch (errC) {
+        console.warn('Error al obtener cursos:', errC);
+      }
+
+      // 2. Obtener Horarios
+      const resH = await fetch(`${API}/horarios`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!resH.ok) {
+        setFilas([
+          nuevaFila('08:00 a 09:20'),
+          nuevaFila('09:30 a 10:50'),
+          nuevaFila('11:00 a 12:20'),
+          nuevaFila('12:20 a 13:40'),
+          nuevaFila('14:20 a 15:50'),
+        ]);
+        setCargando(false);
+        return;
+      }
+
+      const dataH: HorarioItem[] = await resH.json();
+
+      if (!Array.isArray(dataH) || dataH.length === 0) {
+        setFilas([
+          nuevaFila('08:00 a 09:20'),
+          nuevaFila('09:30 a 10:50'),
+          nuevaFila('11:00 a 12:20'),
+          nuevaFila('12:20 a 13:40'),
+          nuevaFila('14:20 a 15:50'),
+        ]);
+        setCargando(false);
+        return;
+      }
+
+      // Normalizar franjas horarias
+      const horasNormalizadas = [...new Set(dataH.map((h) => normalizarHora(h.hora)))];
       const filasMap = new Map<string, Fila>();
 
-      for (const hora of horasSet) {
+      for (const hora of horasNormalizadas) {
         filasMap.set(hora, nuevaFila(hora));
       }
 
-      for (const h of data) {
-        const fila = filasMap.get(h.hora);
+      for (const h of dataH) {
+        const horaNorm = normalizarHora(h.hora);
+        const fila = filasMap.get(horaNorm);
         if (fila && DIAS.includes(h.dia as Dia)) {
+          const parsed = parsearDescripcion(h.descripcion, listaCursos);
           fila.celdas[h.dia as Dia] = {
             id: h.id,
-            descripcion: h.descripcion ?? '',
+            ...parsed,
           };
         }
       }
@@ -134,10 +270,10 @@ export default function Horario() {
         return isNaN(numA) || isNaN(numB) ? a.hora.localeCompare(b.hora) : numA - numB;
       });
 
-      setFilas(filasOrdenadas);
+      setFilas(filasOrdenadas.length > 0 ? filasOrdenadas : [nuevaFila('08:00 a 09:20')]);
     } catch (err) {
-      console.error('Error al obtener horarios:', err);
-      setFilas([nuevaFila()]);
+      console.error('Error al inicializar horarios:', err);
+      setFilas([nuevaFila('08:00 a 09:20')]);
     } finally {
       setCargando(false);
     }
@@ -184,7 +320,7 @@ export default function Horario() {
       ? `${tempHoraInicio.trim()} a ${tempHoraFin.trim()}`
       : tempHoraInicio.trim();
     setFilas((prev) =>
-      prev.map((f, i) => (i === editandoHoraIndex ? { ...f, hora: nuevaHoraStr } : f))
+      prev.map((f, i) => (i === editandoHoraIndex ? { ...f, hora: normalizarHora(nuevaHoraStr) } : f))
     );
     setEditandoHoraIndex(null);
   };
@@ -193,14 +329,116 @@ export default function Horario() {
     setFilas((prev) => prev.map((f, i) => (i === filaIndex ? { ...f, hora: valor } : f)));
   };
 
-  const actualizarCelda = (filaIndex: number, dia: Dia, valor: string) => {
+  // Edición directa en la celda de escritorio
+  const actualizarMateria = (filaIndex: number, dia: Dia, valor: string) => {
     setFilas((prev) =>
       prev.map((f, i) =>
         i === filaIndex
-          ? { ...f, celdas: { ...f.celdas, [dia]: { ...f.celdas[dia], descripcion: valor } } }
+          ? {
+              ...f,
+              celdas: {
+                ...f.celdas,
+                [dia]: {
+                  ...f.celdas[dia],
+                  materia: valor,
+                },
+              },
+            }
           : f
       )
     );
+  };
+
+  const actualizarCurso = (filaIndex: number, dia: Dia, valor: string) => {
+    setFilas((prev) =>
+      prev.map((f, i) =>
+        i === filaIndex
+          ? {
+              ...f,
+              celdas: {
+                ...f.celdas,
+                [dia]: {
+                  ...f.celdas[dia],
+                  curso: valor,
+                },
+              },
+            }
+          : f
+      )
+    );
+  };
+
+  const abrirModalEditarCelda = (filaIndex: number, dia: Dia) => {
+    const celda = filas[filaIndex].celdas[dia];
+    setTempMateria(celda.materia || '');
+    setTempCurso(celda.curso || '');
+    setTempEscuela(celda.escuela || '');
+    setTempCursoId(celda.cursoId ?? null);
+    setEditandoCelda({ filaIndex, dia });
+    setMenuOpcionesFila(null);
+  };
+
+  const seleccionarCursoPredefinido = (cursoIdStr: string) => {
+    if (!cursoIdStr) {
+      setTempCursoId(null);
+      return;
+    }
+    const idNum = parseInt(cursoIdStr, 10);
+    const encontrado = cursosDocente.find((c) => c.id === idNum);
+    if (encontrado) {
+      setTempMateria(encontrado.materia);
+      setTempCurso(encontrado.anio);
+      setTempEscuela(encontrado.escuela);
+      setTempCursoId(encontrado.id);
+    }
+  };
+
+  const guardarCeldaEditada = () => {
+    if (!editandoCelda) return;
+    const { filaIndex, dia } = editandoCelda;
+    setFilas((prev) =>
+      prev.map((f, i) =>
+        i === filaIndex
+          ? {
+              ...f,
+              celdas: {
+                ...f.celdas,
+                [dia]: {
+                  ...f.celdas[dia],
+                  materia: tempMateria.trim(),
+                  curso: tempCurso.trim(),
+                  escuela: tempEscuela.trim(),
+                  cursoId: tempCursoId,
+                },
+              },
+            }
+          : f
+      )
+    );
+    setEditandoCelda(null);
+  };
+
+  const limpiarCelda = (filaIndex: number, dia: Dia) => {
+    setFilas((prev) =>
+      prev.map((f, i) =>
+        i === filaIndex
+          ? {
+              ...f,
+              celdas: {
+                ...f.celdas,
+                [dia]: {
+                  id: f.celdas[dia].id,
+                  materia: '',
+                  curso: '',
+                  escuela: '',
+                  cursoId: null,
+                },
+              },
+            }
+          : f
+      )
+    );
+    setMenuOpcionesFila(null);
   };
 
   const guardarTodo = async () => {
@@ -222,19 +460,22 @@ export default function Horario() {
       const promesas: Promise<Response>[] = [];
 
       for (const fila of filas) {
+        const horaLimpia = normalizarHora(fila.hora);
         for (const dia of DIAS) {
           const celda = fila.celdas[dia];
+          const tieneContenido = celdaTieneDatos(celda);
+          const descStr = tieneContenido ? serializarDescripcion(celda) : '';
 
-          if (celda.id && !celda.descripcion.trim()) {
-            // Existía en BD y quedó vacía → borrar
+          if (celda.id && !tieneContenido) {
+            // Borrar
             promesas.push(
               fetch(`${API}/horarios/${celda.id}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` },
               })
             );
-          } else if (celda.id && celda.descripcion.trim()) {
-            // Recrear
+          } else if (celda.id && tieneContenido) {
+            // Actualizar / Recrear
             promesas.push(
               fetch(`${API}/horarios/${celda.id}`, {
                 method: 'DELETE',
@@ -245,29 +486,29 @@ export default function Horario() {
               fetch(`${API}/horarios`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ dia, hora: fila.hora, descripcion: celda.descripcion }),
+                body: JSON.stringify({ dia, hora: horaLimpia, descripcion: descStr }),
               })
             );
-          } else if (!celda.id && celda.descripcion.trim()) {
-            // Nueva celda con contenido
+          } else if (!celda.id && tieneContenido) {
+            // Crear nuevo
             promesas.push(
               fetch(`${API}/horarios`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ dia, hora: fila.hora, descripcion: celda.descripcion }),
+                body: JSON.stringify({ dia, hora: horaLimpia, descripcion: descStr }),
               })
             );
           }
         }
       }
 
-      await Promise.all(promesas);
+      await Promise.allSettled(promesas);
 
       setOk(true);
       setTimeout(() => {
         setOk(false);
-        fetchHorarios();
-      }, 2000);
+        inicializarDatos();
+      }, 1500);
     } catch (err) {
       console.error('Error al guardar horarios:', err);
       alert('❌ Error al guardar horarios');
@@ -285,7 +526,7 @@ export default function Horario() {
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-container-padding pt-28 md:pt-36 pb-32">
         
         {/* ═════════════════════════════════════════════════════════ */}
-        {/* ── MOBILE VIEW: LAYOUT ADAPTADO SEGÚN ESPECIFICACIÓN ── */}
+        {/* ── MOBILE VIEW: LAYOUT ADAPTADO CON ESCUELA, MATERIA Y CURSO ── */}
         {/* ═════════════════════════════════════════════════════════ */}
         <div className="flex md:hidden flex-col gap-6">
           
@@ -295,7 +536,7 @@ export default function Horario() {
               <h1 className="font-headline-md-mobile text-2xl text-accent-violet uppercase tracking-tight font-extrabold">
                 Grilla Semanal
               </h1>
-              <p className="text-secondary text-xs mt-0.5">Gestión de horarios lectivos</p>
+              <p className="text-secondary text-xs mt-0.5">Materia, curso y escuela por día</p>
             </div>
             
             <button
@@ -344,13 +585,45 @@ export default function Horario() {
               <span>Agregar hora</span>
             </button>
 
-            {/* Time Blocks */}
-            {filas.map((fila, filaIndex) => {
-              const celda = fila.celdas[diaActivo];
-              const tieneContenido = celda.descripcion.trim() !== '';
-              const { inicio, fin } = parsearHora(fila.hora);
+            {/* Time Blocks con Datos */}
+            {(() => {
+              const filasConDatos = filas
+                .map((fila, idx) => ({ fila, idx }))
+                .filter(({ fila }) => celdaTieneDatos(fila.celdas[diaActivo]));
 
-              if (tieneContenido) {
+              if (filasConDatos.length === 0) {
+                return (
+                  <div className="bg-surface-bg neu-inset rounded-2xl p-8 text-center flex flex-col items-center gap-3">
+                    <span className="material-symbols-outlined text-4xl text-secondary/60">calendar_today</span>
+                    <div>
+                      <h3 className="font-headline-md-mobile text-on-surface text-base font-bold">
+                        Sin clases para el {diaActivo}
+                      </h3>
+                      <p className="text-xs text-secondary mt-0.5">
+                        No tenés materias ni cursos registrados para este día.
+                      </p>
+                    </div>
+                    <button
+                      onClick={agregarFila}
+                      className="mt-1 px-5 py-2.5 rounded-xl neu-raised text-accent-violet font-bold text-xs uppercase tracking-wider active:scale-95 transition-all shadow-sm"
+                    >
+                      + Cargar horario para {diaActivo}
+                    </button>
+                  </div>
+                );
+              }
+
+              return filasConDatos.map(({ fila, idx: filaIndex }) => {
+                const celda = fila.celdas[diaActivo];
+                const { inicio, fin } = parsearHora(fila.hora);
+                const cursoRelacionado = celda.cursoId
+                  ? cursosDocente.find((c) => c.id === celda.cursoId)
+                  : cursosDocente.find(
+                      (c) =>
+                        c.materia.trim().toLowerCase() === (celda.materia || '').trim().toLowerCase()
+                    );
+                const cursoIdDestino = celda.cursoId || cursoRelacionado?.id;
+
                 return (
                   <div
                     key={`mob-block-filled-${filaIndex}`}
@@ -370,34 +643,73 @@ export default function Horario() {
                       <span className="font-extrabold text-accent-violet text-sm leading-none">{fin || '...'}</span>
                     </div>
 
-                    {/* Columna Contenido */}
-                    <div className="flex-grow min-w-0">
+                    {/* Columna Contenido: Materia, Curso y Escuela */}
+                    <div
+                      onClick={() => abrirModalEditarCelda(filaIndex, diaActivo)}
+                      className="flex-grow min-w-0 cursor-pointer"
+                    >
                       <div className="flex justify-between items-start gap-2">
-                        <textarea
-                          rows={2}
-                          value={celda.descripcion}
-                          onChange={(e) => actualizarCelda(filaIndex, diaActivo, e.target.value)}
-                          className="font-bold text-on-surface text-sm leading-tight bg-transparent resize-none focus:outline-none w-full"
-                          placeholder="Materia / Aula"
-                        />
+                        <h4 className="font-extrabold text-on-surface text-base leading-tight uppercase truncate">
+                          {celda.materia || 'Sin materia'}
+                        </h4>
                         <button
-                          onClick={() => setMenuOpcionesFila(menuOpcionesFila === filaIndex ? null : filaIndex)}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMenuOpcionesFila(menuOpcionesFila === filaIndex ? null : filaIndex);
+                          }}
                           className="text-secondary hover:text-accent-violet p-1 rounded-lg active:scale-90 transition-transform shrink-0"
                         >
                           <span className="material-symbols-outlined text-[20px]">more_vert</span>
                         </button>
                       </div>
-                      
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="neu-inset px-3 py-0.5 rounded-full text-[10px] uppercase font-extrabold tracking-wider text-accent-violet">
-                          Materia
-                        </span>
+
+                      <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {celda.curso ? (
+                            <span className="neu-inset px-3 py-0.5 rounded-full text-[10px] uppercase font-extrabold tracking-wider text-accent-violet">
+                              {celda.curso}
+                            </span>
+                          ) : null}
+                          {celda.escuela ? (
+                            <div className="flex items-center gap-1 text-xs text-secondary font-semibold truncate max-w-[150px]">
+                              <span className="material-symbols-outlined text-[14px]">school</span>
+                              <span className="truncate">{celda.escuela}</span>
+                            </div>
+                          ) : null}
+                        </div>
+
+                        {cursoIdDestino && (
+                          <Link
+                            href={`/sub-menu-curso/${cursoIdDestino}/alumnos`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl neu-raised text-[10px] font-extrabold text-accent-violet uppercase tracking-wider active:scale-95 transition-all shadow-sm"
+                            title="Ingresar al curso"
+                          >
+                            <span>Aula</span>
+                            <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                          </Link>
+                        )}
                       </div>
                     </div>
 
                     {/* Menú de opciones de la fila */}
                     {menuOpcionesFila === filaIndex && (
                       <div className="absolute right-4 top-10 bg-surface-bg neu-raised rounded-2xl p-2 z-20 flex flex-col gap-1 border border-white/60 shadow-xl animate-in fade-in zoom-in-95">
+                        {cursoIdDestino && (
+                          <Link
+                            href={`/sub-menu-curso/${cursoIdDestino}/alumnos`}
+                            className="px-3 py-1.5 text-[11px] font-bold text-left text-accent-violet hover:bg-violet-50 flex items-center gap-1.5 rounded-lg border-b border-outline-variant/30 pb-2 mb-1"
+                          >
+                            <span className="material-symbols-outlined text-sm">login</span> Ingresar al aula
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => abrirModalEditarCelda(filaIndex, diaActivo)}
+                          className="px-3 py-1.5 text-[11px] font-bold text-left text-secondary hover:text-accent-violet flex items-center gap-1.5 rounded-lg"
+                        >
+                          <span className="material-symbols-outlined text-sm">edit</span> Editar clase
+                        </button>
                         <button
                           onClick={() => abrirModalEditarHora(filaIndex)}
                           className="px-3 py-1.5 text-[11px] font-bold text-left text-secondary hover:text-accent-violet flex items-center gap-1.5 rounded-lg"
@@ -419,54 +731,25 @@ export default function Horario() {
                           <span className="material-symbols-outlined text-sm">arrow_downward</span> Bajar
                         </button>
                         <button
-                          onClick={() => eliminarFila(filaIndex)}
+                          onClick={() => {
+                            limpiarCelda(filaIndex, diaActivo);
+                            setMenuOpcionesFila(null);
+                          }}
                           className="px-3 py-1.5 text-[11px] font-bold text-left text-red-600 hover:bg-red-50 flex items-center gap-1.5 rounded-lg"
                         >
-                          <span className="material-symbols-outlined text-sm">delete</span> Borrar franja
+                          <span className="material-symbols-outlined text-sm">delete</span> Quitar de este día
                         </button>
                       </div>
                     )}
                   </div>
                 );
-              }
-
-              // Empty / Input State
-              return (
-                <div key={`mob-block-empty-${filaIndex}`} className="flex gap-4 items-center">
-                  <div
-                    onClick={() => abrirModalEditarHora(filaIndex)}
-                    className="flex flex-col items-center justify-center w-20 shrink-0 cursor-pointer select-none"
-                    title="Tocar para editar hora"
-                  >
-                    <span className="font-extrabold text-secondary text-sm leading-none">{inicio}</span>
-                    <span className="text-[10px] font-bold text-secondary my-0.5">a</span>
-                    <span className="font-extrabold text-secondary text-sm leading-none">{fin || '...'}</span>
-                  </div>
-
-                  <div className="flex-grow neu-inset rounded-2xl p-3 flex items-center gap-2">
-                    <input
-                      className="w-full bg-transparent border-none text-on-surface placeholder:text-secondary/50 focus:outline-none text-xs font-semibold"
-                      placeholder="Materia / Nota"
-                      type="text"
-                      value={celda.descripcion}
-                      onChange={(e) => actualizarCelda(filaIndex, diaActivo, e.target.value)}
-                    />
-                    <button
-                      onClick={() => eliminarFila(filaIndex)}
-                      className="text-secondary/60 hover:text-red-500 p-1"
-                      title="Eliminar franja"
-                    >
-                      <span className="material-symbols-outlined text-sm">close</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+              });
+            })()}
           </div>
         </div>
 
         {/* ══════════════════════════════════════════════════════════ */}
-        {/* ── DESKTOP VIEW: GRILLA COMPLETA CON NEUMORPHISM TABLE ── */}
+        {/* ── DESKTOP VIEW: GRILLA COMPLETA CON HORA, CURSO Y MATERIA ── */}
         {/* ══════════════════════════════════════════════════════════ */}
         <div className="hidden md:flex flex-col gap-6">
           
@@ -477,7 +760,7 @@ export default function Horario() {
                 GRILLA SEMANAL DE HORARIOS LECTIVOS
               </h1>
               <p className="text-sm text-secondary mt-1 font-semibold">
-                Organizador semanal interactivo de módulos, cursos y horarios escolares.
+                Organizador semanal interactivo de materias, cursos y horarios.
               </p>
             </div>
 
@@ -493,17 +776,17 @@ export default function Horario() {
               <button
                 onClick={guardarTodo}
                 disabled={guardando}
-                className="neu-raised bg-accent-violet text-white px-8 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 hover:bg-accent-violet/90 active:scale-95 transition-all shadow-md disabled:opacity-50"
+                className="neu-raised text-accent-violet hover:brightness-95 px-8 py-3 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-2 active:scale-95 transition-all shadow-md disabled:opacity-50"
               >
                 {guardando ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Guardando...</span>
+                    <div className="w-4 h-4 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-accent-violet">Guardando...</span>
                   </>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined text-base">save</span>
-                    <span>Guardar</span>
+                    <span className="material-symbols-outlined text-base text-accent-violet">save</span>
+                    <span className="text-accent-violet">Guardar</span>
                   </>
                 )}
               </button>
@@ -512,17 +795,17 @@ export default function Horario() {
 
           {/* Table Container */}
           <div className="w-full overflow-x-auto pb-6">
-            <div className="min-w-[1050px] flex flex-col gap-4">
+            <div className="min-w-[1050px] flex flex-col gap-2.5">
               
               {/* Header Row */}
               <div className="grid grid-cols-6 gap-gutter">
-                <div className="neu-header-pill rounded-2xl py-4 flex items-center justify-center text-accent-violet font-extrabold text-sm uppercase tracking-wider">
+                <div className="neu-header-pill rounded-2xl py-3 flex items-center justify-center text-accent-violet font-extrabold text-sm uppercase tracking-wider">
                   Hora
                 </div>
                 {DIAS.map((dia) => (
                   <div
                     key={`desk-head-${dia}`}
-                    className="neu-header-pill rounded-2xl py-4 flex items-center justify-center text-accent-violet font-extrabold text-sm uppercase tracking-wider"
+                    className="neu-header-pill rounded-2xl py-3 flex items-center justify-center text-accent-violet font-extrabold text-sm uppercase tracking-wider"
                   >
                     {dia}
                   </div>
@@ -534,7 +817,7 @@ export default function Horario() {
                 <div key={`desk-row-${filaIndex}`} className="grid grid-cols-6 gap-gutter items-stretch">
                   
                   {/* Hora */}
-                  <div className="neu-raised rounded-2xl p-3.5 flex flex-col items-center justify-center text-accent-violet font-bold text-center h-full min-h-[90px] relative group">
+                  <div className="neu-raised rounded-2xl p-1.5 flex flex-col items-center justify-center text-accent-violet font-bold text-center h-full min-h-[52px] relative group">
                     <textarea
                       rows={2}
                       placeholder="12:20 a&#10;13:40"
@@ -544,56 +827,79 @@ export default function Horario() {
                     />
 
                     {/* Up / Down Controls */}
-                    <div className="absolute right-1.5 top-1.5 flex flex-col gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col opacity-40 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => moverFila(filaIndex, 'arriba')}
                         disabled={filaIndex === 0}
-                        className="w-4 h-4 flex items-center justify-center text-secondary hover:text-accent-violet disabled:opacity-20"
+                        className="w-4 h-3.5 flex items-center justify-center text-secondary hover:text-accent-violet disabled:opacity-20"
                         title="Subir franja"
                       >
-                        <span className="material-symbols-outlined text-[14px] leading-none">arrow_drop_up</span>
+                        <span className="material-symbols-outlined text-[13px] leading-none">arrow_drop_up</span>
                       </button>
                       <button
                         onClick={() => moverFila(filaIndex, 'abajo')}
                         disabled={filaIndex === filas.length - 1}
-                        className="w-4 h-4 flex items-center justify-center text-secondary hover:text-accent-violet disabled:opacity-20"
+                        className="w-4 h-3.5 flex items-center justify-center text-secondary hover:text-accent-violet disabled:opacity-20"
                         title="Bajar franja"
                       >
-                        <span className="material-symbols-outlined text-[14px] leading-none">arrow_drop_down</span>
+                        <span className="material-symbols-outlined text-[13px] leading-none">arrow_drop_down</span>
                       </button>
                     </div>
 
                     <button
                       onClick={() => eliminarFila(filaIndex)}
-                      className="absolute left-1.5 top-1.5 w-4 h-4 flex items-center justify-center text-secondary hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute left-1.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center text-secondary hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
                       title="Eliminar fila"
                     >
                       <span className="material-symbols-outlined text-[12px]">close</span>
                     </button>
                   </div>
 
-                  {/* Day Cells */}
+                  {/* Day Cells: Edición directa de Materia y Curso */}
                   {DIAS.map((dia) => {
                     const celda = fila.celdas[dia];
-                    const tieneContenido = celda.descripcion.trim() !== '';
+                    const tieneContenido = celdaTieneDatos(celda);
 
                     return (
                       <div
                         key={`desk-cell-${filaIndex}-${dia}`}
-                        className={`rounded-2xl transition-all h-full min-h-[90px] ${
-                          tieneContenido ? 'neu-subject-card p-3' : 'neu-inset p-2.5'
+                        className={`rounded-2xl transition-all relative group flex flex-col justify-center min-h-[52px] p-2 select-none ${
+                          tieneContenido
+                            ? 'neu-subject-card'
+                            : 'neu-inset'
                         }`}
                       >
-                        <textarea
-                          placeholder="Materia / Nota"
-                          value={celda.descripcion}
-                          onChange={(e) => actualizarCelda(filaIndex, dia, e.target.value)}
-                          className={`w-full h-full min-h-[70px] bg-transparent resize-none focus:outline-none text-xs leading-relaxed ${
-                            tieneContenido
-                              ? 'text-on-surface font-bold placeholder:text-secondary/50'
-                              : 'text-secondary/80 font-medium placeholder:text-secondary/40'
-                          }`}
-                        />
+                        <div className="flex flex-col justify-center items-center w-full gap-0.5">
+                          {/* Campo Materia */}
+                          <input
+                            type="text"
+                            placeholder="Materia"
+                            value={celda.materia}
+                            onChange={(e) => actualizarMateria(filaIndex, dia, e.target.value)}
+                            className="w-full bg-transparent text-center font-extrabold text-xs text-accent-violet focus:outline-none placeholder:text-secondary/40 uppercase leading-none"
+                            title="Materia"
+                          />
+
+                          {/* Campo Año / Curso */}
+                          <input
+                            type="text"
+                            placeholder="Año / Curso"
+                            value={celda.curso}
+                            onChange={(e) => actualizarCurso(filaIndex, dia, e.target.value)}
+                            className="w-full bg-transparent text-center font-bold text-[11px] text-secondary focus:outline-none placeholder:text-secondary/40 leading-none"
+                            title="Año o división del curso"
+                          />
+                        </div>
+
+                        {/* Botón para abrir modal de opciones avanzadas (elegir de cursos existentes o asignar escuela) */}
+                        <button
+                          type="button"
+                          onClick={() => abrirModalEditarCelda(filaIndex, dia)}
+                          className="absolute right-1 top-1 w-4 h-4 rounded flex items-center justify-center text-secondary/40 hover:text-accent-violet opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Elegir de mis cursos o agregar escuela"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">more_vert</span>
+                        </button>
                       </div>
                     );
                   })}
@@ -603,7 +909,128 @@ export default function Horario() {
           </div>
         </div>
 
-        {/* ── Modal para Editar Franja Horaria (Móvil) ── */}
+        {/* ── Modal para Editar Celda (Materia, Curso, Escuela) ── */}
+        {editandoCelda !== null && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setEditandoCelda(null);
+            }}
+          >
+            <div className="bg-surface-bg neu-raised rounded-3xl p-6 w-full max-w-md flex flex-col gap-4 border border-white/60 shadow-2xl font-mulish">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-headline-md text-lg text-accent-violet uppercase font-extrabold">
+                    Configurar Horario
+                  </h3>
+                  <p className="text-xs text-secondary font-bold">
+                    {editandoCelda.dia} — {filas[editandoCelda.filaIndex]?.hora}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setEditandoCelda(null)}
+                  className="text-secondary hover:text-accent-violet p-1"
+                >
+                  <span className="material-symbols-outlined text-lg">close</span>
+                </button>
+              </div>
+
+              {/* Selector de Cursos creados */}
+              {cursosDocente.length > 0 && (
+                <div className="bg-white/50 p-3 rounded-2xl border border-white/60">
+                  <label className="text-[11px] font-bold text-accent-violet uppercase block mb-1">
+                    Cargar desde tus Cursos guardados:
+                  </label>
+                  <select
+                    value={tempCursoId ?? ''}
+                    onChange={(e) => seleccionarCursoPredefinido(e.target.value)}
+                    className="w-full bg-surface-bg neu-inset rounded-xl px-3 py-2 text-xs font-bold text-on-surface focus:outline-none"
+                  >
+                    <option value="">-- Elegir un curso --</option>
+                    {cursosDocente.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.materia} — {c.anio}° ({c.escuela})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Campos manuales: Materia, Curso, Escuela */}
+              <div className="flex flex-col gap-3">
+                <div>
+                  <label className="text-[10px] font-bold text-secondary uppercase block mb-1">
+                    Materia:
+                  </label>
+                  <input
+                    type="text"
+                    value={tempMateria}
+                    onChange={(e) => setTempMateria(e.target.value)}
+                    placeholder="Ej. Química, Matemática"
+                    className="w-full bg-surface-bg neu-inset rounded-xl px-3 py-2 text-sm font-bold text-accent-violet focus:outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] font-bold text-secondary uppercase block mb-1">
+                      Curso / Año:
+                    </label>
+                    <input
+                      type="text"
+                      value={tempCurso}
+                      onChange={(e) => setTempCurso(e.target.value)}
+                      placeholder="Ej. 2° Año, 1° 1ra"
+                      className="w-full bg-surface-bg neu-inset rounded-xl px-3 py-2 text-sm font-bold text-accent-violet focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-secondary uppercase block mb-1">
+                      Institución / Escuela:
+                    </label>
+                    <input
+                      type="text"
+                      value={tempEscuela}
+                      onChange={(e) => setTempEscuela(e.target.value)}
+                      placeholder="Ej. EET N° 8"
+                      className="w-full bg-surface-bg neu-inset rounded-xl px-3 py-2 text-sm font-bold text-accent-violet focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    limpiarCelda(editandoCelda.filaIndex, editandoCelda.dia);
+                    setEditandoCelda(null);
+                  }}
+                  className="px-4 py-2.5 rounded-xl neu-raised text-red-600 font-bold text-xs uppercase tracking-wider active:scale-95"
+                >
+                  Limpiar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditandoCelda(null)}
+                  className="flex-1 py-2.5 rounded-xl neu-raised text-secondary font-bold text-xs uppercase tracking-wider active:scale-95"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={guardarCeldaEditada}
+                  className="flex-1 py-2.5 rounded-xl neu-raised text-accent-violet hover:brightness-95 font-extrabold text-xs uppercase tracking-wider active:scale-95"
+                >
+                  Aplicar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Modal para Editar Franja Horaria (Móvil y Escritorio) ── */}
         {editandoHoraIndex !== null && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in"
@@ -648,7 +1075,7 @@ export default function Horario() {
                 </button>
                 <button
                   onClick={guardarHoraEditada}
-                  className="flex-1 py-2.5 rounded-xl bg-accent-violet text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-95"
+                  className="flex-1 py-2.5 rounded-xl neu-raised text-accent-violet hover:brightness-95 font-extrabold text-xs uppercase tracking-wider active:scale-95"
                 >
                   Listo
                 </button>

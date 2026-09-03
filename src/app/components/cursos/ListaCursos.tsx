@@ -1,6 +1,8 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { Curso } from './Cursos';
+import { getToken } from '@/lib/token';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
@@ -35,10 +37,75 @@ export default function ListaCursos({ id, anio, escuela, materia, ruta, onElimin
   const [confirmando, setConfirmando] = useState(false);
   const [eliminando, setEliminando] = useState(false);
 
+  const rutaFinal = ruta || (id ? `/sub-menu-curso/${id}/alumnos` : `/curso/${id}`);
+
   const handleEliminar = async () => {
     setEliminando(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = getToken();
+      if (!token) {
+        alert('No hay sesión activa');
+        setEliminando(false);
+        setConfirmando(false);
+        return;
+      }
+
+      // 1️⃣ Buscar y eliminar horarios asociados a este curso
+      try {
+        const resHorarios = await fetch(`${API}/horarios`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (resHorarios.ok) {
+          const horarios: { id: number; descripcion: string | null }[] = await resHorarios.json();
+          if (Array.isArray(horarios)) {
+            const matNorm = (materia || '').trim().toLowerCase();
+            const anioNorm = (anio || '').trim().toLowerCase();
+            const escNorm = (escuela || '').trim().toLowerCase();
+
+            const horariosParaBorrar = horarios.filter((h) => {
+              if (!h.descripcion) return false;
+              const rawDesc = h.descripcion.trim();
+
+              // Caso A: JSON estructurado
+              try {
+                const parsed = JSON.parse(rawDesc);
+                if (parsed.cursoId && Number(parsed.cursoId) === Number(id)) {
+                  return true;
+                }
+                const pMat = (parsed.materia || '').trim().toLowerCase();
+                if (matNorm && pMat === matNorm) {
+                  return true;
+                }
+              } catch {
+                // Caso B: Texto plano (legado)
+                const descLower = rawDesc.toLowerCase();
+                if (matNorm && (descLower === matNorm || descLower.includes(matNorm))) {
+                  return true;
+                }
+                if (escNorm && descLower.includes(escNorm)) {
+                  return true;
+                }
+              }
+              return false;
+            });
+
+            if (horariosParaBorrar.length > 0) {
+              await Promise.allSettled(
+                horariosParaBorrar.map((h) =>
+                  fetch(`${API}/horarios/${h.id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` },
+                  })
+                )
+              );
+            }
+          }
+        }
+      } catch (errHorarios) {
+        console.warn('Advertencia al limpiar horarios del curso:', errHorarios);
+      }
+
+      // 2️⃣ Eliminar el curso
       const res = await fetch(`${API}/cursos/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
@@ -60,7 +127,7 @@ export default function ListaCursos({ id, anio, escuela, materia, ruta, onElimin
     <>
       <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-md hover:shadow-lg border border-violet-200 overflow-hidden transition-all duration-200 relative group my-2">
         {/* Tarjeta clickeable */}
-        <a href={ruta} className="flex items-center p-4 gap-4 pr-12">
+        <Link href={rutaFinal} className="flex items-center p-4 gap-4 pr-12">
           <div className="flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-violet-700 rounded-xl shrink-0 text-white shadow-sm p-1 text-center">
             <span className="font-extrabold text-xl sm:text-2xl leading-none">{anio}°</span>
             <span className="text-[10px] font-bold uppercase tracking-wider opacity-90 mt-0.5">Año</span>
@@ -78,7 +145,7 @@ export default function ListaCursos({ id, anio, escuela, materia, ruta, onElimin
               Ingresar al aula →
             </span>
           </div>
-        </a>
+        </Link>
 
         {/* Botón eliminar */}
         <button
