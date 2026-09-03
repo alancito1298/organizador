@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export const maxDuration = 60; // Permitir hasta 60s en Vercel si es necesario
+export const maxDuration = 30;
 
 export async function POST(req: Request) {
   try {
@@ -20,39 +20,41 @@ export async function POST(req: Request) {
     const cleanBase64 = imageBase64.replace(/^data:image\/[a-zA-Z0-9+.-]+;base64,/, '');
     const cleanMime = mimeType || 'image/jpeg';
 
-    const prompt = `Actúa como un asistente experto en digitalización de nóminas escolares y listas de alumnos.
-Analiza con máxima atención la imagen adjunta (que puede ser una lista escrita a mano, una planilla impresa, una hoja de asistencia o un cuaderno de clase).
-Tu objetivo es extraer a cada uno de los alumnos presentes en la lista.
+    const prompt = `Analiza esta imagen que contiene una nómina, lista de alumnos o planilla escolar.
+Extrae la lista completa de todos los estudiantes (Nombre y Apellido).
 
-Devuelve EXCLUSIVAMENTE un JSON válido (array de objetos) con la siguiente estructura exacta:
+Devuelve EXCLUSIVAMENTE un JSON válido (array de objetos) con la siguiente estructura:
 [
   {
-    "nombre": "Nombre de pila del estudiante",
-    "apellido": "Apellido del estudiante",
-    "dni": "DNI si figura en la lista, sino dejar vacío"
+    "nombre": "Nombre de pila",
+    "apellido": "Apellido",
+    "dni": "DNI si figura (opcional)"
   }
 ]
 
-Reglas estrictas:
-1. Extrae todos los alumnos que aparezcan legibles en la imagen.
-2. Si la lista dice "Apellido, Nombre" (ej: "García, Juan"), asegúrate de asignar "García" como apellido y "Juan" como nombre.
-3. Si solo figura el nombre completo en una sola línea (ej: "Juan García"), pon "Juan" como nombre y "García" como apellido.
-4. Pon formato Capital Case (primer letra mayúscula, ej: "Martínez", "Sofía").
-5. Ignora números de orden (1, 2, 3...), encabezados de columnas (ej. "Alumno", "Firma", "DNI", "Fecha") y firmas o garabatos.
-6. Devuelve ÚNICAMENTE el array JSON crudo, empezando con [ y terminando con ]. Sin explicaciones ni texto adicional.`;
+Reglas:
+1. Extrae todos los alumnos legibles.
+2. Si figura "Apellido, Nombre" (ej. "García, Juan"), separa correctamente: apellido: "García", nombre: "Juan".
+3. Formato Capital Case (ej. "López", "Mateo").
+4. Omite números de orden (1., 2.), encabezados de página y firmas.
+5. Devuelve ÚNICAMENTE el JSON crudo en un array [ ... ].`;
 
-    // Modelos activos y compatibles con la API Key actual
-    const modelos = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
+    // Modelos activos con thinkingLevel low para respuesta ultrarrápida (< 3 segundos)
+    const modelos = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
     let jsonText = '';
     let ultimoError = '';
 
     for (const mod of modelos) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
         const res = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${mod}:generateContent?key=${apiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
             body: JSON.stringify({
               contents: [
                 {
@@ -70,11 +72,16 @@ Reglas estrictas:
               ],
               generationConfig: {
                 temperature: 0.1,
-                maxOutputTokens: 2500,
+                maxOutputTokens: 2048,
+                thinkingConfig: {
+                  thinkingLevel: 'low',
+                },
               },
             }),
           }
         );
+
+        clearTimeout(timeoutId);
 
         if (res.ok) {
           const data = await res.json();
@@ -82,12 +89,12 @@ Reglas estrictas:
           if (jsonText.trim()) break;
         } else {
           const errText = await res.text();
-          ultimoError = `Modelo ${mod} (${res.status}): ${errText.slice(0, 150)}`;
+          ultimoError = `${mod} (${res.status}): ${errText.slice(0, 100)}`;
           console.warn(`Aviso Gemini API:`, ultimoError);
         }
       } catch (errMod: any) {
-        ultimoError = errMod?.message || 'Error de conexión con Gemini';
-        console.warn(`Error llamando a modelo ${mod}:`, errMod);
+        ultimoError = errMod?.message || 'Timeout o error de conexión con Gemini';
+        console.warn(`Fallo en modelo ${mod}:`, errMod?.message);
       }
     }
 
@@ -95,7 +102,7 @@ Reglas estrictas:
       return NextResponse.json(
         {
           success: false,
-          error: 'No se pudo leer la lista de la foto. Asegúrate de que esté bien iluminada y nítida. ' + (ultimoError ? `(${ultimoError})` : ''),
+          error: 'No se pudo leer la lista de la foto. Por favor asegúrate de que la foto esté bien enfocada e iluminada.',
         },
         { status: 422 }
       );
@@ -109,17 +116,17 @@ Reglas estrictas:
     let parsedAlumnos: any[] = [];
     try {
       parsedAlumnos = JSON.parse(jsonFinal);
-    } catch (e) {
-      console.error('Error parseando JSON de Gemini:', jsonFinal);
+    } catch {
+      console.error('Error parseando JSON:', jsonFinal);
       return NextResponse.json(
-        { success: false, error: 'La IA leyó la imagen pero no pudo formatear los datos como lista.' },
+        { success: false, error: 'No se pudo interpretar el formato devuelto por la IA. Intenta con otra foto.' },
         { status: 422 }
       );
     }
 
     if (!Array.isArray(parsedAlumnos) || parsedAlumnos.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'No se detectaron nombres de alumnos en la fotografía. Intenta enfocar más de cerca.' },
+        { success: false, error: 'No se detectaron alumnos en la foto. Intenta enfocar más de cerca la lista.' },
         { status: 422 }
       );
     }

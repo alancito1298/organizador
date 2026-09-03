@@ -26,18 +26,52 @@ interface Props {
 }
 
 /**
- * Redimensiona y comprime la imagen del cliente usando Canvas
- * Convierte fotos pesadas de teléfonos (5MB - 15MB) a un JPEG liviano (~250KB)
- * evitando problemas de límites de payload (413) y timeouts en Vercel/móviles.
+ * Redimensiona y comprime la imagen usando Canvas con timeout de seguridad (2.5s).
+ * Si la imagen es HEIC o el navegador tarda en decodificar, salta al fallback de inmediato
+ * garantizando que NUNCA quede colgado.
  */
-function comprimirImagenParaIA(file: File, maxDimension = 1600, calidad = 0.82): Promise<{ base64: string; mimeType: string }> {
-  return new Promise((resolve, reject) => {
+function comprimirImagenParaIA(file: File, maxDimension = 1400, calidad = 0.8): Promise<{ base64: string; mimeType: string }> {
+  return new Promise((resolve) => {
+    let terminado = false;
+
+    // Timeout de seguridad: Si en 2.5s no se procesó el canvas, resolver con lectura directa
+    const timer = setTimeout(() => {
+      if (terminado) return;
+      terminado = true;
+      const readerFallback = new FileReader();
+      readerFallback.onload = (e) => {
+        resolve({ base64: (e.target?.result as string) || '', mimeType: file.type || 'image/jpeg' });
+      };
+      readerFallback.onerror = () => {
+        resolve({ base64: '', mimeType: 'image/jpeg' });
+      };
+      readerFallback.readAsDataURL(file);
+    }, 2500);
+
     const reader = new FileReader();
-    reader.onerror = () => reject(new Error('No se pudo leer la imagen seleccionada.'));
+    reader.onerror = () => {
+      if (terminado) return;
+      terminado = true;
+      clearTimeout(timer);
+      resolve({ base64: '', mimeType: 'image/jpeg' });
+    };
+
     reader.onload = (e) => {
+      const rawBase64 = (e.target?.result as string) || '';
       const img = new Image();
-      img.onerror = () => reject(new Error('Formato de imagen no soportado por el navegador.'));
+
+      img.onerror = () => {
+        if (terminado) return;
+        terminado = true;
+        clearTimeout(timer);
+        resolve({ base64: rawBase64, mimeType: file.type || 'image/jpeg' });
+      };
+
       img.onload = () => {
+        if (terminado) return;
+        terminado = true;
+        clearTimeout(timer);
+
         try {
           let { width, height } = img;
           if (width > maxDimension || height > maxDimension) {
@@ -55,7 +89,7 @@ function comprimirImagenParaIA(file: File, maxDimension = 1600, calidad = 0.82):
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           if (!ctx) {
-            resolve({ base64: e.target?.result as string, mimeType: file.type || 'image/jpeg' });
+            resolve({ base64: rawBase64, mimeType: file.type || 'image/jpeg' });
             return;
           }
 
@@ -63,11 +97,13 @@ function comprimirImagenParaIA(file: File, maxDimension = 1600, calidad = 0.82):
           const compressed = canvas.toDataURL('image/jpeg', calidad);
           resolve({ base64: compressed, mimeType: 'image/jpeg' });
         } catch {
-          resolve({ base64: e.target?.result as string, mimeType: file.type || 'image/jpeg' });
+          resolve({ base64: rawBase64, mimeType: file.type || 'image/jpeg' });
         }
       };
-      img.src = e.target?.result as string;
+
+      img.src = rawBase64;
     };
+
     reader.readAsDataURL(file);
   });
 }
@@ -89,6 +125,7 @@ export default function ImportarAlumnosModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   if (!abierto) return null;
 
@@ -132,6 +169,15 @@ export default function ImportarAlumnosModal({
     reader.readAsBinaryString(file);
   };
 
+  // Cancelar análisis en curso
+  const cancelarAnalisisFoto = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setAnalizandoFoto(false);
+  };
+
   // Procesar imagen / foto de nómina con Inteligencia Artificial
   const handleFotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMsg(null);
@@ -139,18 +185,34 @@ export default function ImportarAlumnosModal({
     if (!file) return;
 
     setAnalizandoFoto(true);
-    try {
-      // 1. Comprimir imagen en el cliente para reducir tamaño y garantizar formato JPEG compatible
-      const { base64, mimeType } = await comprimirImagenParaIA(file, 1600, 0.82);
 
-      // 2. Enviar a la API
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    // Timeout de 20s para la llamada completa
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 20000);
+
+    try {
+      // 1. Optimizar imagen
+      const { base64, mimeType } = await comprimirImagenParaIA(file, 1400, 0.8);
+
+      if (!base64) {
+        throw new Error('No se pudo procesar la imagen seleccionada.');
+      }
+
+      // 2. Enviar a la API con timeout
       const res = await fetch('/api/alumnos/extraer-foto', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({ imageBase64: base64, mimeType }),
       });
 
-      // 3. Parsear respuesta de manera segura contra respuestas HTML / errores no-JSON
+      clearTimeout(timeoutId);
+
+      // 3. Parsear respuesta segura
       const textResponse = await res.text();
       let data: any = null;
       try {
@@ -158,13 +220,13 @@ export default function ImportarAlumnosModal({
       } catch {
         throw new Error(
           res.status === 413
-            ? 'La imagen es demasiado pesada. Por favor toma la foto un poco más de cerca o comprímela.'
-            : `El servidor devolvió un error inesperado (${res.status}).`
+            ? 'La imagen es demasiado pesada. Toma la foto más cerca o con menos resolución.'
+            : `El servidor devolvió un error (${res.status}). Por favor reintenta.`
         );
       }
 
       if (!res.ok || !data.success) {
-        throw new Error(data?.error || 'No se pudo leer la lista de la foto. Intenta con una imagen más nítida y bien iluminada.');
+        throw new Error(data?.error || 'No se pudo leer la lista. Asegúrate de que los nombres estén bien enfocados.');
       }
 
       const lista: AlumnoImportado[] = (data.alumnos || []).map((a: any, idx: number) => {
@@ -185,16 +247,21 @@ export default function ImportarAlumnosModal({
       });
 
       if (lista.length === 0) {
-        setErrorMsg('No se detectaron nombres legibles en la fotografía. Intenta enfocar los nombres con mayor claridad.');
+        setErrorMsg('No se detectaron nombres legibles en la imagen. Intenta enfocar más de cerca la lista.');
       } else {
         setAlumnos(lista);
       }
     } catch (err: any) {
-      console.error('Error al procesar foto:', err);
-      setErrorMsg(err?.message || 'Error al procesar la foto con Inteligencia Artificial.');
+      if (err.name === 'AbortError') {
+        setErrorMsg('El análisis tardó demasiado tiempo. Intenta con una foto más cercana o recortada.');
+      } else {
+        console.error('Error al procesar foto:', err);
+        setErrorMsg(err?.message || 'Error al procesar la foto con Inteligencia Artificial.');
+      }
     } finally {
+      clearTimeout(timeoutId);
       setAnalizandoFoto(false);
-      // Limpiar el input para permitir seleccionar la misma imagen si se desea
+      abortControllerRef.current = null;
       e.target.value = '';
     }
   };
@@ -275,7 +342,6 @@ export default function ImportarAlumnosModal({
           apellido = parts.slice(1).join(' ') || '';
         }
       } else {
-        // Asignación estándar de 2 columnas: Columna 1 = Nombre, Columna 2 = Apellido
         nombre = String(row[0] || '').trim();
         apellido = String(row[1] || '').trim();
       }
@@ -327,7 +393,6 @@ export default function ImportarAlumnosModal({
     for (let i = 0; i < seleccionados.length; i++) {
       const a = seleccionados[i];
       try {
-        // 1. Crear Alumno
         const resAlumno = await fetch(`${API}/alumnos`, {
           method: 'POST',
           headers,
@@ -341,7 +406,6 @@ export default function ImportarAlumnosModal({
 
         if (resAlumno.ok) {
           const nuevoAlumno = await resAlumno.json();
-          // 2. Inscribir en el curso actual
           await fetch(`${API}/inscripciones`, {
             method: 'POST',
             headers,
@@ -449,6 +513,7 @@ export default function ImportarAlumnosModal({
                 <button
                   type="button"
                   onClick={() => setModoEntrada('excel')}
+                  disabled={analizandoFoto}
                   className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
                     modoEntrada === 'excel'
                       ? 'bg-violet-950 text-white shadow-sm'
@@ -461,6 +526,7 @@ export default function ImportarAlumnosModal({
                 <button
                   type="button"
                   onClick={() => setModoEntrada('foto')}
+                  disabled={analizandoFoto}
                   className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
                     modoEntrada === 'foto'
                       ? 'bg-violet-950 text-white shadow-sm'
@@ -473,6 +539,7 @@ export default function ImportarAlumnosModal({
                 <button
                   type="button"
                   onClick={() => setModoEntrada('pegar')}
+                  disabled={analizandoFoto}
                   className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
                     modoEntrada === 'pegar'
                       ? 'bg-violet-950 text-white shadow-sm'
@@ -527,7 +594,6 @@ export default function ImportarAlumnosModal({
               {/* Modo 2: Cargar mediante Foto con IA */}
               {modoEntrada === 'foto' && (
                 <div className="space-y-4">
-                  {/* Inputs nativos controlados por <label> para evitar DOMException en Safari/iOS */}
                   <input
                     id="foto-camara-input"
                     type="file"
@@ -545,23 +611,30 @@ export default function ImportarAlumnosModal({
                   />
 
                   {analizandoFoto ? (
-                    <div className="border-2 border-violet-300 bg-violet-50/70 rounded-3xl p-12 text-center flex flex-col items-center justify-center gap-4 animate-pulse">
+                    <div className="border-2 border-violet-300 bg-violet-50/70 rounded-3xl p-10 text-center flex flex-col items-center justify-center gap-4 animate-in fade-in duration-200">
                       <div className="w-16 h-16 rounded-2xl bg-violet-200 flex items-center justify-center text-accent-violet animate-bounce">
                         <Sparkles className="w-8 h-8 text-violet-700" />
                       </div>
                       <div>
                         <h4 className="font-extrabold text-lg text-violet-950">Analizando foto con Inteligencia Artificial...</h4>
                         <p className="text-xs text-violet-700 mt-1">
-                          Optimizando imagen, leyendo la lista y reconociendo nombres y apellidos automáticamente.
+                          Leyendo la lista y reconociendo nombres y apellidos automáticamente.
                         </p>
                       </div>
+                      <button
+                        type="button"
+                        onClick={cancelarAnalisisFoto}
+                        className="mt-2 text-xs font-bold text-red-600 hover:text-red-800 bg-white px-4 py-2 rounded-xl border border-red-200 hover:bg-red-50 transition-colors shadow-sm"
+                      >
+                        Cancelar análisis
+                      </button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Opción A: Sacar foto con la cámara del dispositivo */}
+                      {/* Opción A: Cámara */}
                       <label
                         htmlFor="foto-camara-input"
-                        className="border-2 border-dashed border-violet-300 hover:border-violet-600 bg-violet-50/50 hover:bg-violet-50 rounded-3xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group"
+                        className="border-2 border-dashed border-violet-300 hover:border-violet-600 bg-violet-50/50 hover:bg-violet-50 rounded-3xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group active:scale-[0.98]"
                       >
                         <div className="w-14 h-14 rounded-2xl bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center text-violet-700 transition-colors">
                           <Camera className="w-7 h-7" />
@@ -574,10 +647,10 @@ export default function ImportarAlumnosModal({
                         </div>
                       </label>
 
-                      {/* Opción B: Subir imagen existente de la galería */}
+                      {/* Opción B: Galería */}
                       <label
                         htmlFor="foto-galeria-input"
-                        className="border-2 border-dashed border-violet-300 hover:border-violet-600 bg-violet-50/50 hover:bg-violet-50 rounded-3xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group"
+                        className="border-2 border-dashed border-violet-300 hover:border-violet-600 bg-violet-50/50 hover:bg-violet-50 rounded-3xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group active:scale-[0.98]"
                       >
                         <div className="w-14 h-14 rounded-2xl bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center text-violet-700 transition-colors">
                           <ImageIcon className="w-7 h-7" />
