@@ -154,7 +154,7 @@ export default function AlumnosClient() {
     if (!cursoId) return;
     fetchCurso();
     fetchAlumnos();
-  }, [cursoId]);
+  }, [cursoId, trimestreActivo]);
 
   const fetchCurso = async () => {
     const token = getToken();
@@ -276,17 +276,35 @@ export default function AlumnosClient() {
             ).length;
             const asistenciaCalc = totalClases > 0 ? Math.round((presentes / totalClases) * 100) : 0;
 
+            // Helper para obtener el valor numérico de la calificación (soporta valor o nota)
+            const parseNota = (c: any): number => {
+              const raw = c.valor !== undefined && c.valor !== null ? c.valor : c.nota;
+              const num = typeof raw === 'string' ? parseFloat(raw.replace(',', '.')) : Number(raw);
+              return !isNaN(num) && num > 0 ? num : 0;
+            };
+
             // Calcular calificaciones
             const notasAlumno = Array.isArray(dataCalificaciones)
-              ? dataCalificaciones.filter((c: any) => c.alumnoCursoId === i.id && !isNaN(Number(c.nota)) && Number(c.nota) > 0)
+              ? dataCalificaciones.filter((c: any) => c.alumnoCursoId === i.id && parseNota(c) > 0)
               : [];
-            const notasT1 = notasAlumno.filter((c: any) => String(c.trimestre) === '1');
 
-            const sumGeneral = notasAlumno.reduce((acc: number, n: any) => acc + Number(n.nota), 0);
-            const sumT1 = notasT1.reduce((acc: number, n: any) => acc + Number(n.nota), 0);
+            // Notas del trimestre activo seleccionado
+            const notasTrimestreActivo = notasAlumno.filter(
+              (c: any) => Number(c.trimestre) === trimestreActivo || String(c.trimestre) === String(trimestreActivo)
+            );
+            const sumTrimestre = notasTrimestreActivo.reduce((acc: number, n: any) => acc + parseNota(n), 0);
+            const promTrimestre = notasTrimestreActivo.length > 0
+              ? Math.round((sumTrimestre / notasTrimestreActivo.length) * 10) / 10
+              : 0;
 
-            const promGeneral = notasAlumno.length > 0 ? Math.round((sumGeneral / notasAlumno.length) * 10) / 10 : 0;
+            // Notas del 1er trimestre
+            const notasT1 = notasAlumno.filter((c: any) => Number(c.trimestre) === 1 || String(c.trimestre) === '1');
+            const sumT1 = notasT1.reduce((acc: number, n: any) => acc + parseNota(n), 0);
             const promT1 = notasT1.length > 0 ? Math.round((sumT1 / notasT1.length) * 10) / 10 : 0;
+
+            // Promedio General acumulado
+            const sumGeneral = notasAlumno.reduce((acc: number, n: any) => acc + parseNota(n), 0);
+            const promGeneral = notasAlumno.length > 0 ? Math.round((sumGeneral / notasAlumno.length) * 10) / 10 : 0;
 
             return {
               id: alum.id,
@@ -296,7 +314,7 @@ export default function AlumnosClient() {
               contacto: alum.contacto || undefined,
               dni: alum.dni || undefined,
               asistenciaPorcentaje: asistenciaCalc,
-              primerTrimestre: promT1,
+              primerTrimestre: promTrimestre > 0 ? promTrimestre : promT1,
               promedioGeneral: promGeneral,
             };
           })
@@ -982,7 +1000,7 @@ export default function AlumnosClient() {
                       <div className="grid grid-cols-3 gap-2 py-3 px-2 rounded-xl bg-emerald-100/35 border border-emerald-200/50 mb-5 text-center">
                         <div className="flex flex-col items-center">
                           <span className="text-[10px] text-emerald-800 uppercase font-bold leading-tight">
-                            Nota<br />1er Trim
+                            Nota<br />{trimestreActivo}° Trim
                           </span>
                           <span className="font-extrabold text-base sm:text-lg text-emerald-950 mt-1">
                             {alumno.primerTrimestre > 0 ? alumno.primerTrimestre : '-'}<span className="text-xs font-normal text-emerald-700">/10</span>
@@ -1036,7 +1054,7 @@ export default function AlumnosClient() {
                       <div className="grid grid-cols-3 gap-2 py-3 px-2 rounded-xl bg-violet-100/35 border border-violet-200/50 mb-5 text-center">
                         <div className="flex flex-col items-center">
                           <span className="text-[10px] text-violet-800 uppercase font-bold leading-tight">
-                            Nota<br />1er Trim
+                            Nota<br />{trimestreActivo}° Trim
                           </span>
                           <span className="font-extrabold text-base sm:text-lg text-violet-950 mt-1">
                             {alumno.primerTrimestre > 0 ? alumno.primerTrimestre : '-'}<span className="text-xs font-normal text-violet-700">/10</span>
