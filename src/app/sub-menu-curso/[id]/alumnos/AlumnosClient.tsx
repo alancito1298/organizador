@@ -85,43 +85,58 @@ export default function AlumnosClient() {
   const [menuDescargasAbierto, setMenuDescargasAbierto] = useState(false);
 
   // Trimestre Activo
-  const [trimestreActivo, setTrimestreActivo] = useState<number>(1);
+  const [trimestreActivo, setTrimestreActivo] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const savedCurso = cursoId ? localStorage.getItem(`trimestreActivo_curso_${cursoId}`) : null;
+      const savedGlobal = localStorage.getItem('trimestreActivo');
+      const saved = savedCurso || savedGlobal;
+      if (saved && [1, 2, 3].includes(Number(saved))) {
+        return Number(saved);
+      }
+    }
+    return 1;
+  });
   const [modalCerrarTrimestre, setModalCerrarTrimestre] = useState(false);
-
-  // Eliminar Curso
   const [modalEliminarCurso, setModalEliminarCurso] = useState(false);
   const [eliminandoCurso, setEliminandoCurso] = useState(false);
 
-  const handleEliminarCurso = async () => {
+  const eliminarCursoActual = async () => {
     if (!cursoId) return;
-    setEliminandoCurso(true);
     const token = getToken();
+    setEliminandoCurso(true);
     try {
       const res = await fetch(`${API}/cursos/${cursoId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
+        alert('✅ Curso eliminado con éxito.');
         window.location.href = '/cursos';
       } else {
-        alert('❌ No se pudo eliminar el curso');
+        alert('❌ Error al eliminar el curso.');
       }
-    } catch (err) {
-      console.error('Error al eliminar curso:', err);
-      alert('❌ Error al eliminar el curso');
+    } catch (e) {
+      console.error('Error al eliminar curso:', e);
+      alert('❌ Error de conexión al eliminar.');
     } finally {
       setEliminandoCurso(false);
+      setModalEliminarCurso(false);
     }
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem('trimestreActivo');
-    if (saved && [1, 2, 3].includes(Number(saved))) {
-      setTrimestreActivo(Number(saved));
-    } else {
-      setTrimestreActivo(1);
-      localStorage.setItem('trimestreActivo', '1');
-    }
+    const syncTrimestre = () => {
+      const savedCurso = cursoId ? localStorage.getItem(`trimestreActivo_curso_${cursoId}`) : null;
+      const savedGlobal = localStorage.getItem('trimestreActivo');
+      const saved = savedCurso || savedGlobal;
+      if (saved && [1, 2, 3].includes(Number(saved))) {
+        setTrimestreActivo(Number(saved));
+      }
+    };
+
+    syncTrimestre();
+    window.addEventListener('trimestreCambiado', syncTrimestre);
+    window.addEventListener('storage', syncTrimestre);
 
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -132,19 +147,28 @@ export default function AlumnosClient() {
         setConceptoModalAbierto(true);
       }
     }
-  }, []);
+
+    return () => {
+      window.removeEventListener('trimestreCambiado', syncTrimestre);
+      window.removeEventListener('storage', syncTrimestre);
+    };
+  }, [cursoId]);
 
   const cambiarTrimestre = (t: number) => {
-    setTrimestreActivo(t);
-    localStorage.setItem('trimestreActivo', String(t));
+    const nuevo = [1, 2, 3].includes(t) ? t : 1;
+    setTrimestreActivo(nuevo);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('trimestreActivo', String(nuevo));
+      if (cursoId) {
+        localStorage.setItem(`trimestreActivo_curso_${cursoId}`, String(nuevo));
+      }
+      window.dispatchEvent(new Event('trimestreCambiado'));
+    }
   };
 
   const avanzarSiguienteTrimestre = () => {
-    if (trimestreActivo < 3) {
-      cambiarTrimestre(trimestreActivo + 1);
-    } else {
-      cambiarTrimestre(1);
-    }
+    const siguiente = trimestreActivo < 3 ? trimestreActivo + 1 : 1;
+    cambiarTrimestre(siguiente);
     setModalCerrarTrimestre(false);
   };
 

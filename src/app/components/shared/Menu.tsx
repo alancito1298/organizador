@@ -94,31 +94,45 @@ export default function Menu() {
   const [cursoAEliminar, setCursoAEliminar] = useState<Curso | null>(null);
   const [eliminandoCurso, setEliminandoCurso] = useState(false);
 
-  // Modal cerrar trimestre
-  const [trimestreActivo, setTrimestreActivo] = useState<number>(1);
+  // Trimestre activo
+  const [trimestreActivo, setTrimestreActivo] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('trimestreActivo');
+      if (saved && [1, 2, 3].includes(Number(saved))) return Number(saved);
+    }
+    return 1;
+  });
   const [modalCerrarTrimestre, setModalCerrarTrimestre] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('trimestreActivo');
-    if (saved && [1, 2, 3].includes(Number(saved))) {
-      setTrimestreActivo(Number(saved));
-    } else {
-      setTrimestreActivo(1);
-      localStorage.setItem('trimestreActivo', '1');
-    }
+    const syncTrimestre = () => {
+      const saved = localStorage.getItem('trimestreActivo');
+      if (saved && [1, 2, 3].includes(Number(saved))) {
+        setTrimestreActivo(Number(saved));
+      }
+    };
+
+    syncTrimestre();
+    window.addEventListener('trimestreCambiado', syncTrimestre);
+    window.addEventListener('storage', syncTrimestre);
+    return () => {
+      window.removeEventListener('trimestreCambiado', syncTrimestre);
+      window.removeEventListener('storage', syncTrimestre);
+    };
   }, []);
 
   const cambiarTrimestre = (t: number) => {
-    setTrimestreActivo(t);
-    localStorage.setItem('trimestreActivo', String(t));
+    const nuevo = [1, 2, 3].includes(t) ? t : 1;
+    setTrimestreActivo(nuevo);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('trimestreActivo', String(nuevo));
+      window.dispatchEvent(new Event('trimestreCambiado'));
+    }
   };
 
   const avanzarSiguienteTrimestre = () => {
-    if (trimestreActivo < 3) {
-      cambiarTrimestre(trimestreActivo + 1);
-    } else {
-      cambiarTrimestre(1);
-    }
+    const siguiente = trimestreActivo < 3 ? trimestreActivo + 1 : 1;
+    cambiarTrimestre(siguiente);
     setModalCerrarTrimestre(false);
   };
 

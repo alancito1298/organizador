@@ -282,7 +282,13 @@ export default function AsistenciasTabla() {
   const [
     trimestre,
     setTrimestre
-  ] = useState(1);
+  ] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('trimestreActivo');
+      if (saved && [1, 2, 3].includes(Number(saved))) return Number(saved);
+    }
+    return 1;
+  });
 
   const [
     curso,

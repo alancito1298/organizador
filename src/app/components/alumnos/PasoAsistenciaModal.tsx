@@ -94,6 +94,7 @@ export default function PasoAsistenciaModal({
     const fechaISO = new Date(fecha + 'T12:00:00').toISOString();
 
     try {
+      const trimestreActivo = Number(localStorage.getItem('trimestreActivo')) || 1;
       const promesas = Object.entries(respuestas).map(async ([alumnoCursoId, estado]) => {
         return fetch(`${API}/asistencias`, {
           method: 'POST',
@@ -102,6 +103,7 @@ export default function PasoAsistenciaModal({
             alumnoCursoId: Number(alumnoCursoId),
             fecha: fechaISO,
             estado: estado,
+            trimestre: trimestreActivo,
           }),
         });
       });

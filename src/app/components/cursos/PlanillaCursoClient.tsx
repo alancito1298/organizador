@@ -91,7 +91,13 @@ export default function PlanillaCursoClient() {
   const [cargando, setCargando] = useState(true);
 
   // Pestañas: 1 (1° Trim), 2 (2° Trim), 3 (3° Trim), 4 (Consolidado Anual)
-  const [trimestrePestana, setTrimestrePestana] = useState<number>(1);
+  const [trimestrePestana, setTrimestrePestana] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('trimestreActivo');
+      if (saved && [1, 2, 3].includes(Number(saved))) return Number(saved);
+    }
+    return 1;
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [criterioOrden, setCriterioOrden] = useState<'apellido' | 'asistencia' | 'promedio'>('apellido');
   const [filtroEstado, setFiltroEstado] = useState<'todos' | 'promocionados' | 'riesgo'>('todos');

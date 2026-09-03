@@ -107,6 +107,7 @@ export default function PasoConceptoModal({
           estadoBackend = 'ausente';
         }
 
+        const trimestreActivo = Number(localStorage.getItem('trimestreActivo')) || 1;
         return fetch(`${API}/asistencias`, {
           method: 'POST',
           headers,
@@ -114,6 +115,7 @@ export default function PasoConceptoModal({
             alumnoCursoId: Number(alumnoCursoId),
             fecha: fechaISO,
             estado: estadoBackend,
+            trimestre: trimestreActivo,
           }),
         });
       });
