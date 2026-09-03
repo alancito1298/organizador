@@ -645,22 +645,39 @@ export default function AlumnosClient() {
       <Navbar />
 
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 md:px-margin-page pt-28 md:pt-36 pb-32">
-        {/* ── Encabezado de la página ── */}
-        <section className="mb-8 flex flex-col gap-1.5">
-          <h1 className="font-display-lg text-4xl md:text-5xl text-accent-violet uppercase tracking-tight font-extrabold">
-            ALUMNOS
-          </h1>
-          <p className="font-body-lg text-secondary flex items-center gap-2 flex-wrap">
-            {cursoInfo?.anio && (
-              <span className="px-3 py-1 rounded-full neumorphic-inset text-xs font-extrabold text-accent-violet">
-                {formatearGradoCurso(cursoInfo.anio)}
-              </span>
-            )}
-            <span className="font-bold text-on-surface">{materiaNombre}</span>
-            <span className="text-secondary">— {escuelaNombre}</span>
-          </p>
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-center gap-2 text-xs text-secondary mt-0.5">
+        {/* ── Encabezado de la página (Tarjeta centrada en mobile) ── */}
+        <section className="mb-8 bg-surface-bg neumorphic-raised rounded-3xl p-5 sm:p-7 flex flex-col gap-3.5 text-center sm:text-left shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <h1 className="font-display-lg text-3xl sm:text-4xl md:text-5xl text-accent-violet uppercase tracking-tight font-extrabold">
+                ALUMNOS
+              </h1>
+              <div className="font-body-lg text-secondary flex items-center justify-center sm:justify-start gap-2 flex-wrap text-sm sm:text-base">
+                {cursoInfo?.anio && (
+                  <span className="px-3 py-1 rounded-full neumorphic-inset text-xs font-extrabold text-accent-violet">
+                    {formatearGradoCurso(cursoInfo.anio)}
+                  </span>
+                )}
+                <span className="font-bold text-on-surface">{materiaNombre}</span>
+                <span className="text-secondary">— {escuelaNombre}</span>
+              </div>
+            </div>
+
+            {/* Botón Borrar este Curso */}
+            <div className="flex justify-center sm:justify-end">
+              <button
+                onClick={() => setModalEliminarCurso(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-bg neumorphic-raised text-xs font-bold text-red-600 hover:text-red-700 active:scale-95 transition-all shadow-sm"
+                title="Eliminar este curso"
+              >
+                <span className="material-symbols-outlined text-sm">delete</span>
+                Eliminar Curso
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2.5 border-t border-violet-100/60">
+            <div className="flex items-center justify-center sm:justify-start gap-2 text-xs text-secondary">
               <span>Año escolar: 2026 - 2027</span>
               <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full neumorphic-inset text-[10px] font-bold text-accent-violet">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_3px_#22c55e]"></span>
@@ -668,55 +685,48 @@ export default function AlumnosClient() {
               </div>
             </div>
 
-            {/* Botón Borrar este Curso */}
-            <button
-              onClick={() => setModalEliminarCurso(true)}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-bg neumorphic-raised text-[11px] font-bold text-red-600 hover:text-red-700 active:scale-95 transition-all shadow-sm"
-              title="Eliminar este curso"
-            >
-              <span className="material-symbols-outlined text-xs">delete</span>
-              Eliminar Curso
-            </button>
-          </div>
+            {/* ── Indicador de Trimestre Activo + Selector ── */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2.5 text-xs text-secondary">
+              <span className="font-semibold text-secondary">Trimestre:</span>
+              <div className="flex items-center gap-1 bg-surface-bg neumorphic-inset rounded-full p-0.5">
+                {[1, 2, 3].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => cambiarTrimestre(t)}
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all ${
+                      trimestreActivo === t
+                        ? 'bg-accent-violet text-white shadow-sm'
+                        : 'text-secondary hover:text-accent-violet'
+                    }`}
+                  >
+                    {t}° Trim
+                  </button>
+                ))}
+              </div>
 
-          {/* ── Indicador de Trimestre Activo + Cerrar Trimestre ── */}
-          <div className="flex flex-wrap items-center gap-2.5 text-xs text-secondary mt-1">
-            <span className="font-semibold text-secondary">Estás viendo:</span>
-            <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full neumorphic-inset text-xs font-bold text-accent-violet">
-              <span className="material-symbols-outlined text-sm">schedule</span>
-              {trimestreActivo}° Trimestre
+              <button
+                onClick={() => setModalCerrarTrimestre(true)}
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-bg neumorphic-raised text-[11px] font-bold text-amber-800 hover:text-amber-900 active:scale-95 transition-all shadow-sm"
+                title="Cerrar trimestre actual y pasar al siguiente"
+              >
+                <span className="material-symbols-outlined text-sm text-amber-600">lock_reset</span>
+                {trimestreActivo < 3 ? `Cerrar ${trimestreActivo}°` : 'Cerrar 3°'}
+              </button>
             </div>
-
-            {/* Selector Rápido */}
-            <div className="flex items-center gap-1 bg-surface-bg neumorphic-inset rounded-full p-0.5">
-              {[1, 2, 3].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => cambiarTrimestre(t)}
-                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all ${
-                    trimestreActivo === t
-                      ? 'bg-accent-violet text-white shadow-sm'
-                      : 'text-secondary hover:text-accent-violet'
-                  }`}
-                >
-                  {t}° Trim
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setModalCerrarTrimestre(true)}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-bg neumorphic-raised text-[11px] font-bold text-amber-800 hover:text-amber-900 active:scale-95 transition-all shadow-sm ml-1"
-              title="Cerrar trimestre actual y pasar al siguiente"
-            >
-              <span className="material-symbols-outlined text-sm text-amber-600">lock_reset</span>
-              {trimestreActivo < 3 ? `Cerrar ${trimestreActivo}° Trimestre y pasar al ${trimestreActivo + 1}°` : 'Cerrar 3° Trimestre'}
-            </button>
           </div>
         </section>
 
         {/* ── Botones de Acción (Asistencia destacada a lo ancho + grid 2x2 + Descargas) ── */}
         <section className="flex flex-col gap-3 mb-8">
+          {/* Título Tarjeta de Acciones (Centrada en mobile) */}
+          <div className="flex items-center justify-center sm:justify-start mb-1">
+            <div className="w-full sm:w-auto bg-surface-bg neumorphic-raised rounded-2xl px-4 py-2 flex items-center justify-center sm:justify-start gap-2 text-center shadow-sm">
+              <span className="material-symbols-outlined text-base text-accent-violet">bolt</span>
+              <span className="font-extrabold text-xs text-accent-violet uppercase tracking-wider">
+                Acciones del Curso
+              </span>
+            </div>
+          </div>
           {/* En mobile: Asistencia a lo ancho (col-span-2), luego 2 filas de 2x2, y Descargas. En desktop: barra horizontal flex */}
           <div className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
             <div className="contents sm:flex sm:flex-wrap sm:items-center sm:gap-2.5">
@@ -892,13 +902,14 @@ export default function AlumnosClient() {
         {/* ── HERO SECTION: 4 Tarjetas de Destacados con tono diferenciado ── */}
         {!searchQuery.trim() && (
           <section className="mb-10 bg-gradient-to-b from-violet-100/35 via-purple-50/15 to-transparent p-4 sm:p-6 rounded-3xl border border-violet-200/50">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shadow-inner">
+            {/* Título Tarjeta de Destacados (Centrada en mobile) */}
+            <div className="flex items-center justify-center sm:justify-start mb-6">
+              <div className="w-full sm:w-auto bg-surface-bg neumorphic-raised rounded-2xl p-3.5 sm:px-5 flex items-center justify-center sm:justify-start gap-3 text-center sm:text-left shadow-sm">
+                <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shadow-inner shrink-0">
                   <span className="material-symbols-outlined text-xl">hotel_class</span>
                 </div>
-                <div>
-                  <h2 className="font-extrabold text-sm sm:text-base text-violet-950 uppercase tracking-tight flex items-center gap-2">
+                <div className="flex flex-col items-center sm:items-start">
+                  <h2 className="font-extrabold text-sm sm:text-base text-violet-950 uppercase tracking-tight">
                     Destacados del Curso
                   </h2>
                   <span className="text-xs text-secondary font-medium">Top Asistencias y Mejores Calificaciones</span>
@@ -1063,8 +1074,26 @@ export default function AlumnosClient() {
           </section>
         )}
 
-        {/* ── Barra de Búsqueda y Ordenamiento (Debajo del Hero) ── */}
+        {/* ── Barra de Búsqueda y Nómina de Alumnos ── */}
         <section className="mb-8 flex flex-col gap-4">
+          {/* Título Tarjeta de Nómina de Alumnos (Centrada en mobile) */}
+          <div className="flex items-center justify-center sm:justify-start">
+            <div className="w-full sm:w-auto bg-surface-bg neumorphic-raised rounded-2xl p-3.5 sm:px-5 flex items-center justify-between sm:justify-start gap-3 text-center sm:text-left shadow-sm">
+              <div className="flex items-center justify-center sm:justify-start gap-2.5 w-full sm:w-auto">
+                <div className="w-9 h-9 rounded-xl neumorphic-inset flex items-center justify-center text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-xl">groups</span>
+                </div>
+                <div className="flex flex-col items-center sm:items-start">
+                  <h2 className="font-extrabold text-sm sm:text-base text-on-surface uppercase tracking-tight">
+                    Nómina de Alumnos
+                  </h2>
+                  <span className="text-xs text-secondary font-medium">
+                    {alumnos.length} {alumnos.length === 1 ? 'Alumno inscripto' : 'Alumnos inscriptos'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="flex gap-4 items-center">
             <div className="relative w-full">
               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary text-xl">
