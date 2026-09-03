@@ -13,10 +13,10 @@ export default function Header() {
   }, []);
 
   return (
-    <nav className="bg-white/70 backdrop-blur-md border-b border-white/20 fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop h-24 transition-all duration-300">
+    <nav className="bg-white/70 backdrop-blur-md border-b border-white/20 fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 md:px-margin-desktop h-24 transition-all duration-300">
       <Link href="/home" className="flex items-center gap-sm">
         <Image src="/odicono.svg" alt="Organizador Docente" width={32} height={32} />
-        <span className="font-headline-md text-headline-md font-bold text-primary">Organizador Docente</span>
+        <span className="font-headline-md text-headline-md font-bold text-primary hidden md:inline">Organizador Docente</span>
       </Link>
 
       <div className="hidden md:flex items-center gap-lg ml-auto">

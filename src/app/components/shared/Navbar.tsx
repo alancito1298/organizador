@@ -85,18 +85,15 @@ export default function Navbar() {
   return (
     <>
     <header className="fixed top-0 left-0 right-0 w-full z-50 h-20 bg-surface-bg shadow-[0px_4px_10px_rgba(163,177,198,0.3)]">
-      <div className="h-full w-full flex justify-between items-center px-margin-page">
+      <div className="h-full w-full flex justify-between items-center px-4 sm:px-6 md:px-margin-desktop">
 
-        {/* Brand */}
-        <Link href="/home" className="flex items-center gap-4 group">
-          <div className="neumorphic-raised w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-transform">
-            <Image src="/odicono.svg" alt="Organizador Docente" width={30} height={30} priority />
+        {/* Brand: Logo a la izquierda (en mobile solo icono, en desktop icono + nombre) */}
+        <Link href="/home" className="flex items-center gap-3 group">
+          <div className="neumorphic-raised w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-transform shrink-0">
+            <Image src="/odicono.svg" alt="Organizador Docente" width={28} height={28} priority />
           </div>
           <span className="font-headline-md text-headline-md tracking-tight text-primary-container hidden md:block select-none uppercase">
             Organizador Docente
-          </span>
-          <span className="font-headline-md-mobile text-headline-md-mobile tracking-tight text-primary-container md:hidden select-none uppercase">
-            Org Docente
           </span>
         </Link>
 
@@ -184,13 +181,13 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile: hamburger */}
+        {/* Mobile: botón menú a la derecha */}
         <button
-          className="md:hidden neumorphic-raised w-9 h-9 rounded-xl flex items-center justify-center text-text-main"
+          className="md:hidden neumorphic-raised w-10 h-10 rounded-xl flex items-center justify-center text-text-main active:scale-95 transition-all"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Menú"
         >
-          <span className="material-symbols-outlined text-[22px]">
+          <span className="material-symbols-outlined text-[24px]">
             {menuOpen ? "close" : "menu"}
           </span>
         </button>
@@ -198,7 +195,7 @@ export default function Navbar() {
 
       {/* Mobile dropdown menu */}
       {menuOpen && (
-        <div className="md:hidden absolute top-20 left-0 right-0 bg-surface-bg shadow-[0px_8px_20px_rgba(163,177,198,0.4)] z-50 px-margin-page py-3 flex flex-col gap-1.5">
+        <div className="md:hidden absolute top-20 left-0 right-0 bg-surface-bg shadow-[0px_8px_20px_rgba(163,177,198,0.4)] z-50 px-4 sm:px-6 py-4 flex flex-col gap-2 animate-in fade-in duration-150">
           {NAV_LINKS.map((link) => {
             const isActive = pathname === link.href;
             if (link.isExternal) {
