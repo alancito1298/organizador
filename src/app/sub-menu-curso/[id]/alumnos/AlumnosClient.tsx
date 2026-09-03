@@ -118,6 +118,16 @@ export default function AlumnosClient() {
       setTrimestreActivo(1);
       localStorage.setItem('trimestreActivo', '1');
     }
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('abrirAsistencia') === 'true') {
+        setAsistenciaModalAbierto(true);
+      }
+      if (params.get('abrirConcepto') === 'true') {
+        setConceptoModalAbierto(true);
+      }
+    }
   }, []);
 
   const cambiarTrimestre = (t: number) => {
