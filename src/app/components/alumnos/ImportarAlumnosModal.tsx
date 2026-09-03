@@ -25,6 +25,53 @@ interface Props {
   modoInicial?: 'excel' | 'foto' | 'pegar';
 }
 
+/**
+ * Redimensiona y comprime la imagen del cliente usando Canvas
+ * Convierte fotos pesadas de teléfonos (5MB - 15MB) a un JPEG liviano (~250KB)
+ * evitando problemas de límites de payload (413) y timeouts en Vercel/móviles.
+ */
+function comprimirImagenParaIA(file: File, maxDimension = 1600, calidad = 0.82): Promise<{ base64: string; mimeType: string }> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('No se pudo leer la imagen seleccionada.'));
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Formato de imagen no soportado por el navegador.'));
+      img.onload = () => {
+        try {
+          let { width, height } = img;
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve({ base64: e.target?.result as string, mimeType: file.type || 'image/jpeg' });
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', calidad);
+          resolve({ base64: compressed, mimeType: 'image/jpeg' });
+        } catch {
+          resolve({ base64: e.target?.result as string, mimeType: file.type || 'image/jpeg' });
+        }
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function ImportarAlumnosModal({
   cursoId,
   abierto,
@@ -42,8 +89,6 @@ export default function ImportarAlumnosModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const fotoGaleriaInputRef = useRef<HTMLInputElement>(null);
-  const fotoCamaraInputRef = useRef<HTMLInputElement>(null);
 
   if (!abierto) return null;
 
@@ -93,34 +138,33 @@ export default function ImportarAlumnosModal({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      setErrorMsg('Por favor selecciona una imagen válida (.jpg, .png, .jpeg, .webp).');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = async (evt) => {
-      const base64 = evt.target?.result as string;
-      await procesarFotoConIA(base64, file.type);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const procesarFotoConIA = async (base64: string, mimeType: string) => {
     setAnalizandoFoto(true);
-    setErrorMsg(null);
-
     try {
+      // 1. Comprimir imagen en el cliente para reducir tamaño y garantizar formato JPEG compatible
+      const { base64, mimeType } = await comprimirImagenParaIA(file, 1600, 0.82);
+
+      // 2. Enviar a la API
       const res = await fetch('/api/alumnos/extraer-foto', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64: base64, mimeType }),
       });
 
-      const data = await res.json();
+      // 3. Parsear respuesta de manera segura contra respuestas HTML / errores no-JSON
+      const textResponse = await res.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(textResponse);
+      } catch {
+        throw new Error(
+          res.status === 413
+            ? 'La imagen es demasiado pesada. Por favor toma la foto un poco más de cerca o comprímela.'
+            : `El servidor devolvió un error inesperado (${res.status}).`
+        );
+      }
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'No se pudo leer la lista de la foto. Intenta con una imagen más nítida.');
+        throw new Error(data?.error || 'No se pudo leer la lista de la foto. Intenta con una imagen más nítida y bien iluminada.');
       }
 
       const lista: AlumnoImportado[] = (data.alumnos || []).map((a: any, idx: number) => {
@@ -130,7 +174,7 @@ export default function ImportarAlumnosModal({
         const valido = Boolean(nombre.length > 0 && apellido.length > 0);
 
         return {
-          idTemp: `foto_${idx}_${Math.random()}`,
+          idTemp: `foto_${idx}_${Math.random().toString(36).substring(2, 9)}`,
           nombre,
           apellido,
           dni: dni || undefined,
@@ -141,15 +185,17 @@ export default function ImportarAlumnosModal({
       });
 
       if (lista.length === 0) {
-        setErrorMsg('No se detectaron nombres en la fotografía.');
+        setErrorMsg('No se detectaron nombres legibles en la fotografía. Intenta enfocar los nombres con mayor claridad.');
       } else {
         setAlumnos(lista);
       }
     } catch (err: any) {
       console.error('Error al procesar foto:', err);
-      setErrorMsg(err.message || 'Error al procesar la foto con Inteligencia Artificial.');
+      setErrorMsg(err?.message || 'Error al procesar la foto con Inteligencia Artificial.');
     } finally {
       setAnalizandoFoto(false);
+      // Limpiar el input para permitir seleccionar la misma imagen si se desea
+      e.target.value = '';
     }
   };
 
@@ -191,7 +237,7 @@ export default function ImportarAlumnosModal({
     });
 
     if (colApellido !== -1 || colNombre !== -1 || colCompuesto !== -1) {
-      indiceInicio = 1; // La primera fila era encabezado
+      indiceInicio = 1;
     }
 
     for (let r = indiceInicio; r < rows.length; r++) {
@@ -229,7 +275,7 @@ export default function ImportarAlumnosModal({
           apellido = parts.slice(1).join(' ') || '';
         }
       } else {
-        // Asignación estándar de 2 columnas: Columna 1 (0) = Nombre, Columna 2 (1) = Apellido
+        // Asignación estándar de 2 columnas: Columna 1 = Nombre, Columna 2 = Apellido
         nombre = String(row[0] || '').trim();
         apellido = String(row[1] || '').trim();
       }
@@ -243,7 +289,7 @@ export default function ImportarAlumnosModal({
       const valido = Boolean(apellido.length > 0 && nombre.length > 0);
 
       resultado.push({
-        idTemp: `temp_${r}_${Math.random()}`,
+        idTemp: `temp_${r}_${Math.random().toString(36).substring(2, 9)}`,
         apellido,
         nombre,
         dni: dni || undefined,
@@ -346,8 +392,6 @@ export default function ImportarAlumnosModal({
     setTextoPegado('');
     setErrorMsg(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
-    if (fotoGaleriaInputRef.current) fotoGaleriaInputRef.current.value = '';
-    if (fotoCamaraInputRef.current) fotoCamaraInputRef.current.value = '';
   };
 
   return (
@@ -483,20 +527,20 @@ export default function ImportarAlumnosModal({
               {/* Modo 2: Cargar mediante Foto con IA */}
               {modoEntrada === 'foto' && (
                 <div className="space-y-4">
-                  {/* Inputs ocultos para Cámara y Galería */}
+                  {/* Inputs nativos controlados por <label> para evitar DOMException en Safari/iOS */}
                   <input
-                    ref={fotoCamaraInputRef}
+                    id="foto-camara-input"
                     type="file"
                     accept="image/*"
                     capture="environment"
-                    className="hidden"
+                    className="sr-only"
                     onChange={handleFotoUpload}
                   />
                   <input
-                    ref={fotoGaleriaInputRef}
+                    id="foto-galeria-input"
                     type="file"
                     accept="image/*"
-                    className="hidden"
+                    className="sr-only"
                     onChange={handleFotoUpload}
                   />
 
@@ -508,16 +552,15 @@ export default function ImportarAlumnosModal({
                       <div>
                         <h4 className="font-extrabold text-lg text-violet-950">Analizando foto con Inteligencia Artificial...</h4>
                         <p className="text-xs text-violet-700 mt-1">
-                          Leyendo la lista y reconociendo nombres y apellidos automáticamente.
+                          Optimizando imagen, leyendo la lista y reconociendo nombres y apellidos automáticamente.
                         </p>
                       </div>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Opción A: Sacar foto con la cámara del dispositivo */}
-                      <button
-                        type="button"
-                        onClick={() => fotoCamaraInputRef.current?.click()}
+                      <label
+                        htmlFor="foto-camara-input"
                         className="border-2 border-dashed border-violet-300 hover:border-violet-600 bg-violet-50/50 hover:bg-violet-50 rounded-3xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group"
                       >
                         <div className="w-14 h-14 rounded-2xl bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center text-violet-700 transition-colors">
@@ -529,12 +572,11 @@ export default function ImportarAlumnosModal({
                             Apunta y saca una foto clara de la nómina o papel
                           </p>
                         </div>
-                      </button>
+                      </label>
 
                       {/* Opción B: Subir imagen existente de la galería */}
-                      <button
-                        type="button"
-                        onClick={() => fotoGaleriaInputRef.current?.click()}
+                      <label
+                        htmlFor="foto-galeria-input"
                         className="border-2 border-dashed border-violet-300 hover:border-violet-600 bg-violet-50/50 hover:bg-violet-50 rounded-3xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group"
                       >
                         <div className="w-14 h-14 rounded-2xl bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center text-violet-700 transition-colors">
@@ -546,7 +588,7 @@ export default function ImportarAlumnosModal({
                             Sube una imagen o captura guardada en tu dispositivo
                           </p>
                         </div>
-                      </button>
+                      </label>
                     </div>
                   )}
 
@@ -557,7 +599,7 @@ export default function ImportarAlumnosModal({
                     </p>
                     <ul className="list-disc list-inside space-y-0.5 text-violet-700">
                       <li>Asegúrate de que haya buena iluminación y sin sombras sobre los nombres.</li>
-                      <li>Funciona tanto con listas impresas como escritas a mano en letra legible.</li>
+                      <li>Funciona tanto con listas impresas como escritas a mano en letra clara.</li>
                       <li>Antes de guardar, podrás revisar cada alumno en la vista previa y corregir lo que necesites.</li>
                     </ul>
                   </div>
