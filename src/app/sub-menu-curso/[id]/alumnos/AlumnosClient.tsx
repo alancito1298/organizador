@@ -11,7 +11,7 @@ import PerfilAlumnoModal from "@/app/components/alumnos/PerfilAlumnoModal";
 import ImportarAlumnosModal from "@/app/components/alumnos/ImportarAlumnosModal";
 import PasoAsistenciaModal from "@/app/components/alumnos/PasoAsistenciaModal";
 import PasoConceptoModal from "@/app/components/alumnos/PasoConceptoModal";
-import { FileSpreadsheet, Download, FileText, Camera } from "lucide-react";
+import { Upload, FileSpreadsheet, Download, FileText, Camera } from "lucide-react";
 import { exportarExcelAsistencias } from "@/app/utils/exportarExcelAsitencias";
 import { exportarExcelCalificaciones } from "@/app/utils/exportarExcelCalificaciones";
 import { exportarInformeCursoPdf } from "@/app/utils/exportarInformePdf";
@@ -594,58 +594,51 @@ export default function AlumnosClient() {
           </div>
         </section>
 
-        {/* ── Botones de Acción (Importar, Crear y Descargas) ── */}
+        {/* ── Botones de Acción (Importar, Crear, Planillas y Descargas) ── */}
         <section className="flex flex-col gap-3 mb-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap gap-2.5">
+          {/* En mobile: grid de 2 columnas. En desktop: barra horizontal flex */}
+          <div className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
+            <div className="contents sm:flex sm:flex-wrap sm:items-center sm:gap-2.5">
+              {/* Botón 1: Importar Alumnos Unificado (Excel, Foto o Texto) */}
               <button
                 onClick={() => {
                   setModoImportarInicial('excel');
                   setImportarAbierto(true);
                 }}
-                className="px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-emerald-700 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all"
+                className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-emerald-700 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
+                title="Importar alumnos con Excel, Foto con IA o Copiar y Pegar"
               >
-                <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-                Importar Excel
+                <Upload className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="truncate">Importar Alumnos</span>
               </button>
 
-              <button
-                onClick={() => {
-                  setModoImportarInicial('foto');
-                  setImportarAbierto(true);
-                }}
-                className="px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-indigo-700 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow-sm"
-                title="Escanear nómina escolar con una fotografía o cámara"
-              >
-                <Camera className="w-4 h-4 text-indigo-600" />
-                Cargar con Foto
-              </button>
-
+              {/* Botón 2: Nuevo Alumno */}
               <button
                 onClick={() => setModalAgregar(true)}
-                className="px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all"
+                className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
               >
-                <span className="material-symbols-outlined text-base">person_add</span>
-                Nuevo Alumno
+                <span className="material-symbols-outlined text-base shrink-0">person_add</span>
+                <span className="truncate">Nuevo Alumno</span>
               </button>
 
+              {/* Botón 3: Ver Planillas */}
               <Link
                 href={`/sub-menu-curso/${cursoId}/planilla`}
-                className="px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow-sm"
+                className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
               >
-                <span className="material-symbols-outlined text-base text-accent-violet">table_chart</span>
-                Ver Planillas
+                <span className="material-symbols-outlined text-base text-accent-violet shrink-0">table_chart</span>
+                <span className="truncate">Ver Planillas</span>
               </Link>
             </div>
 
-            {/* Botón Unificado de Descargas con Dropdown */}
-            <div className="relative">
+            {/* Botón 4: Descargas con Dropdown */}
+            <div className="relative w-full sm:w-auto">
               <button
                 onClick={() => setMenuDescargasAbierto(!menuDescargasAbierto)}
-                className="px-4 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-sm"
+                className="w-full sm:w-auto px-3.5 sm:px-4 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
                 title="Opciones de descarga y exportación"
               >
-                <Download className="w-4 h-4 text-accent-violet" />
+                <Download className="w-4 h-4 text-accent-violet shrink-0" />
                 <span>Descargas</span>
                 <span className={`material-symbols-outlined text-base transition-transform duration-200 ${menuDescargasAbierto ? 'rotate-180' : ''}`}>
                   expand_more
