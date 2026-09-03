@@ -781,15 +781,20 @@ export default function AlumnosClient() {
           </div>
         </section>
 
-        {/* ── HERO SECTION: 4 Tarjetas de Destacados (Se oculta al buscar) ── */}
+        {/* ── HERO SECTION: 4 Tarjetas de Destacados con tono diferenciado ── */}
         {!searchQuery.trim() && (
-          <section className="mb-10">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <div>
-                <h2 className="font-label-caps text-secondary uppercase tracking-wider font-bold">
-                  ⭐ Destacados del Curso
-                </h2>
-                <span className="text-xs text-secondary font-medium">Top Asistencias & Mejores Calificaciones</span>
+          <section className="mb-10 bg-gradient-to-b from-violet-100/35 via-purple-50/15 to-transparent p-4 sm:p-6 rounded-3xl border border-violet-200/50">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shadow-inner">
+                  <span className="material-symbols-outlined text-xl">hotel_class</span>
+                </div>
+                <div>
+                  <h2 className="font-extrabold text-sm sm:text-base text-violet-950 uppercase tracking-tight flex items-center gap-2">
+                    Destacados del Curso
+                  </h2>
+                  <span className="text-xs text-secondary font-medium">Top Asistencias y Mejores Calificaciones</span>
+                </div>
               </div>
             </div>
 
@@ -798,14 +803,14 @@ export default function AlumnosClient() {
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={`hero-load-${i}`}
-                    className="bg-surface-bg neumorphic-raised rounded-2xl p-6 flex flex-col justify-between gap-6 animate-pulse"
+                    className="bg-white/80 border border-violet-200/40 rounded-2xl p-6 flex flex-col justify-between gap-6 animate-pulse"
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-2">
                         <div className="h-4 bg-outline-variant/30 rounded w-28"></div>
                         <div className="h-4 bg-outline-variant/30 rounded w-36"></div>
                       </div>
-                      <div className="w-9 h-9 rounded-xl neumorphic-inset flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-xl bg-violet-100/50 flex items-center justify-center">
                         <div className="w-4 h-4 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
                       </div>
                     </div>
@@ -830,7 +835,7 @@ export default function AlumnosClient() {
                 ))}
               </div>
             ) : alumnos.length === 0 ? (
-              <div className="bg-surface-bg neumorphic-inset rounded-2xl p-6 text-center">
+              <div className="bg-white/60 border border-violet-200/50 rounded-2xl p-6 text-center">
                 <span className="material-symbols-outlined text-3xl text-secondary mb-1">person_search</span>
                 <p className="text-xs text-secondary italic">
                   Aún no hay alumnos inscriptos para calcular destacados de asistencia y notas.
@@ -838,45 +843,46 @@ export default function AlumnosClient() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Fila 1: Top 2 Asistencias */}
+                {/* Fila 1: Top 2 Asistencias (Tono Esmeralda / Menta suave) */}
                 {heroAlumnos.topAsistencias.map((alumno, idx) => (
                   <div
                     key={`hero-asist-${alumno.id}-${idx}`}
-                    className="bg-surface-bg neumorphic-raised rounded-2xl p-6 flex flex-col justify-between hover:scale-[1.01] transition-transform"
+                    className="bg-gradient-to-br from-emerald-50/90 via-teal-50/40 to-white rounded-2xl p-5 sm:p-6 flex flex-col justify-between border border-emerald-200/80 shadow-md shadow-emerald-950/5 hover:shadow-lg hover:scale-[1.01] transition-all"
                   >
                     <div>
                       <div className="flex justify-between items-start mb-4">
-                        <h3 className="font-headline-md text-on-surface uppercase leading-tight">
+                        <h3 className="font-headline-md text-emerald-950 uppercase leading-tight font-extrabold">
                           {alumno.nombre}<br />{alumno.apellido}
                         </h3>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full neumorphic-inset text-[11px] font-bold text-emerald-600">
-                          <span className="material-symbols-outlined text-sm">event_available</span> Top Asistencia
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/90 text-emerald-800 border border-emerald-300/60 text-[11px] font-bold shadow-sm">
+                          <span className="material-symbols-outlined text-sm text-emerald-600">event_available</span>
+                          Top Asistencia
                         </span>
                       </div>
 
-                      <div className="flex justify-between items-center mb-6 text-center">
+                      <div className="grid grid-cols-3 gap-2 py-3 px-2 rounded-xl bg-emerald-100/35 border border-emerald-200/50 mb-5 text-center">
                         <div className="flex flex-col items-center">
-                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                            Calificación<br />1er Trimestre
+                          <span className="text-[10px] text-emerald-800 uppercase font-bold leading-tight">
+                            Nota<br />1er Trim
                           </span>
-                          <span className="font-headline-md text-accent-violet font-bold mt-1">
-                            {alumno.primerTrimestre > 0 ? alumno.primerTrimestre : '-'}<span className="text-sm font-normal text-secondary">/10</span>
+                          <span className="font-extrabold text-base sm:text-lg text-emerald-950 mt-1">
+                            {alumno.primerTrimestre > 0 ? alumno.primerTrimestre : '-'}<span className="text-xs font-normal text-emerald-700">/10</span>
                           </span>
                         </div>
-                        <div className="flex flex-col items-center">
-                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                            Promedio de<br />asistencia
+                        <div className="flex flex-col items-center border-x border-emerald-200/60">
+                          <span className="text-[10px] text-emerald-800 uppercase font-bold leading-tight">
+                            Promedio<br />Asistencia
                           </span>
-                          <span className="font-headline-md text-accent-violet font-bold mt-1">
+                          <span className="font-extrabold text-base sm:text-lg text-emerald-600 mt-1">
                             {alumno.asistenciaPorcentaje}%
                           </span>
                         </div>
                         <div className="flex flex-col items-center">
-                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                            Calificación<br />Total
+                          <span className="text-[10px] text-emerald-800 uppercase font-bold leading-tight">
+                            Nota<br />Total
                           </span>
-                          <span className="font-headline-md text-accent-violet font-bold mt-1">
-                            {alumno.promedioGeneral > 0 ? alumno.promedioGeneral : '-'}<span className="text-sm font-normal text-secondary">/10</span>
+                          <span className="font-extrabold text-base sm:text-lg text-emerald-950 mt-1">
+                            {alumno.promedioGeneral > 0 ? alumno.promedioGeneral : '-'}<span className="text-xs font-normal text-emerald-700">/10</span>
                           </span>
                         </div>
                       </div>
@@ -884,52 +890,53 @@ export default function AlumnosClient() {
 
                     <button
                       onClick={() => abrirPerfil(alumno.alumnoCursoId)}
-                      className="w-full py-3 rounded-full bg-surface-bg neumorphic-raised text-accent-violet font-label-caps uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all font-bold text-xs"
+                      className="w-full py-2.5 rounded-xl bg-white hover:bg-emerald-700 hover:text-white text-emerald-800 border border-emerald-300/80 font-bold text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all"
                     >
-                      VER ALUMNO
+                      Ver Alumno
                     </button>
                   </div>
                 ))}
 
-                {/* Fila 2: Top 2 Calificaciones */}
+                {/* Fila 2: Top 2 Calificaciones (Tono Violeta / Púrpura suave) */}
                 {heroAlumnos.topCalificaciones.map((alumno, idx) => (
                   <div
                     key={`hero-notas-${alumno.id}-${idx}`}
-                    className="bg-surface-bg neumorphic-raised rounded-2xl p-6 flex flex-col justify-between hover:scale-[1.01] transition-transform"
+                    className="bg-gradient-to-br from-violet-50/90 via-purple-50/40 to-white rounded-2xl p-5 sm:p-6 flex flex-col justify-between border border-violet-200/80 shadow-md shadow-violet-950/5 hover:shadow-lg hover:scale-[1.01] transition-all"
                   >
                     <div>
                       <div className="flex justify-between items-start mb-4">
-                        <h3 className="font-headline-md text-on-surface uppercase leading-tight">
+                        <h3 className="font-headline-md text-violet-950 uppercase leading-tight font-extrabold">
                           {alumno.nombre}<br />{alumno.apellido}
                         </h3>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full neumorphic-inset text-[11px] font-bold text-accent-violet">
-                          <span className="material-symbols-outlined text-sm">workspace_premium</span> Top Notas
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-100/90 text-violet-800 border border-violet-300/60 text-[11px] font-bold shadow-sm">
+                          <span className="material-symbols-outlined text-sm text-violet-600">workspace_premium</span>
+                          Top Notas
                         </span>
                       </div>
 
-                      <div className="flex justify-between items-center mb-6 text-center">
+                      <div className="grid grid-cols-3 gap-2 py-3 px-2 rounded-xl bg-violet-100/35 border border-violet-200/50 mb-5 text-center">
                         <div className="flex flex-col items-center">
-                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                            Calificación<br />1er Trimestre
+                          <span className="text-[10px] text-violet-800 uppercase font-bold leading-tight">
+                            Nota<br />1er Trim
                           </span>
-                          <span className="font-headline-md text-accent-violet font-bold mt-1">
-                            {alumno.primerTrimestre > 0 ? alumno.primerTrimestre : '-'}<span className="text-sm font-normal text-secondary">/10</span>
+                          <span className="font-extrabold text-base sm:text-lg text-violet-950 mt-1">
+                            {alumno.primerTrimestre > 0 ? alumno.primerTrimestre : '-'}<span className="text-xs font-normal text-violet-700">/10</span>
                           </span>
                         </div>
-                        <div className="flex flex-col items-center">
-                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                            Promedio de<br />asistencia
+                        <div className="flex flex-col items-center border-x border-violet-200/60">
+                          <span className="text-[10px] text-violet-800 uppercase font-bold leading-tight">
+                            Promedio<br />Asistencia
                           </span>
-                          <span className="font-headline-md text-accent-violet font-bold mt-1">
+                          <span className="font-extrabold text-base sm:text-lg text-violet-600 mt-1">
                             {alumno.asistenciaPorcentaje}%
                           </span>
                         </div>
                         <div className="flex flex-col items-center">
-                          <span className="font-body-sm text-secondary text-[10px] uppercase font-bold">
-                            Calificación<br />Total
+                          <span className="text-[10px] text-violet-800 uppercase font-bold leading-tight">
+                            Nota<br />Total
                           </span>
-                          <span className="font-headline-md text-accent-violet font-bold mt-1">
-                            {alumno.promedioGeneral > 0 ? alumno.promedioGeneral : '-'}<span className="text-sm font-normal text-secondary">/10</span>
+                          <span className="font-extrabold text-base sm:text-lg text-violet-950 mt-1">
+                            {alumno.promedioGeneral > 0 ? alumno.promedioGeneral : '-'}<span className="text-xs font-normal text-violet-700">/10</span>
                           </span>
                         </div>
                       </div>
@@ -937,9 +944,9 @@ export default function AlumnosClient() {
 
                     <button
                       onClick={() => abrirPerfil(alumno.alumnoCursoId)}
-                      className="w-full py-3 rounded-full bg-surface-bg neumorphic-raised text-accent-violet font-label-caps uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all font-bold text-xs"
+                      className="w-full py-2.5 rounded-xl bg-white hover:bg-violet-700 hover:text-white text-violet-900 border border-violet-300/80 font-bold text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all"
                     >
-                      VER ALUMNO
+                      Ver Alumno
                     </button>
                   </div>
                 ))}
