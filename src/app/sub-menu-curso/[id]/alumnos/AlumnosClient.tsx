@@ -15,6 +15,7 @@ import { exportarExcelAsistencias } from "@/app/utils/exportarExcelAsitencias";
 import { exportarExcelCalificaciones } from "@/app/utils/exportarExcelCalificaciones";
 import { exportarInformeCursoPdf } from "@/app/utils/exportarInformePdf";
 import { getToken } from "@/lib/token";
+import SubMenuCursoNav from "@/app/components/shared/SubMenuCursoNav";
 import type { Alumno, AlumnoConStats } from "@/app/types/alumnos";
 export type { Alumno, AlumnoConStats };
 
@@ -592,7 +593,16 @@ export default function AlumnosClient() {
           </div>
         </section>
 
-        {/* ── Botones de Acción (Importar, Crear y Descargas) ── */}
+        {/* ── Sub-Navegación entre Secciones del Curso ── */}
+        <SubMenuCursoNav
+          cursoId={cursoId}
+          seccionActual="alumnos"
+          materia={cursoInfo?.materia}
+          escuela={cursoInfo?.escuela}
+          anio={cursoInfo?.anio}
+        />
+
+        {/* ── Botones de Acción (Importar, Crear, Planilla y Descargas) ── */}
         <section className="flex flex-col gap-3 mb-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap gap-2.5">
@@ -611,6 +621,14 @@ export default function AlumnosClient() {
                 <span className="material-symbols-outlined text-base">person_add</span>
                 Nuevo Alumno
               </button>
+
+              <a
+                href={`/sub-menu-curso/${cursoId}/planilla`}
+                className="px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-violet-800 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all"
+              >
+                <span className="material-symbols-outlined text-base text-violet-600">table_chart</span>
+                Ver Planillas Trimestrales
+              </a>
             </div>
 
             {/* Botón Unificado de Descargas con Dropdown */}

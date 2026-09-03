@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import Cargando from '../shared/Cargando';
+import SubMenuCursoNav from '../shared/SubMenuCursoNav';
 
 const API =
   process.env.NEXT_PUBLIC_API_URL ??
@@ -803,11 +804,18 @@ Cargando asistencias..."
     p-1
     bg-violet-100
     min-h-screen
-  
     m-0
-  
-    
+    pt-24
     ">
+      <div className="max-w-7xl mx-auto px-4">
+        <SubMenuCursoNav
+          cursoId={cursoId}
+          seccionActual="asistencia"
+          materia={curso?.materia}
+          escuela={curso?.escuela}
+          anio={curso?.anio}
+        />
+      </div>
 
       {/* TRIMESTRES */}
 
