@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import Navbar from "@/app/components/shared/Navbar";
 import BottomNav from "@/app/components/shared/BottomNav";
 import Footer from "@/app/components/shared/Footer";
@@ -10,12 +11,11 @@ import PerfilAlumnoModal from "@/app/components/alumnos/PerfilAlumnoModal";
 import ImportarAlumnosModal from "@/app/components/alumnos/ImportarAlumnosModal";
 import PasoAsistenciaModal from "@/app/components/alumnos/PasoAsistenciaModal";
 import PasoConceptoModal from "@/app/components/alumnos/PasoConceptoModal";
-import { FileSpreadsheet, Download, FileText } from "lucide-react";
+import { FileSpreadsheet, Download, FileText, Camera } from "lucide-react";
 import { exportarExcelAsistencias } from "@/app/utils/exportarExcelAsitencias";
 import { exportarExcelCalificaciones } from "@/app/utils/exportarExcelCalificaciones";
 import { exportarInformeCursoPdf } from "@/app/utils/exportarInformePdf";
 import { getToken } from "@/lib/token";
-import SubMenuCursoNav from "@/app/components/shared/SubMenuCursoNav";
 import type { Alumno, AlumnoConStats } from "@/app/types/alumnos";
 export type { Alumno, AlumnoConStats };
 
@@ -70,6 +70,7 @@ export default function AlumnosClient() {
   const [eliminandoId, setEliminandoId] = useState<number | null>(null);
   const [perfilAbierto, setPerfilAbierto] = useState(false);
   const [importarAbierto, setImportarAbierto] = useState(false);
+  const [modoImportarInicial, setModoImportarInicial] = useState<'excel' | 'foto' | 'pegar'>('excel');
   const [asistenciaModalAbierto, setAsistenciaModalAbierto] = useState(false);
   const [conceptoModalAbierto, setConceptoModalAbierto] = useState(false);
 
@@ -593,25 +594,31 @@ export default function AlumnosClient() {
           </div>
         </section>
 
-        {/* ── Sub-Navegación entre Secciones del Curso ── */}
-        <SubMenuCursoNav
-          cursoId={cursoId}
-          seccionActual="alumnos"
-          materia={cursoInfo?.materia}
-          escuela={cursoInfo?.escuela}
-          anio={cursoInfo?.anio}
-        />
-
-        {/* ── Botones de Acción (Importar, Crear, Planilla y Descargas) ── */}
+        {/* ── Botones de Acción (Importar, Crear y Descargas) ── */}
         <section className="flex flex-col gap-3 mb-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap gap-2.5">
               <button
-                onClick={() => setImportarAbierto(true)}
+                onClick={() => {
+                  setModoImportarInicial('excel');
+                  setImportarAbierto(true);
+                }}
                 className="px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-emerald-700 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all"
               >
                 <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
                 Importar Excel
+              </button>
+
+              <button
+                onClick={() => {
+                  setModoImportarInicial('foto');
+                  setImportarAbierto(true);
+                }}
+                className="px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-indigo-700 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow-sm"
+                title="Escanear nómina escolar con una fotografía o cámara"
+              >
+                <Camera className="w-4 h-4 text-indigo-600" />
+                Cargar con Foto
               </button>
 
               <button
@@ -622,13 +629,13 @@ export default function AlumnosClient() {
                 Nuevo Alumno
               </button>
 
-              <a
+              <Link
                 href={`/sub-menu-curso/${cursoId}/planilla`}
-                className="px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-violet-800 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all"
+                className="px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow-sm"
               >
-                <span className="material-symbols-outlined text-base text-violet-600">table_chart</span>
-                Ver Planillas Trimestrales
-              </a>
+                <span className="material-symbols-outlined text-base text-accent-violet">table_chart</span>
+                Ver Planillas
+              </Link>
             </div>
 
             {/* Botón Unificado de Descargas con Dropdown */}
@@ -654,10 +661,26 @@ export default function AlumnosClient() {
                   />
                   <div className="absolute right-0 sm:right-0 max-sm:left-1/2 max-sm:-translate-x-1/2 mt-2 w-72 max-w-[calc(100vw-32px)] bg-surface-bg neumorphic-raised rounded-2xl p-2.5 z-30 flex flex-col gap-1.5 border border-white/60 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
                     <span className="font-label-caps text-secondary text-[10px] uppercase font-bold px-3 pt-1.5 pb-1">
-                      Elegir formato de descarga
+                      Elegir formato o planilla
                     </span>
 
-                    {/* Opción 1: Asistencias Excel */}
+                    {/* Opción 1: Planilla Trimestral en Pantalla */}
+                    <a
+                      href={`/sub-menu-curso/${cursoId}/planilla`}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-violet-50 text-left transition-colors group"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-violet-100/70 neumorphic-inset flex items-center justify-center shrink-0 text-violet-700 group-hover:scale-105 transition-transform">
+                        <span className="material-symbols-outlined text-lg">table_chart</span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold text-violet-950 truncate">
+                          Planilla Trimestral
+                        </p>
+                        <p className="text-[10px] text-secondary truncate">Ver en pantalla las 3 planillas</p>
+                      </div>
+                    </a>
+
+                    {/* Opción 2: Asistencias Excel */}
                     <button
                       onClick={() => {
                         setMenuDescargasAbierto(false);
@@ -677,7 +700,7 @@ export default function AlumnosClient() {
                       </div>
                     </button>
 
-                    {/* Opción 2: Calificaciones Excel */}
+                    {/* Opción 3: Calificaciones Excel */}
                     <button
                       onClick={() => {
                         setMenuDescargasAbierto(false);
@@ -697,7 +720,7 @@ export default function AlumnosClient() {
                       </div>
                     </button>
 
-                    {/* Opción 3: Informe PDF */}
+                    {/* Opción 4: Informe PDF */}
                     <button
                       onClick={() => {
                         setMenuDescargasAbierto(false);
@@ -1385,10 +1408,11 @@ export default function AlumnosClient() {
         onCerrar={() => setPerfilAbierto(false)}
       />
 
-      {/* ── Modal Importar Alumnos desde Excel / CSV ── */}
+      {/* ── Modal Importar Alumnos desde Excel / Foto / CSV ── */}
       <ImportarAlumnosModal
         abierto={importarAbierto}
         cursoId={cursoId}
+        modoInicial={modoImportarInicial}
         onCerrar={() => setImportarAbierto(false)}
         onImportados={fetchAlumnos}
       />

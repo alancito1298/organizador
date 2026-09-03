@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
-import { Upload, FileSpreadsheet, Download, Check, X, AlertCircle } from 'lucide-react';
+import { Upload, FileSpreadsheet, Download, Check, X, AlertCircle, Camera, Sparkles, Image as ImageIcon } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 
@@ -22,6 +22,7 @@ interface Props {
   onCerrar: () => void;
   onImportacionExitosa?: () => void;
   onImportados?: () => void;
+  modoInicial?: 'excel' | 'foto' | 'pegar';
 }
 
 export default function ImportarAlumnosModal({
@@ -30,14 +31,19 @@ export default function ImportarAlumnosModal({
   onCerrar,
   onImportacionExitosa,
   onImportados,
+  modoInicial = 'excel',
 }: Props) {
   const [alumnos, setAlumnos] = useState<AlumnoImportado[]>([]);
-  const [modoPegar, setModoPegar] = useState(false);
+  const [modoEntrada, setModoEntrada] = useState<'excel' | 'foto' | 'pegar'>(modoInicial);
   const [textoPegado, setTextoPegado] = useState('');
   const [procesando, setProcesando] = useState(false);
+  const [analizandoFoto, setAnalizandoFoto] = useState(false);
   const [progreso, setProgreso] = useState({ actual: 0, total: 0 });
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fotoGaleriaInputRef = useRef<HTMLInputElement>(null);
+  const fotoCamaraInputRef = useRef<HTMLInputElement>(null);
 
   if (!abierto) return null;
 
@@ -79,6 +85,72 @@ export default function ImportarAlumnosModal({
       }
     };
     reader.readAsBinaryString(file);
+  };
+
+  // Procesar imagen / foto de nómina con Inteligencia Artificial
+  const handleFotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorMsg(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setErrorMsg('Por favor selecciona una imagen válida (.jpg, .png, .jpeg, .webp).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      const base64 = evt.target?.result as string;
+      await procesarFotoConIA(base64, file.type);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const procesarFotoConIA = async (base64: string, mimeType: string) => {
+    setAnalizandoFoto(true);
+    setErrorMsg(null);
+
+    try {
+      const res = await fetch('/api/alumnos/extraer-foto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64, mimeType }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'No se pudo leer la lista de la foto. Intenta con una imagen más nítida.');
+      }
+
+      const lista: AlumnoImportado[] = (data.alumnos || []).map((a: any, idx: number) => {
+        const nombre = (a.nombre || '').trim();
+        const apellido = (a.apellido || '').trim();
+        const dni = (a.dni || '').trim();
+        const valido = Boolean(nombre.length > 0 && apellido.length > 0);
+
+        return {
+          idTemp: `foto_${idx}_${Math.random()}`,
+          nombre,
+          apellido,
+          dni: dni || undefined,
+          contacto: undefined,
+          valido,
+          seleccionado: valido,
+        };
+      });
+
+      if (lista.length === 0) {
+        setErrorMsg('No se detectaron nombres en la fotografía.');
+      } else {
+        setAlumnos(lista);
+      }
+    } catch (err: any) {
+      console.error('Error al procesar foto:', err);
+      setErrorMsg(err.message || 'Error al procesar la foto con Inteligencia Artificial.');
+    } finally {
+      setAnalizandoFoto(false);
+    }
   };
 
   // Procesar texto pegado desde portapapeles
@@ -185,7 +257,6 @@ export default function ImportarAlumnosModal({
       setErrorMsg('No se detectaron alumnos válidos en las filas leídas.');
     } else {
       setAlumnos(resultado);
-      setModoPegar(false);
     }
   };
 
@@ -275,6 +346,8 @@ export default function ImportarAlumnosModal({
     setTextoPegado('');
     setErrorMsg(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
+    if (fotoGaleriaInputRef.current) fotoGaleriaInputRef.current.value = '';
+    if (fotoCamaraInputRef.current) fotoCamaraInputRef.current.value = '';
   };
 
   return (
@@ -284,18 +357,32 @@ export default function ImportarAlumnosModal({
         <div className="bg-violet-950 text-white p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-violet-800 flex items-center justify-center">
-              <FileSpreadsheet className="w-5 h-5 text-violet-200" />
+              {modoEntrada === 'foto' ? (
+                <Camera className="w-5 h-5 text-violet-200" />
+              ) : (
+                <FileSpreadsheet className="w-5 h-5 text-violet-200" />
+              )}
             </div>
             <div>
-              <h3 className="text-xl font-bold">Importar Alumnos desde Excel / CSV</h3>
+              <h3 className="text-xl font-bold">
+                {alumnos.length > 0
+                  ? 'Vista Previa de Alumnos'
+                  : modoEntrada === 'foto'
+                  ? 'Cargar Alumnos mediante Foto'
+                  : 'Importar Alumnos desde Excel / CSV'}
+              </h3>
               <p className="text-xs text-violet-300">
-                {alumnos.length > 0 ? 'Paso 2: Vista previa y verificación de datos' : 'Carga nóminas (Columna 1: Nombre, Columna 2: Apellido)'}
+                {alumnos.length > 0
+                  ? 'Paso 2: Verifica que los datos estén bien asignados antes de guardar'
+                  : modoEntrada === 'foto'
+                  ? 'Saca una foto o sube una imagen de la nómina escolar'
+                  : 'Carga nóminas (Columna 1: Nombre, Columna 2: Apellido)'}
               </p>
             </div>
           </div>
           <button
             onClick={onCerrar}
-            disabled={procesando}
+            disabled={procesando || analizandoFoto}
             className="text-violet-300 hover:text-white p-2 rounded-full hover:bg-violet-900 transition-colors"
           >
             <X className="w-6 h-6" />
@@ -312,36 +399,176 @@ export default function ImportarAlumnosModal({
           )}
 
           {alumnos.length === 0 ? (
-            <div className="space-y-6">
-              {/* Zona de Subida */}
-              {!modoPegar ? (
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-violet-300 hover:border-violet-600 bg-violet-50/50 hover:bg-violet-50 rounded-3xl p-8 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group"
+            <div className="space-y-5">
+              {/* Selector de Modo de Entrada (Excel / Foto / Pegar) */}
+              <div className="flex items-center bg-violet-50 p-1.5 rounded-2xl gap-1">
+                <button
+                  type="button"
+                  onClick={() => setModoEntrada('excel')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    modoEntrada === 'excel'
+                      ? 'bg-violet-950 text-white shadow-sm'
+                      : 'text-violet-700 hover:bg-white/60'
+                  }`}
                 >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".xlsx, .xls, .csv"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                  />
-                  <div className="w-16 h-16 rounded-2xl bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center text-violet-700 transition-colors">
-                    <Upload className="w-8 h-8" />
+                  <FileSpreadsheet className="w-4 h-4" />
+                  Archivo Excel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModoEntrada('foto')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    modoEntrada === 'foto'
+                      ? 'bg-violet-950 text-white shadow-sm'
+                      : 'text-violet-700 hover:bg-white/60'
+                  }`}
+                >
+                  <Camera className="w-4 h-4" />
+                  Foto / Escanear (IA)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModoEntrada('pegar')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    modoEntrada === 'pegar'
+                      ? 'bg-violet-950 text-white shadow-sm'
+                      : 'text-violet-700 hover:bg-white/60'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Copiar y Pegar
+                </button>
+              </div>
+
+              {/* Modo 1: Subir Archivo Excel */}
+              {modoEntrada === 'excel' && (
+                <div className="space-y-4">
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="border-2 border-dashed border-violet-300 hover:border-violet-600 bg-violet-50/50 hover:bg-violet-50 rounded-3xl p-8 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group"
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".xlsx, .xls, .csv"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                    />
+                    <div className="w-16 h-16 rounded-2xl bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center text-violet-700 transition-colors">
+                      <Upload className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-violet-950 text-lg">
+                        Arrastrá tu archivo Excel o hacé clic para buscar
+                      </p>
+                      <p className="text-xs text-violet-600 mt-1">
+                        Formatos: .xlsx, .xls, .csv (2 columnas estándar: 1ª Nombre, 2ª Apellido. Sin necesidad de formato tabla)
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-violet-950 text-lg">
-                      Arrastrá tu archivo Excel o hacé clic para buscar
-                    </p>
-                    <p className="text-xs text-violet-600 mt-1">
-                      Formatos soportados: .xlsx, .xls, .csv (2 columnas estándar: 1ª Nombre, 2ª Apellido. Sin necesidad de formato de tabla)
-                    </p>
+
+                  <div className="flex justify-end pt-1">
+                    <button
+                      type="button"
+                      onClick={descargarPlantilla}
+                      className="inline-flex items-center gap-2 text-xs font-semibold text-violet-800 bg-violet-100 hover:bg-violet-200 px-3.5 py-2 rounded-xl transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      Descargar Plantilla de Ejemplo (2 Columnas) (.xlsx)
+                    </button>
                   </div>
                 </div>
-              ) : (
+              )}
+
+              {/* Modo 2: Cargar mediante Foto con IA */}
+              {modoEntrada === 'foto' && (
+                <div className="space-y-4">
+                  {/* Inputs ocultos para Cámara y Galería */}
+                  <input
+                    ref={fotoCamaraInputRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={handleFotoUpload}
+                  />
+                  <input
+                    ref={fotoGaleriaInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFotoUpload}
+                  />
+
+                  {analizandoFoto ? (
+                    <div className="border-2 border-violet-300 bg-violet-50/70 rounded-3xl p-12 text-center flex flex-col items-center justify-center gap-4 animate-pulse">
+                      <div className="w-16 h-16 rounded-2xl bg-violet-200 flex items-center justify-center text-accent-violet animate-bounce">
+                        <Sparkles className="w-8 h-8 text-violet-700" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-lg text-violet-950">Analizando foto con Inteligencia Artificial...</h4>
+                        <p className="text-xs text-violet-700 mt-1">
+                          Leyendo la lista y reconociendo nombres y apellidos automáticamente.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Opción A: Sacar foto con la cámara del dispositivo */}
+                      <button
+                        type="button"
+                        onClick={() => fotoCamaraInputRef.current?.click()}
+                        className="border-2 border-dashed border-violet-300 hover:border-violet-600 bg-violet-50/50 hover:bg-violet-50 rounded-3xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group"
+                      >
+                        <div className="w-14 h-14 rounded-2xl bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center text-violet-700 transition-colors">
+                          <Camera className="w-7 h-7" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-violet-950 text-base">Tomar Foto con la Cámara</p>
+                          <p className="text-xs text-violet-600 mt-0.5">
+                            Apunta y saca una foto clara de la nómina o papel
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* Opción B: Subir imagen existente de la galería */}
+                      <button
+                        type="button"
+                        onClick={() => fotoGaleriaInputRef.current?.click()}
+                        className="border-2 border-dashed border-violet-300 hover:border-violet-600 bg-violet-50/50 hover:bg-violet-50 rounded-3xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 group"
+                      >
+                        <div className="w-14 h-14 rounded-2xl bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center text-violet-700 transition-colors">
+                          <ImageIcon className="w-7 h-7" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-violet-950 text-base">Elegir de la Galería / Archivos</p>
+                          <p className="text-xs text-violet-600 mt-0.5">
+                            Sube una imagen o captura guardada en tu dispositivo
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="bg-violet-50/60 p-4 rounded-2xl border border-violet-100 text-xs text-violet-800 space-y-1">
+                    <p className="font-bold flex items-center gap-1.5 text-violet-950">
+                      <Sparkles className="w-4 h-4 text-violet-600" />
+                      Consejos para una foto óptima:
+                    </p>
+                    <ul className="list-disc list-inside space-y-0.5 text-violet-700">
+                      <li>Asegúrate de que haya buena iluminación y sin sombras sobre los nombres.</li>
+                      <li>Funciona tanto con listas impresas como escritas a mano en letra legible.</li>
+                      <li>Antes de guardar, podrás revisar cada alumno en la vista previa y corregir lo que necesites.</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* Modo 3: Copiar y Pegar Texto */}
+              {modoEntrada === 'pegar' && (
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-violet-950">
-                    Pegá las filas copiadas de tu planilla de Excel (Columna 1: Nombre, Columna 2: Apellido):
+                    Pegá las filas copiadas de tu planilla o texto (Columna 1: Nombre, Columna 2: Apellido):
                   </label>
                   <textarea
                     rows={6}
@@ -358,26 +585,6 @@ export default function ImportarAlumnosModal({
                   </button>
                 </div>
               )}
-
-              {/* Botones de acción secundaria */}
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setModoPegar(!modoPegar)}
-                  className="text-sm font-medium text-violet-700 hover:text-violet-900 hover:underline"
-                >
-                  {modoPegar ? '📁 Cambiar a subir archivo Excel' : '📋 O pegar texto / columnas directamente'}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={descargarPlantilla}
-                  className="inline-flex items-center gap-2 text-xs font-semibold text-violet-800 bg-violet-100 hover:bg-violet-200 px-3.5 py-2 rounded-xl transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  Descargar Plantilla de Ejemplo (2 Columnas) (.xlsx)
-                </button>
-              </div>
             </div>
           ) : (
             <div className="space-y-4">
@@ -387,7 +594,7 @@ export default function ImportarAlumnosModal({
                 <div>
                   <span className="font-bold block text-sm text-amber-950 mb-0.5">👁️ Vista Previa de Verificación</span>
                   <span>
-                    Revisá que las columnas de <strong>Nombre</strong> y <strong>Apellido</strong> se hayan leído correctamente. Podés editar cualquier dato manualmente o desmarcar alumnos. Si los datos están bien, presioná <strong>Aceptar e Importar</strong>. Si no son correctos, hacé clic en <strong>Descartar</strong>.
+                    Revisa que las columnas de <strong>Nombre</strong> y <strong>Apellido</strong> se hayan extraído correctamente. Puedes corregir cualquier dato directamente en la tabla. Si los datos están bien, presiona <strong>Aceptar e Importar</strong>. Si prefieres reintentar, haz clic en <strong>Descartar</strong>.
                   </span>
                 </div>
               </div>
@@ -396,7 +603,7 @@ export default function ImportarAlumnosModal({
                 <div>
                   <h4 className="font-bold text-violet-950">Estudiantes Detectados ({alumnos.length})</h4>
                   <p className="text-xs text-gray-500">
-                    {alumnos.filter((a) => a.seleccionado && a.valido).length} listos para importar
+                    {alumnos.filter((a) => a.seleccionado && a.valido).length} listos para importar al curso
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -503,7 +710,7 @@ export default function ImportarAlumnosModal({
             <button
               type="button"
               onClick={onCerrar}
-              disabled={procesando}
+              disabled={procesando || analizandoFoto}
               className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:text-gray-800 transition-colors"
             >
               Cancelar

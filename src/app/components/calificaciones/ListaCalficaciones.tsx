@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ListPlus, Download, FileText } from "lucide-react";
 import Cargando from "../shared/Cargando";
-import SubMenuCursoNav from "../shared/SubMenuCursoNav";
 import { exportarExcelCalificaciones } from '../../utils/exportarExcelCalificaciones';
 import { exportarInformeCursoPdf } from '../../utils/exportarInformePdf';
 import { enqueueSyncAction } from '@/app/utils/offlineSync';
@@ -307,17 +306,7 @@ export default function ListaCalificaciones() {
     bg-violet-100
     min-h-screen
     m-0
-    pt-24
   ">
-      <div className="max-w-7xl mx-auto px-4">
-        <SubMenuCursoNav
-          cursoId={cursoId}
-          seccionActual="calificaciones"
-          materia={curso?.materia}
-          escuela={curso?.escuela}
-          anio={curso?.anio}
-        />
-      </div>
 
       {/* TABLA — mismo patrón que AsistenciasTabla */}
       <div className="w-screen max-w-screen overflow-x-scroll overflow-y-hidden ">

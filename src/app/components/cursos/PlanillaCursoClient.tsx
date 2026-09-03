@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/shared/Navbar';
 import BottomNav from '@/app/components/shared/BottomNav';
 import Footer from '@/app/components/shared/Footer';
-import SubMenuCursoNav from '@/app/components/shared/SubMenuCursoNav';
+import Link from 'next/link';
 import PerfilAlumnoModal from '@/app/components/alumnos/PerfilAlumnoModal';
 import { usePerfilAlumno } from '@/app/hooks/usePerfilAlumno';
 import { getToken } from '@/lib/token';
@@ -421,14 +421,15 @@ export default function PlanillaCursoClient() {
           </p>
         </section>
 
-        {/* Sub-Navegación del Curso */}
-        <SubMenuCursoNav
-          cursoId={cursoId}
-          seccionActual="planilla"
-          materia={cursoInfo?.materia}
-          escuela={cursoInfo?.escuela}
-          anio={cursoInfo?.anio}
-        />
+        <div className="mb-4">
+          <Link
+            href={`/sub-menu-curso/${cursoId}/alumnos`}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-surface-bg neumorphic-raised text-accent-violet text-xs font-bold hover:scale-105 active:scale-95 transition-all w-fit shadow-sm"
+          >
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            Volver a Alumnos
+          </Link>
+        </div>
 
         {/* Pestañas de Selector de Trimestre */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6 bg-surface-bg neumorphic-raised p-2 rounded-2xl">
