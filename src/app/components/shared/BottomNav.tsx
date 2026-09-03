@@ -116,6 +116,17 @@ const BottomNav = () => {
           <span className="sr-only">Home</span>
         </Link>
 
+        {/* Asistente Pedagógico IA */}
+        <button
+          aria-label="Asistente Pedagógico IA"
+          onClick={() => window.dispatchEvent(new Event('toggleChatbotIA'))}
+          className="relative flex flex-col items-center justify-center text-primary p-2 hover:scale-110 active:scale-95 transition-all focus:outline-none"
+          title="Asistente Pedagógico IA"
+        >
+          <span className="text-xl leading-none select-none">🤖</span>
+          <span className="sr-only">Asistente IA</span>
+        </button>
+
         {/* Notifications */}
         <button
           aria-label="Notifications"

@@ -89,6 +89,17 @@ export default function ChatbotIA() {
   };
 
   useEffect(() => {
+    const handleAbrir = () => setAbierto(true);
+    const handleToggle = () => setAbierto((prev) => !prev);
+    window.addEventListener('abrirChatbotIA', handleAbrir);
+    window.addEventListener('toggleChatbotIA', handleToggle);
+    return () => {
+      window.removeEventListener('abrirChatbotIA', handleAbrir);
+      window.removeEventListener('toggleChatbotIA', handleToggle);
+    };
+  }, []);
+
+  useEffect(() => {
     if (abierto) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
@@ -169,16 +180,16 @@ export default function ChatbotIA() {
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 font-sans">
-      {/* BOTÓN FLOTANTE */}
+    <div className="fixed bottom-4 sm:bottom-6 right-1/2 translate-x-1/2 sm:translate-x-0 sm:right-6 z-50 font-sans">
+      {/* BOTÓN FLOTANTE (Oculto en mobile porque se accede directamente desde BottomNav) */}
       {!abierto && (
         <button
           onClick={() => setAbierto(true)}
-          className="bg-primary hover:bg-primary/90 text-white p-3.5 sm:px-4 sm:py-3 rounded-full shadow-2xl flex items-center gap-2 transition-all duration-300 transform hover:scale-105 border-2 border-white/30"
+          className="hidden md:flex bg-primary hover:bg-primary/90 text-white p-3.5 sm:px-4 sm:py-3 rounded-full shadow-2xl items-center gap-2 transition-all duration-300 transform hover:scale-105 border-2 border-white/30"
           aria-label="Abrir Asistente Pedagógico IA"
         >
           <span className="text-2xl animate-bounce">🤖</span>
-          <span className="hidden sm:inline font-bold text-sm">Asistente IA</span>
+          <span className="inline font-bold text-sm">Asistente IA</span>
           <span className="bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
             PLUS
           </span>
