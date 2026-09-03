@@ -317,13 +317,13 @@ export default function AlumnosClient() {
       return { topAsistencias: [], topCalificaciones: [] };
     }
 
-    // Ordenados por asistencia desc
+    // Ordenados por asistencia desc (Top 1)
     const sortedByAsistencia = [...alumnos].sort((a, b) => b.asistenciaPorcentaje - a.asistenciaPorcentaje);
-    const topAsistencias = sortedByAsistencia.slice(0, 2);
+    const topAsistencias = sortedByAsistencia.slice(0, 1);
 
-    // Ordenados por calificación general desc
+    // Ordenados por calificación general desc (Top 1)
     const sortedByNotas = [...alumnos].sort((a, b) => (b.promedioGeneral || b.primerTrimestre) - (a.promedioGeneral || a.primerTrimestre));
-    const topCalificaciones = sortedByNotas.slice(0, 2);
+    const topCalificaciones = sortedByNotas.slice(0, 1);
 
     return { topAsistencias, topCalificaciones };
   }, [alumnos]);
@@ -919,7 +919,7 @@ export default function AlumnosClient() {
 
             {cargandoAlumnos ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[1, 2, 3, 4].map((i) => (
+                {[1, 2].map((i) => (
                   <div
                     key={`hero-load-${i}`}
                     className="bg-white/80 border border-violet-200/40 rounded-2xl p-6 flex flex-col justify-between gap-6 animate-pulse"
@@ -962,7 +962,7 @@ export default function AlumnosClient() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Fila 1: Top 2 Asistencias (Tono Esmeralda / Menta suave) */}
+                {/* Tarjeta 1: Top 1 Asistencia (Tono Esmeralda / Menta suave) */}
                 {heroAlumnos.topAsistencias.map((alumno, idx) => (
                   <div
                     key={`hero-asist-${alumno.id}-${idx}`}
@@ -1016,7 +1016,7 @@ export default function AlumnosClient() {
                   </div>
                 ))}
 
-                {/* Fila 2: Top 2 Calificaciones (Tono Violeta / Púrpura suave) */}
+                {/* Tarjeta 2: Top 1 Calificación (Tono Violeta / Púrpura suave) */}
                 {heroAlumnos.topCalificaciones.map((alumno, idx) => (
                   <div
                     key={`hero-notas-${alumno.id}-${idx}`}
