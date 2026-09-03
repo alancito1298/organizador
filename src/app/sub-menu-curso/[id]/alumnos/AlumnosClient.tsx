@@ -1414,7 +1414,7 @@ export default function AlumnosClient() {
                 Cancelar
               </button>
               <button
-                onClick={handleEliminarCurso}
+                onClick={eliminarCursoActual}
                 disabled={eliminandoCurso}
                 className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:bg-red-700 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
