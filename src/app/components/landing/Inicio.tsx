@@ -1,6 +1,7 @@
 'use client';
 
 import Image from "next/image";
+import Link from "next/link";
 import Features from "./Features";
 import Planes from "./PlanesPrecios";
 import Header from "../shared/Header";
@@ -11,297 +12,372 @@ import StickyMobileCta from "./StickyMobileCta";
 
 const items = [
   {
+    id: "offline",
     titulo: "⚡ Modo Offline en el Aula",
     descripcion: "¿Poca señal o sin Wi-Fi en tu escuela? Tomá asistencia y cargá notas sin internet. Tus datos se guardan en tu dispositivo y se sincronizan al reconectar.",
-    imagen: "/asistencias-img.jpeg",
-    alt: "Modo sin conexión offline para tomar asistencia y notas escolares en el aula sin internet",
   },
   {
+    id: "ia",
     titulo: "🤖 Asistente Pedagógico con IA",
     descripcion: "Generá secuencias didácticas, exámenes listos para imprimir, rúbricas y adaptaciones curriculares en segundos con Inteligencia Artificial.",
-    imagen: "/cursos-img.jpeg",
-    alt: "Asistente de inteligencia artificial para docentes para crear planificaciones y exámenes",
   },
   {
+    id: "cursos",
     titulo: "Crear y gestionar cursos fácilmente",
     descripcion: "Organizá todas tus materias en segundos, separando cursos, años y contenido sin complicaciones.",
-    imagen: "/cursos-img.jpeg",
-    alt: "Captura de pantalla de la interfaz de gestión de cursos, escuelas y materias en Organizador Docente",
   },
   {
+    id: "asistencias",
     titulo: "Registrar asistencia y concepto",
-    descripcion: "Marcá el registro de tus clases con tan solo un click. Visual ágil y rápida.",
-    imagen: "/asistencias-img.jpeg",
-    alt: "Planilla digital de toma de asistencia escolar diaria, ausentes y conceptos pedagógicos",
+    descripcion: "Marcá el registro de tus clases con tan solo un click. Visual ágil y rápida con conceptos pedagógicos.",
   },
   {
+    id: "agenda",
     titulo: "Toda tu información en un solo lugar",
     descripcion: "Agenda, Planificaciones, Calificaciones, Horarios, Asistencia, Conceptos y Recordatorios unificados.",
-    imagen: "/agenda-img.jpeg",
-    alt: "Calendario y agenda docente interactiva con recordatorios de exámenes y eventos escolares",
   },
   {
+    id: "calificaciones",
     titulo: "Seguimiento de calificaciones",
-    descripcion: "Agregá, ordená, consultá y editá calificaciones fácilmente con promedios automáticos.",
-    imagen: "/calificaciones-img.jpeg",
-    alt: "Registro de calificaciones escolares, notas de evaluaciones y promedios automáticos por trimestre",
+    descripcion: "Agregá, ordená, consultá y editá calificaciones fácilmente con promedios automáticos por trimestre.",
   },
   {
+    id: "alumnos",
     titulo: "Administrá tus alumnos con sencillez",
-    descripcion: "Agregá, borrá, consultá y editá estudiantes de cada curso con un solo click.",
-    imagen: "/alumnos-img.jpeg",
-    alt: "Listado completo de estudiantes inscritos y datos de contacto de las familias por curso",
+    descripcion: "Agregá, consultá y gestioná estudiantes de cada curso con sus contactos y teléfonos familiares.",
   },
 ];
 
 export default function Inicio() {
   return (
-    <div className="bg-surface text-on-surface font-body-md antialiased overflow-x-hidden selection:bg-secondary-container selection:text-on-secondary-container">
-
-      {/* TopNavBar */}
+    <div className="bg-surface-bg text-text-main font-mulish antialiased overflow-x-hidden selection:bg-accent-violet/20 min-h-screen">
+      {/* TopNavBar Neumórfica */}
       <Header />
 
-      <main className="pt-24 md:pt-32">
-
+      <main className="pt-24 sm:pt-32">
         {/* Hero Section */}
-        <section className="px-margin-mobile md:px-margin-desktop py-xl flex flex-col lg:flex-row items-center gap-xl relative overflow-hidden">
-          {/* Decorative Background Blob */}
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-bl from-surface-lavender to-transparent -z-10 rounded-bl-[100px] opacity-70" />
-
-          <div className="flex-1 flex flex-col items-start gap-md z-10">
-            <div className="flex flex-wrap gap-xs mb-xs">
-              <div className="inline-flex items-center gap-xs bg-success-green/10 text-success-green px-sm py-xs rounded-full font-label-md text-label-md border border-success-green/20">
-                <span className="material-symbols-outlined text-[16px]">eco</span>
-                Plan 100% Gratis disponible (hasta 4 cursos)
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20 flex flex-col lg:flex-row items-center gap-12 relative">
+          <div className="flex-1 flex flex-col items-start gap-4 z-10">
+            {/* Badges */}
+            <div className="flex flex-wrap gap-2 mb-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full neumorphic-inset text-[11px] font-extrabold uppercase tracking-wider text-emerald-600">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981]"></span>
+                Plan Gratis disponible (Hasta 4 cursos)
               </div>
-              <div className="inline-flex items-center gap-xs bg-amber-500/15 text-amber-900 border border-amber-500/30 font-bold px-sm py-xs rounded-full font-label-md text-label-md shadow-sm">
-                <span>⚡</span> Modo Offline: Funciona sin Internet
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full neumorphic-inset text-[11px] font-extrabold uppercase tracking-wider text-amber-600">
+                <span>⚡</span>
+                Modo Offline: Funciona sin Wi-Fi
               </div>
-              <div className="inline-flex items-center gap-xs bg-tertiary-fixed text-on-tertiary-fixed font-bold px-sm py-xs rounded-full font-label-md text-label-md shadow-sm">
-                <span>🤖</span> IA Pedagógica
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full neumorphic-inset text-[11px] font-extrabold uppercase tracking-wider text-accent-violet">
+                <span>🤖</span>
+                IA Pedagógica Argentina
               </div>
             </div>
 
-            <h1 className="font-display-lg text-display-lg text-primary max-w-2xl">
+            {/* Titular Principal */}
+            <h1 className="text-3xl sm:text-5xl lg:text-5xl font-extrabold text-on-surface tracking-tight leading-[1.15]">
               Organizá tu agenda de clases, planificaciones y notas en un{" "}
-              <span className="text-secondary relative whitespace-nowrap">
+              <span className="text-accent-violet relative inline-block">
                 solo lugar
-                <svg className="absolute w-full h-3 -bottom-1 left-0 text-tertiary-fixed" preserveAspectRatio="none" viewBox="0 0 100 10">
+                <svg
+                  className="absolute w-full h-2.5 -bottom-1 left-0 text-accent-violet/30"
+                  preserveAspectRatio="none"
+                  viewBox="0 0 100 10"
+                >
                   <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" strokeWidth="4" />
                 </svg>
               </span>.
             </h1>
 
-            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
-              Generá exámenes e ideas con IA, tomá asistencia, llevá el seguimiento de tus alumnos y exportá todo a Excel en 1 clic. Diseñado por y para docentes.
+            {/* Bajada */}
+            <p className="text-sm sm:text-base text-secondary max-w-xl font-medium leading-relaxed">
+              Generá exámenes e ideas con Inteligencia Artificial, tomá asistencia en el aula sin internet, llevá el seguimiento de tus alumnos y exportá todo a Excel en 1 clic. Diseñado por y para docentes.
             </p>
 
-            <div className="flex flex-wrap items-center gap-sm mt-sm">
-              <a className="bg-primary text-white font-label-md text-label-md px-lg py-sm rounded-lg hover:bg-primary-container transition-all shadow-md flex items-center gap-xs" href="/registro">
-                Registrarme Gratis
-                <span className="material-symbols-outlined text-[18px]">rocket_launch</span>
-              </a>
-              <a className="bg-surface-lavender text-secondary font-label-md text-label-md px-lg py-sm rounded-lg hover:bg-surface-container transition-all flex items-center gap-xs" href="/login">
-                Iniciar Sesión
-                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-              </a>
+            {/* CTAs */}
+            <div className="flex flex-wrap items-center gap-3 mt-2">
+              <Link
+                href="/registro"
+                className="bg-accent-violet text-white font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-2xl shadow-lg shadow-accent-violet/25 hover:bg-accent-violet/90 active:scale-95 transition-all flex items-center gap-2"
+              >
+                <span>Comenzar 100% Gratis</span>
+                <span className="material-symbols-outlined text-sm">rocket_launch</span>
+              </Link>
+              <Link
+                href="/login"
+                className="bg-surface-bg neumorphic-raised text-on-surface font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-2xl hover:text-accent-violet active:scale-95 transition-all flex items-center gap-2"
+              >
+                <span>Ya tengo cuenta</span>
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </Link>
             </div>
 
-            <div className="flex flex-wrap items-center gap-md mt-md text-sm text-on-surface-variant font-label-sm">
-              <div className="flex items-center gap-base"><span className="material-symbols-outlined text-[16px] text-success-green">check_circle</span> 🤖 Asistente IA</div>
-              <div className="flex items-center gap-base"><span className="material-symbols-outlined text-[16px] text-success-green">check_circle</span> Agenda y Horarios</div>
-              <div className="flex items-center gap-base"><span className="material-symbols-outlined text-[16px] text-success-green">check_circle</span> Planificaciones</div>
-              <div className="flex items-center gap-base"><span className="material-symbols-outlined text-[16px] text-success-green">check_circle</span> Exportar a Excel</div>
+            {/* Highlights */}
+            <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-secondary font-bold">
+              <div className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm text-emerald-600">check_circle</span>
+                Asistente IA Educativo
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm text-emerald-600">check_circle</span>
+                Sin límites de alumnos
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm text-emerald-600">check_circle</span>
+                Exportación directa a Excel
+              </div>
             </div>
           </div>
 
-          <div className="flex-1 w-full relative group">
-            <div className="absolute inset-0 bg-primary/5 rounded-2xl transform rotate-3 scale-105 transition-transform duration-500 group-hover:rotate-6" />
-            <Image
-              alt="Docente organizando su agenda y planificaciones de clase con Organizador Docente"
-              title="Docente organizando su agenda y planificaciones con Organizador Docente"
-              src="/img-profe.jpg"
-              width={1200}
-              height={800}
-              className="w-full h-auto rounded-2xl shadow-xl relative z-10 object-cover aspect-[3/2] border border-outline-variant/30 transform transition-transform duration-500 hover:scale-[1.02]"
-              priority
-            />
+          {/* Imagen Hero con Marco Neumórfico */}
+          <div className="flex-1 w-full relative">
+            <div className="bg-surface-bg neumorphic-raised rounded-3xl p-3 sm:p-4 border border-white/70 shadow-2xl overflow-hidden group">
+              <Image
+                alt="Docente organizando su agenda y planificaciones de clase con Organizador Docente"
+                title="Docente organizando su agenda y planificaciones con Organizador Docente"
+                src="/img-profe.jpg"
+                width={1200}
+                height={800}
+                className="w-full h-auto rounded-2xl object-cover aspect-[3/2] transform group-hover:scale-[1.02] transition-transform duration-500"
+                priority
+              />
+            </div>
           </div>
         </section>
 
-        {/* TL;DR Features Bento Grid */}
-        <section className="bg-surface-container-low py-xl px-margin-mobile md:px-margin-desktop">
-          <div className="text-center mb-xl">
-            <div className="inline-block bg-tertiary-fixed text-on-tertiary-fixed font-label-sm px-sm py-xs rounded-full mb-md uppercase tracking-wider font-bold">⚡ En pocas palabras</div>
-            <h2 className="font-headline-lg text-headline-lg text-primary">Todo lo que resuelve por vos</h2>
+        {/* Bento Grid: Todo lo que resuelve por vos */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+          <div className="text-center mb-12 flex flex-col items-center gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full neumorphic-inset text-xs font-extrabold uppercase tracking-wider text-accent-violet">
+              <span>⚡</span>
+              En Pocas Palabras
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-on-surface tracking-tight">
+              Todo lo que resuelve por vos
+            </h2>
+            <p className="text-sm sm:text-base text-secondary max-w-xl">
+              Simplificá tu gestión escolar diaria con herramientas pensadas para la realidad docente.
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md max-w-6xl mx-auto">
-            {/* Card 1 (Spans 2 columns on lg) */}
-            <div className="lg:col-span-2 bg-surface rounded-xl p-lg border border-outline-variant shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary-fixed rounded-bl-full -z-10 opacity-50 group-hover:scale-110 transition-transform" />
-              <div>
-                <div className="w-12 h-12 bg-primary-container text-white rounded-lg flex items-center justify-center mb-md">
-                  <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>calendar_month</span>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Bento Card 1: Agenda (Ocupa 2 col en desktop) */}
+            <div className="lg:col-span-2 bg-surface-bg neumorphic-raised rounded-3xl p-7 border border-white/60 shadow-lg flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-start gap-4">
+                <div className="p-3.5 rounded-2xl neumorphic-inset text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-2xl">calendar_month</span>
                 </div>
-                <h3 className="font-headline-md text-headline-md text-primary mb-sm">1. Agenda Docente</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant max-w-md">Agendá exámenes, entregas y eventos escolares con alertas. Visualiza toda tu semana de un vistazo y nunca olvides una fecha importante.</p>
+                <div>
+                  <h3 className="text-xl font-extrabold text-on-surface mb-1">1. Agenda y Cronograma Semanal</h3>
+                  <p className="text-xs sm:text-sm text-secondary font-medium leading-relaxed max-w-xl">
+                    Agendá exámenes, entregas de trabajos prácticos, actos escolares y reuniones con alertas. Visualizá tu semana completa con tus horarios y materias de cada institución.
+                  </p>
+                </div>
               </div>
             </div>
-            {/* Card 2: Asistente IA (Destacado) */}
-            <div className="bg-gradient-to-br from-primary to-primary-container text-white rounded-xl p-lg shadow-md hover:shadow-lg transition-shadow group relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-tertiary-fixed text-on-tertiary-fixed font-label-sm px-md py-xs rounded-bl-lg font-bold">
-                ⭐ NUEVO
+
+            {/* Bento Card 2: Asistente IA (Destacado Violeta) */}
+            <div className="bg-gradient-to-br from-accent-violet to-violet-900 text-white rounded-3xl p-7 shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+              <div className="absolute top-0 right-0 bg-amber-400 text-amber-950 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-bl-xl shadow-sm">
+                ⭐ NOVEDAD
               </div>
-              <div className="w-12 h-12 bg-white/20 text-white rounded-lg flex items-center justify-center mb-md text-2xl">
-                🤖
+              <div className="flex items-start gap-4 mb-4">
+                <div className="p-3.5 rounded-2xl bg-white/20 backdrop-blur-sm text-white shrink-0 text-xl">
+                  🤖
+                </div>
+                <div>
+                  <h3 className="text-xl font-extrabold text-white mb-1">2. Asistente Pedagógico con IA</h3>
+                  <p className="text-xs text-white/90 font-medium leading-relaxed">
+                    Formulá exámenes a desarrollar con rúbrica, secuencias didácticas y adaptaciones curriculares en segundos.
+                  </p>
+                </div>
               </div>
-              <h3 className="font-headline-md text-headline-md mb-sm text-white">2. Asistente Pedagógico IA</h3>
-              <p className="font-body-md text-body-md text-white/90">Generá exámenes listos para imprimir, secuencias didácticas y adaptaciones de aula en segundos.</p>
+              <span className="text-[11px] font-extrabold text-amber-300 flex items-center gap-1 mt-2">
+                Conoce tus cursos y alumnos <span className="material-symbols-outlined text-xs">arrow_forward</span>
+              </span>
             </div>
-            {/* Card 3 */}
-            <div className="bg-surface rounded-xl p-lg border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
-              <div className="w-12 h-12 bg-secondary-container text-white rounded-lg flex items-center justify-center mb-md">
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>library_books</span>
+
+            {/* Bento Card 3: Planificaciones */}
+            <div className="bg-surface-bg neumorphic-raised rounded-3xl p-7 border border-white/60 shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-start gap-4">
+                <div className="p-3.5 rounded-2xl neumorphic-inset text-emerald-600 shrink-0">
+                  <span className="material-symbols-outlined text-2xl">library_books</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-on-surface mb-1">3. Planificaciones</h3>
+                  <p className="text-xs text-secondary font-medium leading-relaxed">
+                    Unidades didácticas, proyectos anuales y documentos pedagógicos centralizados por materia.
+                  </p>
+                </div>
               </div>
-              <h3 className="font-headline-md text-headline-md text-primary mb-sm">3. Planificaciones</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant">Secuencias didácticas, unidades y archivos en un solo lugar.</p>
             </div>
-            {/* Card 4 */}
-            <div className="bg-surface rounded-xl p-lg border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
-              <div className="w-12 h-12 bg-success-green/20 text-success-green rounded-lg flex items-center justify-center mb-md">
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>
+
+            {/* Bento Card 4: Asistencias */}
+            <div className="bg-surface-bg neumorphic-raised rounded-3xl p-7 border border-white/60 shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-start gap-4">
+                <div className="p-3.5 rounded-2xl neumorphic-inset text-emerald-600 shrink-0">
+                  <span className="material-symbols-outlined text-2xl">how_to_reg</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-on-surface mb-1">4. Asistencias y Conceptos</h3>
+                  <p className="text-xs text-secondary font-medium leading-relaxed">
+                    Marcá presentes, ausencias, justificadas y conceptos positivos/negativos en 1 clic aún sin internet.
+                  </p>
+                </div>
               </div>
-              <h3 className="font-headline-md text-headline-md text-primary mb-sm">4. Asistencias</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant">Marcá presente, ausente y concepto pedagógico en 1 clic.</p>
             </div>
-            {/* Card 5 */}
-            <div className="bg-surface rounded-xl p-lg border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
-              <div className="w-12 h-12 bg-tertiary-container text-on-tertiary-container rounded-lg flex items-center justify-center mb-md">
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>bar_chart</span>
+
+            {/* Bento Card 5: Calificaciones */}
+            <div className="bg-surface-bg neumorphic-raised rounded-3xl p-7 border border-white/60 shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <div className="flex items-start gap-4">
+                <div className="p-3.5 rounded-2xl neumorphic-inset text-accent-violet shrink-0">
+                  <span className="material-symbols-outlined text-2xl">bar_chart</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-on-surface mb-1">5. Calificaciones Automáticas</h3>
+                  <p className="text-xs text-secondary font-medium leading-relaxed">
+                    Notas de trabajos prácticos, orales y evaluaciones con cálculo de promedios por trimestre.
+                  </p>
+                </div>
               </div>
-              <h3 className="font-headline-md text-headline-md text-primary mb-sm">5. Calificaciones</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant">Notas de trabajos y evaluaciones con promedio automático.</p>
-            </div>
-            {/* Card 6 */}
-            <div className="bg-surface rounded-xl p-lg border border-outline-variant shadow-sm hover:shadow-md transition-shadow group bg-gradient-to-br from-surface to-surface-lavender">
-              <div className="w-12 h-12 bg-deep-indigo text-white rounded-lg flex items-center justify-center mb-md">
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>download</span>
-              </div>
-              <h3 className="font-headline-md text-headline-md text-primary mb-sm">6. Exportar a Excel</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant">Descargá todas tus planillas a .xlsx listas para presentar a directivos.</p>
             </div>
           </div>
         </section>
 
-        {/* How it Works (Screenshots) */}
+        {/* Sección de Capturas de Módulos */}
         <Features items={items} />
 
-        {/* Pricing Section */}
-        <Planes />
+        {/* Sección Excel Export */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+          <div className="bg-surface-bg neumorphic-raised rounded-3xl p-8 sm:p-12 border border-white/60 shadow-xl flex flex-col lg:flex-row items-center gap-10">
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full neumorphic-inset text-xs font-extrabold uppercase tracking-wider text-emerald-600 w-fit">
+                <span className="material-symbols-outlined text-sm">table_view</span>
+                Exportación Pro
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-on-surface tracking-tight">
+                Toda tu información lista para entregar a dirección
+              </h2>
+              <p className="text-xs sm:text-sm text-secondary font-medium leading-relaxed">
+                Descargá tus planillas en formato Excel (.xlsx) con un solo clic. Simplificá el cierre de trimestre, la entrega de asistencias mensuales y el reporte de promedios.
+              </p>
 
-        {/* Excel Export Section */}
-        <section className="py-xl px-margin-mobile md:px-margin-desktop bg-surface overflow-hidden">
-          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-xl">
-            <div className="flex-1 space-y-md">
-              <h2 className="font-display-lg text-display-lg text-primary">Toda tu información lista para imprimir</h2>
-              <p className="font-body-lg text-body-lg text-on-surface-variant">Descargá tus planillas en formato Excel listas para presentar. Simplificá el cierre de notas y el envío de informes a dirección.</p>
-              <div className="space-y-sm mt-lg">
-                <div className="flex items-start gap-md p-md bg-surface-lavender rounded-xl border border-outline-variant/30">
-                  <span className="material-symbols-outlined text-secondary text-[32px]">checklist</span>
-                  <div>
-                    <h4 className="font-headline-md text-lg text-primary mb-1">Asistencias</h4>
-                    <p className="text-sm text-on-surface-variant">Exportá la asistencia mensual con porcentajes automáticos.</p>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+                <div className="p-3.5 rounded-2xl neumorphic-inset flex flex-col gap-1">
+                  <span className="text-xs font-extrabold text-on-surface">Asistencias</span>
+                  <span className="text-[11px] text-secondary">Porcentajes y ausentes calculados.</span>
                 </div>
-                <div className="flex items-start gap-md p-md bg-surface-lavender rounded-xl border border-outline-variant/30">
-                  <span className="material-symbols-outlined text-secondary text-[32px]">grade</span>
-                  <div>
-                    <h4 className="font-headline-md text-lg text-primary mb-1">Calificaciones</h4>
-                    <p className="text-sm text-on-surface-variant">Descargá las notas por trimestre con promedios finales calculados.</p>
-                  </div>
+                <div className="p-3.5 rounded-2xl neumorphic-inset flex flex-col gap-1">
+                  <span className="text-xs font-extrabold text-on-surface">Calificaciones</span>
+                  <span className="text-[11px] text-secondary">Notas trimestrales y finales.</span>
                 </div>
-                <div className="flex items-start gap-md p-md bg-surface-lavender rounded-xl border border-outline-variant/30">
-                  <span className="material-symbols-outlined text-secondary text-[32px]">group</span>
-                  <div>
-                    <h4 className="font-headline-md text-lg text-primary mb-1">Alumnos</h4>
-                    <p className="text-sm text-on-surface-variant">Listados completos de tus alumnos con sus datos de contacto.</p>
-                  </div>
+                <div className="p-3.5 rounded-2xl neumorphic-inset flex flex-col gap-1">
+                  <span className="text-xs font-extrabold text-on-surface">Nóminas</span>
+                  <span className="text-[11px] text-secondary">Listado de alumnos y contactos.</span>
                 </div>
               </div>
             </div>
-            <div className="flex-1 w-full relative">
-              <div className="absolute inset-0 bg-secondary/10 rounded-2xl transform -rotate-3 scale-105 transition-transform duration-500" />
-              <div className="relative z-10 bg-white rounded-2xl shadow-xl border border-outline-variant/30 overflow-hidden flex flex-col h-[400px]">
-                {/* Fake Spreadsheet Header */}
-                <div className="bg-surface-container-high border-b border-outline-variant/50 p-sm flex items-center gap-sm">
-                  <div className="flex gap-1">
-                    <div className="w-3 h-3 rounded-full bg-error" />
-                    <div className="w-3 h-3 rounded-full bg-tertiary-fixed-dim" />
-                    <div className="w-3 h-3 rounded-full bg-success-green" />
+
+            {/* Preview Planilla */}
+            <div className="flex-1 w-full">
+              <div className="bg-white rounded-2xl shadow-xl border border-outline-variant/30 overflow-hidden">
+                <div className="bg-slate-100 border-b border-slate-200 px-4 py-2.5 flex items-center justify-between">
+                  <div className="flex gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
                   </div>
-                  <div className="bg-white rounded px-sm py-1 text-xs text-on-surface-variant flex-1 text-center font-mono">Planilla_Asistencia_1A.xlsx</div>
+                  <span className="text-[11px] font-mono text-slate-500 font-bold">Planilla_Asistencia_1A.xlsx</span>
+                  <span className="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded">Excel</span>
                 </div>
-                {/* Fake Spreadsheet Body */}
-                <div className="flex-1 bg-white p-sm overflow-hidden relative">
-                  <div className="grid grid-cols-5 gap-1 text-xs font-mono text-on-surface-variant mb-2">
-                    <div className="bg-surface-container-low p-2 font-bold border-b border-r border-outline-variant/20">Alumno</div>
-                    <div className="bg-surface-container-low p-2 font-bold border-b border-r border-outline-variant/20">Lunes 4</div>
-                    <div className="bg-surface-container-low p-2 font-bold border-b border-r border-outline-variant/20">Miércoles 6</div>
-                    <div className="bg-surface-container-low p-2 font-bold border-b border-r border-outline-variant/20">Viernes 8</div>
-                    <div className="bg-surface-container-low p-2 font-bold border-b border-outline-variant/20">% Asist.</div>
-                    <div className="p-2 border-b border-r border-outline-variant/20">Pérez, Juan</div>
-                    <div className="p-2 text-center text-success-green border-b border-r border-outline-variant/20">P</div>
-                    <div className="p-2 text-center text-success-green border-b border-r border-outline-variant/20">P</div>
-                    <div className="p-2 text-center text-error border-b border-r border-outline-variant/20">A</div>
-                    <div className="p-2 text-center border-b border-outline-variant/20">66%</div>
-                    <div className="p-2 border-b border-r border-outline-variant/20">García, Ana</div>
-                    <div className="p-2 text-center text-success-green border-b border-r border-outline-variant/20">P</div>
-                    <div className="p-2 text-center text-success-green border-b border-r border-outline-variant/20">P</div>
-                    <div className="p-2 text-center text-success-green border-b border-r border-outline-variant/20">P</div>
-                    <div className="p-2 text-center border-b border-outline-variant/20">100%</div>
-                    <div className="p-2 border-b border-r border-outline-variant/20">López, Martín</div>
-                    <div className="p-2 text-center text-error border-b border-r border-outline-variant/20">A</div>
-                    <div className="p-2 text-center text-success-green border-b border-r border-outline-variant/20">P</div>
-                    <div className="p-2 text-center text-success-green border-b border-r border-outline-variant/20">P</div>
-                    <div className="p-2 text-center border-b border-outline-variant/20">66%</div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
+                <div className="p-3 text-[11px] font-mono text-slate-700 overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-200 text-slate-400 text-[10px] uppercase">
+                        <th className="p-1.5 font-bold">Estudiante</th>
+                        <th className="p-1.5 text-center font-bold">Clase 1</th>
+                        <th className="p-1.5 text-center font-bold">Clase 2</th>
+                        <th className="p-1.5 text-center font-bold">Clase 3</th>
+                        <th className="p-1.5 text-center font-bold text-emerald-600">% Asist.</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-slate-100">
+                        <td className="p-1.5 font-medium">García, Ana</td>
+                        <td className="p-1.5 text-center text-emerald-600 font-bold">P</td>
+                        <td className="p-1.5 text-center text-emerald-600 font-bold">P</td>
+                        <td className="p-1.5 text-center text-emerald-600 font-bold">P</td>
+                        <td className="p-1.5 text-center font-bold text-emerald-600">100%</td>
+                      </tr>
+                      <tr className="border-b border-slate-100">
+                        <td className="p-1.5 font-medium">López, Martín</td>
+                        <td className="p-1.5 text-center text-red-500 font-bold">A</td>
+                        <td className="p-1.5 text-center text-emerald-600 font-bold">P</td>
+                        <td className="p-1.5 text-center text-emerald-600 font-bold">P</td>
+                        <td className="p-1.5 text-center font-bold text-amber-600">66%</td>
+                      </tr>
+                      <tr>
+                        <td className="p-1.5 font-medium">Pérez, Juan</td>
+                        <td className="p-1.5 text-center text-emerald-600 font-bold">P</td>
+                        <td className="p-1.5 text-center text-emerald-600 font-bold">P</td>
+                        <td className="p-1.5 text-center text-emerald-600 font-bold">P</td>
+                        <td className="p-1.5 text-center font-bold text-emerald-600">100%</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Device Compatibility */}
+        {/* Sección Dispositivos */}
         <InfoDispositivos />
 
-        {/* FAQ Section */}
+        {/* Sección Planes y Precios */}
+        <Planes />
+
+        {/* Sección Preguntas Frecuentes */}
         <Faq />
 
-        {/* CTA Section */}
-        <section className="py-xl px-margin-mobile md:px-margin-desktop bg-primary text-white text-center rounded-3xl mx-margin-mobile md:mx-margin-desktop mb-xl overflow-hidden relative shadow-lg">
-          <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center">
-            <h2 className="font-display-lg text-display-lg mb-sm">¿Tenés más dudas?</h2>
-            <p className="font-body-lg text-body-lg text-on-primary/80 mb-lg">Estamos acá para ayudarte a simplificar tu día a día. Escribinos o comenzá a probar la plataforma gratis hoy mismo.</p>
-            <div className="flex flex-wrap items-center justify-center gap-md w-full">
-              <a className="bg-tertiary-fixed text-on-tertiary-fixed font-label-md px-lg py-sm rounded-lg hover:bg-tertiary transition-colors shadow-md font-bold flex items-center gap-xs" href="/registro">
-                Registrarme Gratis
-                <span className="material-symbols-outlined text-[18px]">rocket_launch</span>
-              </a>
-              <a className="bg-transparent border border-white text-white font-label-md px-lg py-sm rounded-lg hover:bg-white/10 transition-colors flex items-center gap-xs" href="https://cv-sigma-umber.vercel.app/" target="_blank" rel="noopener noreferrer">
-                Contactar Soporte
-                <span className="material-symbols-outlined text-[18px]">mail</span>
+        {/* CTA Final */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
+          <div className="bg-gradient-to-br from-violet-900 to-indigo-950 text-white rounded-3xl p-8 sm:p-14 shadow-2xl text-center flex flex-col items-center gap-4 relative overflow-hidden border border-white/20">
+            <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-extrabold uppercase tracking-wider backdrop-blur-sm">
+              🚀 Empezá hoy mismo
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              ¿Listo para simplificar tu trabajo docente?
+            </h2>
+            <p className="text-xs sm:text-sm text-white/80 max-w-xl font-medium leading-relaxed">
+              Unite a miles de docentes que ya ahorran horas cada semana organizando sus clases, asistencias y planificaciones desde un solo lugar.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-4 w-full">
+              <Link
+                href="/registro"
+                className="bg-white text-accent-violet font-extrabold text-xs uppercase tracking-wider px-7 py-3.5 rounded-2xl shadow-xl hover:bg-slate-100 active:scale-95 transition-all flex items-center gap-2"
+              >
+                <span>Crear Cuenta Gratis</span>
+                <span className="material-symbols-outlined text-sm">rocket_launch</span>
+              </Link>
+              <a
+                href="https://cv-sigma-umber.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-transparent border border-white/40 text-white font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-2xl hover:bg-white/10 active:scale-95 transition-all flex items-center gap-2"
+              >
+                <span>Contactar Soporte</span>
+                <span className="material-symbols-outlined text-sm">mail</span>
               </a>
             </div>
           </div>
         </section>
-
       </main>
 
       {/* Footer */}
       <Footer />
 
-      {/* Floating Mobile Button */}
+      {/* Botón Flotante Mobile */}
       <StickyMobileCta />
     </div>
   );

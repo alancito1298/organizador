@@ -1,163 +1,195 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Planes() {
   const [esAnual, setEsAnual] = useState(false);
 
   return (
-    <section className="py-xl px-margin-mobile md:px-margin-desktop bg-surface-container-low" id="precios">
-      <div className="text-center mb-lg">
-        <h2 className="font-display-lg text-display-lg text-primary mb-sm">Elegí el plan ideal para vos</h2>
-        <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-          Comenzá gratis con todas las herramientas esenciales o desbloqueá el potencial completo con el Plan Plus.
+    <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto font-mulish" id="precios">
+      <div className="text-center mb-12 flex flex-col items-center gap-3">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full neumorphic-inset text-xs font-extrabold uppercase tracking-wider text-accent-violet">
+          <span className="material-symbols-outlined text-sm">payments</span>
+          Planes Transparentes
+        </div>
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-on-surface tracking-tight">
+          Elegí el plan ideal para tu labor docente
+        </h2>
+        <p className="text-sm sm:text-base text-secondary max-w-2xl">
+          Comenzá 100% gratis con tus primeros cursos o desbloqueá cursos ilimitados, Asistente IA y planillas Excel Pro.
         </p>
 
         {/* Toggle Mensual / Anual */}
-        <div className="flex items-center justify-center gap-sm mt-md">
-          <span className={`text-sm font-medium ${!esAnual ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>
-            Facturación Mensual
-          </span>
+        <div className="mt-4 inline-flex items-center p-1.5 rounded-full neumorphic-inset bg-surface-bg">
           <button
             type="button"
-            onClick={() => setEsAnual(!esAnual)}
-            className="relative inline-flex h-7 w-14 items-center rounded-full bg-primary/20 transition-colors focus:outline-none p-1"
-            aria-label="Cambiar periodo de facturación"
+            onClick={() => setEsAnual(false)}
+            className={`px-4 py-2 rounded-full text-xs font-extrabold transition-all ${
+              !esAnual
+                ? 'bg-accent-violet text-white shadow-md shadow-accent-violet/25'
+                : 'text-secondary hover:text-on-surface'
+            }`}
           >
-            <span
-              className={`inline-block h-5 w-5 transform rounded-full bg-primary transition-transform ${
-                esAnual ? 'translate-x-7 bg-tertiary-fixed' : 'translate-x-0'
-              }`}
-            />
+            Facturación Mensual
           </button>
-          <span className={`text-sm font-medium flex items-center gap-xs ${esAnual ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>
-            Facturación Anual
-            <span className="bg-tertiary-fixed text-on-tertiary-fixed text-xs px-xs py-[2px] rounded-full font-bold">
-              Ahorrá $20.000
+          <button
+            type="button"
+            onClick={() => setEsAnual(true)}
+            className={`px-4 py-2 rounded-full text-xs font-extrabold flex items-center gap-1.5 transition-all ${
+              esAnual
+                ? 'bg-accent-violet text-white shadow-md shadow-accent-violet/25'
+                : 'text-secondary hover:text-on-surface'
+            }`}
+          >
+            <span>Facturación Anual</span>
+            <span className="bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
+              Ahorrás 33%
             </span>
-          </span>
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-lg max-w-4xl mx-auto items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-4xl mx-auto">
         {/* Plan 1: Gratis */}
-        <div className="bg-surface rounded-2xl p-lg border border-outline-variant shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+        <div className="bg-surface-bg neumorphic-raised rounded-3xl p-7 sm:p-9 border border-white/60 shadow-lg flex flex-col justify-between transition-transform hover:-translate-y-1 duration-300">
           <div>
-            <div className="inline-block bg-success-green/10 text-success-green font-label-sm px-sm py-xs rounded-full mb-md font-bold">
-              🌱 100% GRATIS
+            <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-700 px-3 py-1 rounded-full text-xs font-extrabold mb-4 border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              100% GRATIS PARA SIEMPRE
             </div>
-            <h3 className="text-2xl font-bold text-primary mb-xs">Plan Gratis</h3>
-            <p className="text-xs text-on-surface-variant mb-md">Ideal para organizarte sin costo inicial.</p>
-            <div className="text-4xl font-bold text-primary mb-sm">
-              $0 <span className="text-base font-normal text-on-surface-variant">/siempre</span>
+            <h3 className="text-2xl font-extrabold text-on-surface mb-1">Plan Inicial</h3>
+            <p className="text-xs text-secondary mb-6">Todas las funciones básicas para comenzar sin tarjeta de crédito.</p>
+
+            <div className="text-4xl font-extrabold text-on-surface mb-2 flex items-baseline gap-1">
+              $0
+              <span className="text-sm font-bold text-secondary">/ sin costo</span>
             </div>
+            <p className="text-[11px] text-secondary font-medium mb-6">Sin vencimiento. Usalo todo el ciclo lectivo.</p>
 
-            <hr className="my-md border-outline-variant/50" />
+            <div className="h-px bg-outline-variant/30 my-4"></div>
 
-            <ul className="space-y-sm flex-1">
-              <li className="flex items-center gap-sm text-on-surface-variant font-medium">
-                <span className="material-symbols-outlined text-success-green text-[22px]">check_circle</span>
+            <ul className="space-y-3 text-xs sm:text-sm text-text-main">
+              <li className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">check_circle</span>
                 <span><strong>Hasta 4 cursos</strong> simultáneos</span>
               </li>
-              <li className="flex items-center gap-sm text-on-surface-variant">
-                <span className="material-symbols-outlined text-success-green text-[22px]">check_circle</span>
-                <span>Alumnos ilimitados</span>
+              <li className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">check_circle</span>
+                <span>Alumnos y matrículas ilimitadas</span>
               </li>
-              <li className="flex items-center gap-sm text-on-surface-variant">
-                <span className="material-symbols-outlined text-success-green text-[22px]">check_circle</span>
-                <span>Asistencias y Calificaciones</span>
+              <li className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">check_circle</span>
+                <span>Toma de asistencia y conceptos</span>
               </li>
-              <li className="flex items-center gap-sm text-on-surface-variant">
-                <span className="material-symbols-outlined text-success-green text-[22px]">check_circle</span>
-                <span>Agenda y Horarios docentes</span>
+              <li className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">check_circle</span>
+                <span>Carga de calificaciones y promedios</span>
               </li>
-              <li className="flex items-center gap-sm text-on-surface-variant/50">
-                <span className="material-symbols-outlined text-on-surface-variant/40 text-[22px]">cancel</span>
-                <span className="line-through">Exportación a Excel</span>
+              <li className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">check_circle</span>
+                <span>Agenda escolar y grilla horaria semanal</span>
               </li>
-              <li className="flex items-center gap-sm text-on-surface-variant/50">
-                <span className="material-symbols-outlined text-on-surface-variant/40 text-[22px]">cancel</span>
-                <span className="line-through">Planificaciones y Bibliografía</span>
+              <li className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">check_circle</span>
+                <span>Modo Offline en el aula sin internet</span>
+              </li>
+              <li className="flex items-center gap-2.5 text-secondary/50">
+                <span className="material-symbols-outlined text-secondary/40 text-lg shrink-0">cancel</span>
+                <span className="line-through">Exportación a planillas Excel</span>
+              </li>
+              <li className="flex items-center gap-2.5 text-secondary/50">
+                <span className="material-symbols-outlined text-secondary/40 text-lg shrink-0">cancel</span>
+                <span className="line-through">Asistente Pedagógico con IA ilimitado</span>
               </li>
             </ul>
           </div>
 
-          <a
-            className="w-full py-md text-center rounded-xl border-2 border-primary text-primary font-bold hover:bg-surface-lavender transition-colors block mt-xl"
+          <Link
             href="/registro"
+            className="w-full mt-8 py-3.5 text-center rounded-2xl neumorphic-raised font-extrabold text-xs uppercase tracking-wider text-accent-violet hover:bg-accent-violet hover:text-white transition-all shadow-sm block active:scale-95"
           >
             Registrarme Gratis
-          </a>
+          </Link>
         </div>
 
         {/* Plan 2: Plus (Destacado) */}
-        <div className="bg-primary text-white rounded-2xl p-lg shadow-xl flex flex-col justify-between border-2 border-primary-container relative overflow-hidden">
-          <div className="absolute top-0 right-0 bg-tertiary-fixed text-on-tertiary-fixed font-label-sm px-md py-xs rounded-bl-lg font-bold">
-            ⭐ MÁS POPULAR
+        <div className="bg-surface-bg neumorphic-raised rounded-3xl p-7 sm:p-9 border-2 border-accent-violet/40 shadow-2xl flex flex-col justify-between relative overflow-hidden transition-transform hover:-translate-y-1 duration-300">
+          {/* Ribbon Superior */}
+          <div className="absolute top-0 right-0 bg-accent-violet text-white text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-bl-2xl shadow-sm">
+            ⭐ RECOMENDADO DOCENTE
           </div>
 
           <div>
-            <div className="inline-block bg-white/20 text-white font-label-sm px-sm py-xs rounded-full mb-md mt-2 font-bold">
-              ¡30 DÍAS PRUEBA GRATIS!
+            <div className="inline-flex items-center gap-1.5 bg-accent-violet/15 text-accent-violet px-3 py-1 rounded-full text-xs font-extrabold mb-4 border border-accent-violet/30">
+              <span className="material-symbols-outlined text-sm">bolt</span>
+              ¡30 DÍAS DE PRUEBA GRATIS!
             </div>
-            <h3 className="text-2xl font-bold mb-xs">Plan Plus</h3>
-            <p className="text-xs text-white/80 mb-md">Potencia completa para gestionar todas tus escuelas.</p>
-            
-            <div className="text-4xl font-bold mb-sm">
+            <h3 className="text-2xl font-extrabold text-on-surface mb-1">Plan Plus</h3>
+            <p className="text-xs text-secondary mb-6">Máxima potencia para docentes con muchas materias y escuelas.</p>
+
+            <div className="text-4xl font-extrabold text-accent-violet mb-2 flex items-baseline gap-1">
               {esAnual ? '$39.999' : '$4.999'}
-              <span className="text-base font-normal text-primary-fixed-dim">
-                {esAnual ? ' /año' : ' /mes'}
+              <span className="text-sm font-bold text-secondary">
+                {esAnual ? ' / año' : ' / mes'}
               </span>
             </div>
-            {esAnual && (
-              <div className="text-xs text-tertiary-fixed font-bold mb-xs">
-                Equivalente a $3.333/mes (Ahorrás $20.000 al año)
-              </div>
+            {esAnual ? (
+              <p className="text-[11px] text-emerald-600 font-bold mb-6">
+                Equivale a $3.333/mes (Ahorrás $20.000 pagando anual)
+              </p>
+            ) : (
+              <p className="text-[11px] text-secondary font-medium mb-6">
+                Podés pausar o cancelar en cualquier momento sin costo.
+              </p>
             )}
 
-            <hr className="my-md border-white/20" />
+            <div className="h-px bg-outline-variant/30 my-4"></div>
 
-            <ul className="space-y-sm flex-1">
-              <li className="flex items-center gap-sm font-semibold">
-                <span className="material-symbols-outlined text-tertiary-fixed text-[22px]">smart_toy</span>
-                <span><strong>🤖 Asistente Pedagógico con IA</strong></span>
+            <ul className="space-y-3 text-xs sm:text-sm text-text-main">
+              <li className="flex items-center gap-2.5 font-bold text-accent-violet">
+                <span className="material-symbols-outlined text-accent-violet text-lg shrink-0">smart_toy</span>
+                <span>🤖 Asistente Pedagógico con IA Ilimitado</span>
               </li>
-              <li className="flex items-center gap-sm font-semibold">
-                <span className="material-symbols-outlined text-tertiary-fixed text-[22px]">star</span>
-                <span><strong>Cursos ilimitados</strong></span>
+              <li className="flex items-center gap-2.5 font-bold">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">all_inclusive</span>
+                <span>Cursos y divisiones ilimitadas</span>
               </li>
-              <li className="flex items-center gap-sm font-semibold">
-                <span className="material-symbols-outlined text-tertiary-fixed text-[22px]">star</span>
-                <span><strong>Exportación e Importación Excel Pro</strong></span>
+              <li className="flex items-center gap-2.5 font-bold">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">table_view</span>
+                <span>Exportación e Importación de Planillas Excel (.xlsx)</span>
               </li>
-              <li className="flex items-center gap-sm">
-                <span className="material-symbols-outlined text-tertiary-fixed text-[22px]">check_circle</span>
-                <span>Planificaciones y Bibliografía pedagógica</span>
+              <li className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">check_circle</span>
+                <span>Módulo de Planificaciones anuales y secuencias</span>
               </li>
-              <li className="flex items-center gap-sm">
-                <span className="material-symbols-outlined text-tertiary-fixed text-[22px]">check_circle</span>
-                <span>Alumnos y materias ilimitadas</span>
+              <li className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">check_circle</span>
+                <span>Bibliografía y diseños curriculares argentinos</span>
               </li>
-              <li className="flex items-center gap-sm">
-                <span className="material-symbols-outlined text-tertiary-fixed text-[22px]">check_circle</span>
-                <span>Sin publicidad y soporte prioritario</span>
+              <li className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">check_circle</span>
+                <span>Sincronización en la nube multidispositivo</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-emerald-600 text-lg shrink-0">check_circle</span>
+                <span>Soporte prioritario por WhatsApp</span>
               </li>
             </ul>
           </div>
 
-          <a
-            className="w-full py-md text-center rounded-xl bg-tertiary-fixed text-on-tertiary-fixed font-bold hover:bg-tertiary transition-colors shadow-md block mt-xl text-lg"
+          <Link
             href="/registro"
+            className="w-full mt-8 py-3.5 text-center rounded-2xl bg-accent-violet text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-accent-violet/30 hover:bg-accent-violet/90 active:scale-95 transition-all block"
           >
-            ¡Probar 30 Días Gratis!
-          </a>
+            ¡Probar 30 Días Gratis Ahora!
+          </Link>
         </div>
       </div>
 
-      <div className="text-center mt-lg text-on-surface-variant font-body-md text-sm">
-        Los pagos se procesan de forma segura mediante <strong>MercadoPago</strong>.<br />
-        Podés cancelar o cambiar tu suscripción en cualquier momento sin compromisos.
-      </div>
+      <p className="text-center mt-8 text-xs text-secondary">
+        Los cobros se realizan de forma 100% segura mediante <strong>Mercado Pago</strong> con débito, crédito o dinero en cuenta.
+      </p>
     </section>
   );
 }
