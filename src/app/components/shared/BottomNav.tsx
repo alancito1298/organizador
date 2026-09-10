@@ -79,7 +79,39 @@ const BottomNav = () => {
     }
   };
 
+  const [seenIds, setSeenIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    try {
+      const s = localStorage.getItem('seen_notif_ids');
+      if (s) setSeenIds(JSON.parse(s));
+    } catch {}
+
+    const onSeen = () => {
+      try {
+        const s = localStorage.getItem('seen_notif_ids');
+        if (s) setSeenIds(JSON.parse(s));
+      } catch {}
+    };
+    window.addEventListener('notif_seen', onSeen);
+    return () => window.removeEventListener('notif_seen', onSeen);
+  }, []);
+
+  const totalNoVistos = [...eventosHoy, ...eventosMañana].filter(i => !seenIds.includes(i.id)).length;
   const totalNotif = eventosHoy.length + eventosMañana.length;
+
+  const handleOpenNotif = () => {
+    setModalNotif(true);
+    const todos = [...eventosHoy, ...eventosMañana].map(i => i.id);
+    if (todos.length > 0) {
+      const updated = Array.from(new Set([...seenIds, ...todos]));
+      setSeenIds(updated);
+      try {
+        localStorage.setItem('seen_notif_ids', JSON.stringify(updated));
+        window.dispatchEvent(new Event('notif_seen'));
+      } catch {}
+    }
+  };
 
   return (
     <>
@@ -120,23 +152,23 @@ const BottomNav = () => {
         <button
           aria-label="Asistente Pedagógico IA"
           onClick={() => window.dispatchEvent(new Event('toggleChatbotIA'))}
-          className="relative flex flex-col items-center justify-center text-primary p-2 hover:scale-110 active:scale-95 transition-all focus:outline-none"
+          className="relative flex flex-col items-center justify-center text-secondary hover:text-accent-violet p-2 hover:scale-110 active:scale-95 transition-all focus:outline-none"
           title="Asistente Pedagógico IA"
         >
-          <span className="text-xl leading-none select-none">🤖</span>
+          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>smart_toy</span>
           <span className="sr-only">Asistente IA</span>
         </button>
 
         {/* Notifications */}
         <button
           aria-label="Notifications"
-          onClick={() => setModalNotif(true)}
+          onClick={handleOpenNotif}
           className="relative flex flex-col items-center justify-center text-secondary p-2 hover:scale-110 transition-transform focus:outline-none"
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>notifications</span>
-          {totalNotif > 0 && (
+          {totalNoVistos > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-              {totalNotif}
+              {totalNoVistos}
             </span>
           )}
           <span className="sr-only">Notifications</span>

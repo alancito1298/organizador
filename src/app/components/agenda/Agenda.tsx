@@ -164,15 +164,31 @@ export default function AgendaCalendario() {
     });
   };
 
-  // Eventos del mes activo
+  const esMesActual = year === new Date().getFullYear() && month === new Date().getMonth();
+
+  // Eventos del mes activo (o rango desde ayer hasta 15 días si es mes actual)
   const eventosMesActivo = agendaItems
     .filter(item => {
+      if (!item.fecha) return false;
+      if (esMesActual) {
+        const hoyDate = new Date();
+        const ayer = new Date(hoyDate.getFullYear(), hoyDate.getMonth(), hoyDate.getDate() - 1);
+        const posterior15 = new Date(hoyDate.getFullYear(), hoyDate.getMonth(), hoyDate.getDate() + 15);
+        const toYMD = (d: Date) => {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${y}-${m}-${day}`;
+        };
+        const desde = toYMD(ayer);
+        const hasta = toYMD(posterior15);
+        const k = item.fecha.split('T')[0];
+        return k >= desde && k <= hasta;
+      }
       const [y, m] = item.fecha.split('T')[0].split('-').map(Number);
       return y === year && m - 1 === month;
     })
     .sort((a, b) => a.fecha.localeCompare(b.fecha));
-
-  const esMesActual = year === new Date().getFullYear() && month === new Date().getMonth();
 
   return (
     <div className="w-full min-h-screen bg-surface-bg text-text-main flex flex-col font-mulish antialiased">

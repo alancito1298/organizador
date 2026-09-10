@@ -80,7 +80,39 @@ export default function Navbar() {
     fetchAgenda();
   }, []);
 
+  const [seenIds, setSeenIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    try {
+      const s = localStorage.getItem('seen_notif_ids');
+      if (s) setSeenIds(JSON.parse(s));
+    } catch {}
+
+    const onSeen = () => {
+      try {
+        const s = localStorage.getItem('seen_notif_ids');
+        if (s) setSeenIds(JSON.parse(s));
+      } catch {}
+    };
+    window.addEventListener('notif_seen', onSeen);
+    return () => window.removeEventListener('notif_seen', onSeen);
+  }, []);
+
+  const totalNoVistos = [...eventosHoy, ...eventosMañana].filter(i => !seenIds.includes(i.id)).length;
   const totalNotif = eventosHoy.length + eventosMañana.length;
+
+  const handleOpenNotif = () => {
+    setModalNotif(true);
+    const todos = [...eventosHoy, ...eventosMañana].map(i => i.id);
+    if (todos.length > 0) {
+      const updated = Array.from(new Set([...seenIds, ...todos]));
+      setSeenIds(updated);
+      try {
+        localStorage.setItem('seen_notif_ids', JSON.stringify(updated));
+        window.dispatchEvent(new Event('notif_seen'));
+      } catch {}
+    }
+  };
 
   return (
     <>
@@ -134,13 +166,13 @@ export default function Navbar() {
           {/* Notificaciones */}
           <button
             aria-label="Notificaciones"
-            onClick={() => setModalNotif(true)}
+            onClick={handleOpenNotif}
             className="neumorphic-raised w-9 h-9 rounded-full flex items-center justify-center text-text-main hover:text-primary-container relative hover:scale-105 active:scale-95 transition-transform"
           >
             <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 0" }}>notifications</span>
-            {totalNotif > 0 && (
+            {totalNoVistos > 0 && (
               <span className="absolute -top-1 -right-1 bg-accent-violet text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {totalNotif}
+                {totalNoVistos}
               </span>
             )}
           </button>

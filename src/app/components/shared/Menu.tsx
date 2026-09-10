@@ -337,13 +337,30 @@ export default function Menu() {
     ...Array.from({ length: totalDiasMes }, (_, i) => i + 1)
   ];
 
+  const hoyDate = new Date();
+  const ayerDate = new Date(hoyDate.getFullYear(), hoyDate.getMonth(), hoyDate.getDate() - 1);
+  const posterior15Date = new Date(hoyDate.getFullYear(), hoyDate.getMonth(), hoyDate.getDate() + 15);
+  const formatYMD = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  const desdeStr = formatYMD(ayerDate);
+  const hastaStr = formatYMD(posterior15Date);
+
   const eventosMes = agenda.filter(item => {
-    const [y, m] = item.fecha.split('T')[0].split('-').map(Number);
-    return y === currentYear && m === (currentMonth + 1);
+    if (!item.fecha) return false;
+    const k = item.fecha.split('T')[0];
+    return k >= desdeStr && k <= hastaStr;
   }).sort((a, b) => a.fecha.localeCompare(b.fecha));
 
   const diasConEvento = new Set(
-    eventosMes.map(item => Number(item.fecha.split('T')[0].split('-')[2]))
+    agenda.filter(item => {
+      if (!item.fecha) return false;
+      const [y, m] = item.fecha.split('T')[0].split('-').map(Number);
+      return y === currentYear && m === (currentMonth + 1);
+    }).map(item => Number(item.fecha.split('T')[0].split('-')[2]))
   );
 
   const primerNombre = usuario?.nombre ? usuario.nombre.trim().split(' ')[0] : '';
@@ -389,21 +406,14 @@ export default function Menu() {
           </span>
         </div>
 
-        {/* Stickers carrusel horizontal */}
-        <div className="flex overflow-x-auto no-scrollbar gap-3 pb-2 -mx-1 px-1 snap-x">
+        {/* Recordatorios en grid de dos columnas sin scroll */}
+        <div className="grid grid-cols-2 gap-3 pb-1">
           {actividadesHoy.map((act, index) => {
-            const borderColors = [
-              'border-l-accent-violet',
-              'border-l-emerald-600',
-              'border-l-indigo-600',
-              'border-l-amber-600',
-            ];
-            const borderClass = borderColors[index % borderColors.length];
-
             return (
-              <div
+              <Link
                 key={`stk-act-${act.id}-${index}`}
-                className={`snap-start shrink-0 w-[240px] sm:w-[260px] bg-surface-bg rounded-2xl p-3.5 neumorphic-raised border-l-[5px] ${borderClass} flex flex-col justify-between hover:scale-[1.02] hover:-rotate-1 active:scale-98 transition-all shadow-md group`}
+                href={act.cursoId ? `/sub-menu-curso/${act.cursoId}/alumnos` : '/cursos'}
+                className="w-full bg-white rounded-2xl p-3.5 border border-outline-variant/30 flex flex-col justify-between hover:bg-slate-50 transition-colors group"
               >
                 <div>
                   <div className="flex items-center justify-between gap-1 mb-1.5">
@@ -428,18 +438,7 @@ export default function Menu() {
                     </p>
                   )}
                 </div>
-
-                {/* Botón con enlace para ir al curso del sticker */}
-                <div className="mt-3 pt-2 border-t border-outline-variant/30">
-                  <Link
-                    href={act.cursoId ? `/sub-menu-curso/${act.cursoId}/alumnos` : '/cursos'}
-                    className="w-full py-1.5 px-3 rounded-xl bg-surface-bg neumorphic-raised text-accent-violet hover:brightness-95 font-extrabold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 active:scale-95 shadow-sm transition-all"
-                  >
-                    <span>Ir al curso</span>
-                    <span className="material-symbols-outlined text-xs font-extrabold">arrow_forward</span>
-                  </Link>
-                </div>
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -696,7 +695,7 @@ export default function Menu() {
             ) : eventosMes.length === 0 ? (
               <div className="bg-surface-bg neumorphic-inset rounded-2xl p-5 text-center">
                 <span className="material-symbols-outlined text-3xl text-secondary mb-1">event_available</span>
-                <p className="text-xs text-secondary font-medium">No hay eventos agendados para este mes.</p>
+                <p className="text-xs text-secondary font-medium">No hay eventos agendados desde ayer hasta los próximos 15 días.</p>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
@@ -883,7 +882,7 @@ export default function Menu() {
             ) : eventosMes.length === 0 ? (
               <div className="bg-surface-bg neumorphic-inset rounded-2xl p-6 text-center">
                 <span className="material-symbols-outlined text-3xl text-secondary mb-1">event_available</span>
-                <p className="text-xs text-secondary font-medium">No hay eventos agendados para este mes.</p>
+                <p className="text-xs text-secondary font-medium">No hay eventos agendados desde ayer hasta los próximos 15 días.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
