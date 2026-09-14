@@ -11,12 +11,49 @@ interface Message {
   timestamp: string;
 }
 
-const PROMPTS_SUGERIDOS = [
-  '📝 Secuencia didáctica de 3 clases',
-  '📝 Crear evaluación con 5 preguntas',
-  '💡 Dinámica corta para iniciar clase',
-  '♿ Idea para adaptación curricular',
-];
+// ── Inline: **negrita** ─────────────────────────────────────────────
+function renderInlineWeb(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*\n]+\*\*)/);
+  if (parts.length === 1) return text;
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.startsWith('**') && part.endsWith('**')
+          ? <strong key={i} style={{ fontWeight: 800 }}>{part.slice(2, -2)}</strong>
+          : <span key={i}>{part}</span>
+      )}
+    </>
+  );
+}
+
+// ── Bloque markdown completo (web) ───────────────────────────────────
+function renderMarkdownWeb(text: string): React.ReactNode {
+  const lines = text.split('\n');
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      {lines.map((line, i) => {
+        if (/^#{1,2}\s+/.test(line)) {
+          const content = line.replace(/^#{1,2}\s+/, '').replace(/\*\*/g, '').trim();
+          return <p key={i} style={{ fontSize: 23, fontWeight: 900, margin: '6px 0 2px', lineHeight: 1.4 }}>{content}</p>;
+        }
+        if (/^#{3,6}\s+/.test(line)) {
+          const content = line.replace(/^#{3,6}\s+/, '').replace(/\*\*/g, '').trim();
+          return <p key={i} style={{ fontSize: 22, fontWeight: 800, margin: '4px 0 2px', lineHeight: 1.4 }}>{content}</p>;
+        }
+        if (/^\s*[-*+]\s+/.test(line)) {
+          const content = line.replace(/^\s*[-*+]\s+/, '').trim();
+          return <p key={i} style={{ fontSize: 22, margin: '1px 0', lineHeight: 1.5 }}>• {renderInlineWeb(content)}</p>;
+        }
+        const numMatch = line.match(/^\s*(\d+)\.\s+(.*)/);
+        if (numMatch) {
+          return <p key={i} style={{ fontSize: 22, margin: '1px 0', lineHeight: 1.5 }}>{numMatch[1]}. {renderInlineWeb(numMatch[2].trim())}</p>;
+        }
+        if (!line.trim()) return <div key={i} style={{ height: 6 }} />;
+        return <p key={i} style={{ fontSize: 22, margin: '1px 0', lineHeight: 1.5 }}>{renderInlineWeb(line)}</p>;
+      })}
+    </div>
+  );
+}
 
 const RUTAS_SIN_CHAT = ['/', '/login', '/registro', '/planes', '/recuperar', '/forgotpassword', '/reset-password', '/clave'];
 
@@ -143,7 +180,10 @@ export default function ChatbotIA() {
           'Content-Type': 'application/json',
           Authorization: token ? `Bearer ${token}` : '',
         },
-        body: JSON.stringify({ prompt: texto }),
+        body: JSON.stringify({
+          prompt: texto,
+          historial: mensajes.slice(-8).map((m) => ({ sender: m.sender, text: m.text })),
+        }),
       });
 
       const data = await res.json();
@@ -245,7 +285,10 @@ export default function ChatbotIA() {
                       : 'bg-surface text-on-surface border border-outline-variant rounded-bl-none'
                   }`}
                 >
-                  <div className="whitespace-pre-wrap">{msg.text}</div>
+                  {msg.sender === 'bot'
+                    ? renderMarkdownWeb(msg.text)
+                    : <div className="whitespace-pre-wrap">{msg.text}</div>
+                  }
 
                   {msg.sender === 'bot' && (
                     <button
@@ -269,20 +312,8 @@ export default function ChatbotIA() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* PROMPTS RÁPIDOS (Si hay pocos mensajes) */}
-          {mensajes.length <= 2 && (
-            <div className="px-3 py-2 bg-surface border-t border-outline-variant flex gap-1.5 overflow-x-auto no-scrollbar">
-              {PROMPTS_SUGERIDOS.map((p, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => enviarMensaje(p)}
-                  className="text-[11px] bg-surface-container hover:bg-surface-lavender text-primary border border-primary/20 rounded-full px-3 py-1 font-medium whitespace-nowrap transition"
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          )}
+
+
 
           {/* BANNER PLAN PLUS (SI CORRESPONDE) */}
           {!esPlus && (

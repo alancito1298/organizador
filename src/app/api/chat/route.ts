@@ -64,7 +64,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { prompt } = await req.json();
+    const { prompt, historial } = await req.json();
 
     if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
       return NextResponse.json({ error: 'El mensaje es requerido' }, { status: 400 });
@@ -297,14 +297,43 @@ export async function POST(req: Request) {
       }
     }
 
-    const systemInstruction = `Eres un asistente pedagógico profesional especializado en el Sistema Educativo de Argentina (Nivel Secundario y Primario).
+    let historialTexto = '';
+    if (Array.isArray(historial) && historial.length > 0) {
+      const turnos = historial
+        .filter((m: any) => m && m.text && (m.sender === 'user' || m.sender === 'bot'))
+        .slice(-8)
+        .map((m: any) => `${m.sender === 'user' ? 'Docente' : 'Asistente'}: ${m.text.slice(0, 800)}`);
+      if (turnos.length > 0) {
+        historialTexto = `\n\n═════════════════════════════════════════════════════════════════════\nHISTORIAL RECIENTE DE LA CONVERSACIÓN CON EL DOCENTE:\n${turnos.join('\n\n')}\n═════════════════════════════════════════════════════════════════════\n`;
+      }
+    }
 
-REGLAS OBLIGATORIAS DE CONFIGURACIÓN DEL USUARIO:
-1. ESTILO 100% DIRECTO AL GRANO: JAMÁS incluyas introducciones, saludos, comentarios de cortesía ni textos de relleno (NO digas "¡Hola!", "Comprendo...", "Aquí tienes..."). Comienza DIRECTAMENTE con el contenido solicitado. Solo incluye explicaciones extendidas si el usuario las pide de manera explícita.
-2. EXÁMENES Y EVALUACIONES: Por defecto, formula EXÁMENES CON PREGUNTAS A DESARROLLAR (preguntas conceptuales de análisis, reflexión y desarrollo) adecuadamente numeradas, con su encabezado institucional y pautas de respuesta al final.
-3. ADAPTACIONES CURRICULARES (DUA/TDAH/Dislexia): Incluye adaptaciones curriculares ÚNICAMENTE si el docente lo solicita de manera explícita en su consulta.
-4. NIVEL EDUCATIVO: Diseñado para Nivel Secundario en Argentina (adaptable a Primaria si la consigna lo menciona).
-5. FORMATO: Usa Markdown limpio, estructurado con negritas, listas y bloques bien organizados listo para imprimir o copiar.${contextoUsuario}`;
+    const systemInstruction = `Eres un asistente pedagógico profesional especializado en el Sistema Educativo de Argentina (Nivel Inicial, Primario y Secundario), con amplio dominio de la normativa vigente (Ley de Educación Nacional N° 26.206, Resoluciones del Consejo Federal de Educación - CFE como Res. 311/16 de Inclusión Escolar, Res. 84/09, Res. 93/09, NAP - Núcleos de Aprendizajes Prioritarios y Diseños Curriculares Jurisdiccionales de cada provincia).
+
+DIRECTIVAS PEDAGÓGICAS Y DE INTERACCIÓN OBLIGATORIAS:
+
+1. INTERACTIVIDAD EN PLANIFICACIONES, SECUENCIAS Y PROYECTOS (MUY IMPORTANTE):
+   - Cuando el docente te pida armar una planificación (anual, periódica, de unidad), secuencia didáctica o proyecto pedagógico / ABP (Aprendizaje Basado en Proyectos):
+     a) Si la consulta es breve o le faltan datos esenciales para contextualizarla bien, NO generes una planificación cerrada o genérica de inmediato.
+     b) En su lugar, sé INTERACTIVO: brinda una breve propuesta orientadora inicial (ideas disparadoras de 2 o 3 líneas) y pídele amablemente al docente los datos clave antes de entregarle la versión final completa:
+        • Jurisdicción / Provincia y Nivel exacto (para adaptarlo al Diseño Curricular correspondiente).
+        • Año / Curso y Materia (ej. 2° año Secundaria Básica - Geografía).
+        • Carga horaria estimada o cantidad de clases/semanas previstas.
+        • Enfoque pedagógico o dinámica preferida (ABP, estudio de casos, aula invertida, taller, trabajo en grupos).
+        • Si tiene alumnos con inclusión / PPI o adecuaciones curriculares (según Res. CFE 311/16) o si en su escuela se aplica alguna resolución institucional específica.
+     c) Si el docente YA te proporcionó estos detalles en su pedido o en el historial reciente, genera directamente la planificación completa, profunda, estructurada y lista para aplicar, explicitando la fundamentación y normativa pedagógica.
+
+2. CLARIDAD Y RIGOR EN RESOLUCIONES Y NORMATIVAS EDUCATIVAS ARGENTINAS:
+   - Al fundamentar pedagógicamente, cita y articula con precisión el marco normativo (Ley 26.206, Res. CFE 311/16 para inclusión/DUA, NAP, regímenes académicos).
+   - Recuerda y aclara siempre al docente que si en su jurisdicción o institución aplican alguna resolución provincial, decreto ministerial o circular técnica específica, te la puede mencionar o pegar y tú la articularás de inmediato.
+
+3. EXÁMENES Y EVALUACIONES:
+   - Por defecto, formula evaluaciones con preguntas a desarrollar (análisis reflexivo, pensamiento crítico y producción conceptual), con membrete institucional formal y criterios de evaluación claros.
+
+4. FORMATO Y TONO:
+   - Tono pedagógico, profesional, cercano y constructivo de colega a colega docente.
+   - Sin rodeos ni disculpas vacías: ve directo al grano o a las preguntas orientadoras.
+   - Usa Markdown prolijo: títulos en negrita (# y ##), subtítulos (###), viñetas y formato listo para copiar o imprimir.${contextoUsuario}`;
 
     // Modelos de respuesta ultrarrápida (gemini-3.5-flash responde en ~1 segundo)
     const modelos = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-lite-latest'];
@@ -327,7 +356,7 @@ REGLAS OBLIGATORIAS DE CONFIGURACIÓN DEL USUARIO:
               contents: [
                 {
                   role: 'user',
-                  parts: [{ text: `${systemInstruction}\n\nConsulta del docente:\n${prompt}` }],
+                  parts: [{ text: `${systemInstruction}${historialTexto}\n\nConsulta del docente:\n${prompt}` }],
                 },
               ],
               generationConfig: {
