@@ -11,6 +11,7 @@ import PerfilAlumnoModal from "@/app/components/alumnos/PerfilAlumnoModal";
 import ImportarAlumnosModal from "@/app/components/alumnos/ImportarAlumnosModal";
 import PasoAsistenciaModal from "@/app/components/alumnos/PasoAsistenciaModal";
 import PasoConceptoModal from "@/app/components/alumnos/PasoConceptoModal";
+import PasoCalificacionModal from "@/app/components/alumnos/PasoCalificacionModal";
 import { Upload, FileSpreadsheet, Download, FileText, Camera } from "lucide-react";
 import { exportarExcelAsistencias } from "@/app/utils/exportarExcelAsitencias";
 import { exportarExcelCalificaciones } from "@/app/utils/exportarExcelCalificaciones";
@@ -73,6 +74,7 @@ export default function AlumnosClient() {
   const [modoImportarInicial, setModoImportarInicial] = useState<'excel' | 'foto' | 'pegar'>('excel');
   const [asistenciaModalAbierto, setAsistenciaModalAbierto] = useState(false);
   const [conceptoModalAbierto, setConceptoModalAbierto] = useState(false);
+  const [calificacionModalAbierto, setCalificacionModalAbierto] = useState(false);
 
   // Estado de Asistencia del día corriente (cargando, pendiente, cargadas, sin_clases)
   type EstadoAsistenciaHoy = 'cargando' | 'pendiente' | 'cargadas' | 'sin_clases';
@@ -145,6 +147,9 @@ export default function AlumnosClient() {
       }
       if (params.get('abrirConcepto') === 'true') {
         setConceptoModalAbierto(true);
+      }
+      if (params.get('abrirCalificacion') === 'true' || params.get('abrirNotas') === 'true') {
+        setCalificacionModalAbierto(true);
       }
     }
 
@@ -787,7 +792,7 @@ export default function AlumnosClient() {
                 {renderBadgeEstadoAsistencia()}
               </button>
 
-              {/* Fila 2 en mobile: Concepto & Importar */}
+              {/* Fila 2 en mobile: Concepto & Calificación */}
               <button
                 onClick={() => setConceptoModalAbierto(true)}
                 className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-amber-700 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
@@ -797,6 +802,16 @@ export default function AlumnosClient() {
                 <span className="truncate">Concepto</span>
               </button>
 
+              <button
+                onClick={() => setCalificacionModalAbierto(true)}
+                className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-violet-800 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
+                title="Cargar calificaciones y notas de la clase"
+              >
+                <span className="material-symbols-outlined text-base text-accent-violet">edit_note</span>
+                <span className="truncate">Calificación</span>
+              </button>
+
+              {/* Fila 3 en mobile: Importar & Nuevo Alumno */}
               <button
                 onClick={() => {
                   setModoImportarInicial('excel');
@@ -809,7 +824,6 @@ export default function AlumnosClient() {
                 <span className="truncate">Importar</span>
               </button>
 
-              {/* Fila 3 en mobile: Nuevo Alumno & Ver Planillas */}
               <button
                 onClick={() => setModalAgregar(true)}
                 className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
@@ -818,6 +832,7 @@ export default function AlumnosClient() {
                 <span className="truncate">Nuevo Alumno</span>
               </button>
 
+              {/* Fila 4 en mobile: Ver Planillas */}
               <Link
                 href={`/sub-menu-curso/${cursoId}/planilla`}
                 className="w-full sm:w-auto px-3.5 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
@@ -827,8 +842,8 @@ export default function AlumnosClient() {
               </Link>
             </div>
 
-            {/* Fila 4 en mobile: Descargas */}
-            <div className="relative col-span-2 sm:col-auto w-full sm:w-auto">
+            {/* Fila 4 en mobile (junto a Ver Planillas): Descargas */}
+            <div className="relative w-full sm:w-auto">
               <button
                 onClick={() => setMenuDescargasAbierto(!menuDescargasAbierto)}
                 className="w-full sm:w-auto px-3.5 sm:px-4 py-2.5 rounded-2xl bg-surface-bg neumorphic-raised text-accent-violet font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:scale-[1.02] sm:hover:scale-105 active:scale-95 transition-all shadow-sm"
@@ -1629,6 +1644,16 @@ export default function AlumnosClient() {
         alumnos={alumnos}
         cursoInfo={cursoInfo}
         onCerrar={() => setConceptoModalAbierto(false)}
+        onFinalizado={fetchAlumnos}
+      />
+
+      {/* ── Modal Cargar Calificaciones de la Clase ── */}
+      <PasoCalificacionModal
+        abierto={calificacionModalAbierto}
+        alumnos={alumnos}
+        cursoInfo={cursoInfo}
+        trimestreActual={trimestreActivo}
+        onCerrar={() => setCalificacionModalAbierto(false)}
         onFinalizado={fetchAlumnos}
       />
     </div>
