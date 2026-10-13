@@ -42,6 +42,19 @@ interface CacheContexto {
 }
 const cacheContextoDocente = new Map<string, CacheContexto>();
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown-ip';
@@ -60,20 +73,20 @@ export async function POST(req: Request) {
             ? 'Has alcanzado el límite de consultas por minuto. Por favor, aguarda un instante.'
             : 'Has alcanzado el límite de consultas de prueba. Inicia sesión para continuar.',
         },
-        { status: 429 }
+        { status: 429, headers: corsHeaders }
       );
     }
 
     const { prompt, historial } = await req.json();
 
     if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
-      return NextResponse.json({ error: 'El mensaje es requerido' }, { status: 400 });
+      return NextResponse.json({ error: 'El mensaje es requerido' }, { status: 400, headers: corsHeaders });
     }
 
     if (prompt.length > 2500) {
       return NextResponse.json(
         { error: 'El mensaje no puede superar los 2500 caracteres' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -81,7 +94,7 @@ export async function POST(req: Request) {
     if (!apiKey) {
       return NextResponse.json(
         { error: 'Servicio de IA temporalmente no disponible' },
-        { status: 503 }
+        { status: 503, headers: corsHeaders }
       );
     }
 
@@ -335,14 +348,14 @@ DIRECTIVAS PEDAGÓGICAS Y DE INTERACCIÓN OBLIGATORIAS:
    - Sin rodeos ni disculpas vacías: ve directo al grano o a las preguntas orientadoras.
    - Usa Markdown prolijo: títulos en negrita (# y ##), subtítulos (###), viñetas y formato listo para copiar o imprimir.${contextoUsuario}`;
 
-    // Modelos de respuesta ultrarrápida (gemini-3.5-flash responde en ~1 segundo)
-    const modelos = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-lite-latest'];
+    // Modelos con respuesta en < 1s y alta disponibilidad
+    const modelos = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-flash-latest'];
     let replyText = '';
 
     for (const mod of modelos) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000);
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
 
         const res = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${mod}:generateContent?key=${apiKey}`,
@@ -384,9 +397,9 @@ DIRECTIVAS PEDAGÓGICAS Y DE INTERACCIÓN OBLIGATORIAS:
       replyText = 'No pude generar la respuesta en este momento. Por favor reintenta en un instante.';
     }
 
-    return NextResponse.json({ response: replyText });
+    return NextResponse.json({ response: replyText }, { headers: corsHeaders });
   } catch (error: any) {
     console.error('Error en API /api/chat:', error);
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500, headers: corsHeaders });
   }
 }
