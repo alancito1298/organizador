@@ -48,6 +48,38 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
+// ── Rotación automática de API keys de Gemini ──────────────────────────────
+// Acepta GEMINI_API_KEYS (separadas por coma) y/o GEMINI_API_KEY, GEMINI_API_KEY_2..5.
+// Si una key falla por estar inválida/revocada o sin cuota, se bloquea temporalmente
+// y se usa la siguiente, para que el asistente siga respondiendo.
+function obtenerApiKeys(): string[] {
+  const keys = [
+    ...(process.env.GEMINI_API_KEYS || '').split(','),
+    process.env.GEMINI_API_KEY,
+    process.env.GEMINI_API_KEY_2,
+    process.env.GEMINI_API_KEY_3,
+    process.env.GEMINI_API_KEY_4,
+    process.env.GEMINI_API_KEY_5,
+  ]
+    .map((k) => k?.trim())
+    .filter((k): k is string => Boolean(k));
+  return Array.from(new Set(keys));
+}
+
+// key -> timestamp hasta el cual no se debe usar
+const keyBloqueadaHasta = new Map<string, number>();
+
+function ordenarKeysDisponibles(keys: string[]): string[] {
+  const ahora = Date.now();
+  const disponibles = keys.filter((k) => (keyBloqueadaHasta.get(k) ?? 0) <= ahora);
+  // Si todas están bloqueadas, se intentan igual (mejor intentar que no responder)
+  return disponibles.length > 0 ? disponibles : keys;
+}
+
+function bloquearKey(key: string, ms: number) {
+  keyBloqueadaHasta.set(key, Date.now() + ms);
+}
+
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
@@ -90,8 +122,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
+    const apiKeys = obtenerApiKeys();
+    if (apiKeys.length === 0) {
       return NextResponse.json(
         { error: 'Servicio de IA temporalmente no disponible' },
         { status: 503, headers: corsHeaders }
@@ -351,45 +383,81 @@ DIRECTIVAS PEDAGÓGICAS Y DE INTERACCIÓN OBLIGATORIAS:
     // Modelos con respuesta en < 1s y alta disponibilidad
     const modelos = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-flash-latest'];
     let replyText = '';
+    const inicio = Date.now();
+    const LIMITE_TOTAL_MS = 25000; // no exceder el tiempo máximo de la función
 
-    for (const mod of modelos) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 7000);
+    const keysOrdenadas = ordenarKeysDisponibles(apiKeys);
 
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${mod}:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            signal: controller.signal,
-            body: JSON.stringify({
-              contents: [
-                {
-                  role: 'user',
-                  parts: [{ text: `${systemInstruction}${historialTexto}\n\nConsulta del docente:\n${prompt}` }],
-                },
-              ],
-              generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 2500,
+    recorrerKeys: for (let idxKey = 0; idxKey < keysOrdenadas.length; idxKey++) {
+      const apiKey = keysOrdenadas[idxKey];
+      const etiquetaKey = `key#${apiKeys.indexOf(apiKey) + 1}`;
+
+      for (const mod of modelos) {
+        if (Date.now() - inicio > LIMITE_TOTAL_MS) break recorrerKeys;
+
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${mod}:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
               },
-            }),
-          }
-        );
-        clearTimeout(timeoutId);
+              signal: controller.signal,
+              body: JSON.stringify({
+                contents: [
+                  {
+                    role: 'user',
+                    parts: [{ text: `${systemInstruction}${historialTexto}\n\nConsulta del docente:\n${prompt}` }],
+                  },
+                ],
+                generationConfig: {
+                  temperature: 0.7,
+                  maxOutputTokens: 2500,
+                },
+              }),
+            }
+          );
+          clearTimeout(timeoutId);
 
-        if (res.ok) {
-          const data = await res.json();
-          replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          if (replyText) break;
-        } else {
-          console.warn(`Modelo ${mod} devolvió estado ${res.status}, intentando siguiente...`);
+          if (res.ok) {
+            const data = await res.json();
+            replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            if (replyText) {
+              if (idxKey > 0) console.info(`Chat respondido con ${etiquetaKey} (rotación activa)`);
+              break recorrerKeys;
+            }
+            continue;
+          }
+
+          const cuerpoError = await res.text().catch(() => '');
+          const keyInvalida =
+            res.status === 401 ||
+            res.status === 403 ||
+            (res.status === 400 && /API_KEY_INVALID|API key (not valid|expired)|PERMISSION_DENIED/i.test(cuerpoError));
+
+          if (keyInvalida) {
+            // Key revocada, vencida o inválida: no usarla durante 1 hora
+            console.error(`${etiquetaKey} inválida/vencida (status ${res.status}). Rotando a la siguiente key...`);
+            bloquearKey(apiKey, 60 * 60 * 1000);
+            continue recorrerKeys;
+          }
+
+          if (res.status === 429) {
+            // Cuota agotada para esta key: descansarla 1 minuto
+            console.warn(`${etiquetaKey} sin cuota (429). Rotando a la siguiente key...`);
+            bloquearKey(apiKey, 60 * 1000);
+            continue recorrerKeys;
+          }
+
+          // 503 / 404 / otros: problema del modelo, probar el siguiente modelo con la misma key
+          console.warn(`Modelo ${mod} (${etiquetaKey}) devolvió estado ${res.status}, intentando siguiente...`);
+        } catch (e) {
+          console.error(`Error consultando modelo ${mod} (${etiquetaKey}):`, e);
         }
-      } catch (e) {
-        console.error(`Error consultando modelo ${mod}:`, e);
       }
     }
 
