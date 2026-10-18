@@ -48,17 +48,24 @@ export default function AdBanner() {
   const [mostrarAd, setMostrarAd] = useState(true);
   const [adIndex, setAdIndex] = useState(0);
   const [dismissed, setDismissed] = useState(false);
-  const isRealAdSense = ADSENSE_CLIENT_ID && ADSENSE_CLIENT_ID !== 'ca-pub-XXXXXXXXXXXXXXXX';
+  const isRealAdSense = Boolean(ADSENSE_CLIENT_ID && ADSENSE_CLIENT_ID !== 'ca-pub-XXXXXXXXXXXXXXXX');
 
   useEffect(() => {
-    if (sessionStorage.getItem('ad_banner_dismissed') === '1') return;
+    // Verificar si el usuario ya lo cerró en esta sesión
+    if (typeof window !== 'undefined') {
+      const isDismissed = sessionStorage.getItem('ad_banner_dismissed') === '1';
+      if (isDismissed) {
+        setDismissed(true);
+        return;
+      }
+    }
 
     verificarSuscripcion();
 
     if (!isRealAdSense) {
       const timer = setInterval(() => {
         setAdIndex((prev) => (prev + 1) % DEMO_ADS.length);
-      }, 8000);
+      }, 9000);
 
       return () => clearInterval(timer);
     }
@@ -99,6 +106,7 @@ export default function AdBanner() {
 
       const data = await res.json();
       
+      // Si el plan es de pago y está activo, nunca mostrar publicidad
       if (data && data.estado === 'activa' && data.periodo !== 'gratis') {
         sessionStorage.setItem('user_plan_tipo', 'pago');
         setMostrarAd(false);
@@ -113,7 +121,9 @@ export default function AdBanner() {
 
   const handleDismiss = () => {
     setDismissed(true);
-    sessionStorage.setItem('ad_banner_dismissed', '1');
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('ad_banner_dismissed', '1');
+    }
   };
 
   if (!mostrarAd || dismissed) return null;
@@ -121,15 +131,24 @@ export default function AdBanner() {
   const currentAd = DEMO_ADS[adIndex];
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-2 animate-fade-in">
+    <div className="w-full max-w-4xl mx-auto px-2 animate-fade-in transition-all">
       {isRealAdSense ? (
         // CONTENEDOR OFICIAL DE GOOGLE ADSENSE
-        <div className="relative bg-white/90 backdrop-blur rounded-xl p-2 shadow-xl border border-violet-300 flex flex-col items-center">
+        <div className="relative bg-white/95 backdrop-blur-md rounded-xl p-2 shadow-lg border border-violet-200 flex flex-col items-center">
           <div className="w-full flex justify-between items-center px-2 mb-1">
-            <span className="text-[9px] uppercase font-bold text-gray-400">Anuncio</span>
-            <Link href="/planes" className="text-[10px] text-violet-700 font-bold hover:underline flex items-center gap-1">
-              <Sparkles size={10} /> Quitar anuncios
-            </Link>
+            <span className="text-[9px] uppercase tracking-wider font-bold text-gray-400">Anuncio</span>
+            <div className="flex items-center gap-2">
+              <Link href="/planes" className="text-[10px] text-violet-700 font-bold hover:underline flex items-center gap-1">
+                <Sparkles size={10} /> Quitar anuncios
+              </Link>
+              <button
+                onClick={handleDismiss}
+                title="Cerrar anuncio"
+                className="p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded transition"
+              >
+                <X size={13} />
+              </button>
+            </div>
           </div>
           <ins
             className="adsbygoogle"
