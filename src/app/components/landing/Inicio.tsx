@@ -10,6 +10,7 @@ import InfoDispositivos from "./InfoDispositivos";
 import Faq from "./Faq";
 import StickyMobileCta from "./StickyMobileCta";
 import GooglePlayIcon from "../shared/GooglePlayIcon";
+import ContadorDocentes from "./ContadorDocentes";
 
 const items = [
   {
@@ -119,7 +120,7 @@ export default function Inicio() {
                 className="bg-slate-950 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider px-5 py-3.5 rounded-2xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 border border-slate-800"
               >
                 <GooglePlayIcon className="w-4 h-4 shrink-0" />
-                <span>Google Play</span>
+                <span>Descargar App</span>
               </a>
             </div>
 
@@ -138,6 +139,9 @@ export default function Inicio() {
                 Exportación directa a Excel
               </div>
             </div>
+
+            {/* Social Proof: Contador de docentes registrados */}
+            <ContadorDocentes variant="hero-inline" />
           </div>
 
           {/* Imagen Hero con Marco Neumórfico */}
@@ -152,6 +156,10 @@ export default function Inicio() {
                 className="w-full h-auto rounded-2xl object-cover aspect-[3/2] transform group-hover:scale-[1.02] transition-transform duration-500"
                 priority
               />
+            </div>
+            {/* Badge flotante con contador en tiempo real */}
+            <div className="absolute -bottom-5 sm:-bottom-6 -left-2 sm:-left-4 z-20">
+              <ContadorDocentes variant="floating-card" />
             </div>
           </div>
         </section>

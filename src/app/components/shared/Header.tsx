@@ -74,7 +74,7 @@ export default function Header() {
             className="text-xs font-black bg-slate-950 hover:bg-black text-white px-3.5 py-2.5 rounded-2xl shadow-sm hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1.5 border border-slate-800"
           >
             <GooglePlayIcon className="w-4 h-4 shrink-0" />
-            <span>Google Play</span>
+            <span>Descargar App</span>
           </a>
           <Link
             href="/login"
