@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import GooglePlayIcon from './GooglePlayIcon';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -64,16 +65,26 @@ export default function Header() {
         </div>
 
         {/* Botones Auth Desktop */}
-        <div className="hidden md:flex items-center gap-2.5">
+        <div className="hidden md:flex items-center gap-2 lg:gap-2.5">
+          <a
+            href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Descargar app en Google Play Store"
+            className="text-xs font-black bg-slate-950 hover:bg-black text-white px-3.5 py-2.5 rounded-2xl shadow-sm hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1.5 border border-slate-800"
+          >
+            <GooglePlayIcon className="w-4 h-4 shrink-0" />
+            <span>Google Play</span>
+          </a>
           <Link
             href="/login"
-            className="text-xs font-extrabold text-on-surface hover:text-accent-violet px-4 py-2.5 rounded-2xl transition-all active:scale-95"
+            className="text-xs font-extrabold text-on-surface hover:text-accent-violet px-3 lg:px-4 py-2.5 rounded-2xl transition-all active:scale-95"
           >
             Iniciar Sesión
           </Link>
           <Link
             href="/registro"
-            className="text-xs font-extrabold bg-accent-violet text-white px-5 py-2.5 rounded-2xl shadow-md shadow-accent-violet/25 hover:bg-accent-violet/90 active:scale-95 transition-all flex items-center gap-1.5"
+            className="text-xs font-extrabold bg-accent-violet text-white px-4 lg:px-5 py-2.5 rounded-2xl shadow-md shadow-accent-violet/25 hover:bg-accent-violet/90 active:scale-95 transition-all flex items-center gap-1.5"
           >
             <span>Registrarme Gratis</span>
             <span className="material-symbols-outlined text-xs">arrow_forward</span>
@@ -81,7 +92,16 @@ export default function Header() {
         </div>
 
         {/* Botón Mobile Menu */}
-        <div className="flex md:hidden items-center gap-2">
+        <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
+          <a
+            href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Descargar app en Google Play"
+            className="p-1.5 rounded-xl bg-slate-950 text-white shadow-sm flex items-center justify-center border border-slate-800 active:scale-95"
+          >
+            <GooglePlayIcon className="w-4 h-4" />
+          </a>
           <Link
             href="/login"
             className="text-[11px] font-extrabold text-accent-violet px-2.5 py-1.5 rounded-xl neumorphic-inset"
@@ -137,6 +157,16 @@ export default function Header() {
           </a>
 
           <div className="pt-3 border-t border-violet-100 flex flex-col gap-2">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="text-xs font-black bg-slate-950 hover:bg-black text-white text-center py-3 rounded-2xl shadow-sm flex items-center justify-center gap-2 border border-slate-800"
+            >
+              <GooglePlayIcon className="w-4 h-4" />
+              <span>Descargar en Google Play</span>
+            </a>
             <Link
               href="/registro"
               onClick={() => setOpen(false)}

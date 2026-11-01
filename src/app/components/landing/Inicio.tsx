@@ -9,6 +9,7 @@ import Footer from "../shared/Footer";
 import InfoDispositivos from "./InfoDispositivos";
 import Faq from "./Faq";
 import StickyMobileCta from "./StickyMobileCta";
+import GooglePlayIcon from "../shared/GooglePlayIcon";
 
 const items = [
   {
@@ -110,6 +111,16 @@ export default function Inicio() {
                 <span>Ya tengo cuenta</span>
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </Link>
+              <a
+                href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Descargar app en Google Play Store"
+                className="bg-slate-950 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider px-5 py-3.5 rounded-2xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 border border-slate-800"
+              >
+                <GooglePlayIcon className="w-4 h-4 shrink-0" />
+                <span>Google Play</span>
+              </a>
             </div>
 
             {/* Highlights */}
