@@ -131,6 +131,21 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
+      {/* Garantiza que la landing page se mantenga 100% limpia sin anuncios */}
+      <style>{`
+        .google-auto-placed,
+        ins.adsbygoogle,
+        iframe[name^="aswift_"],
+        iframe[id^="aswift_"],
+        div[id^="aswift_"] {
+          display: none !important;
+          visibility: hidden !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+          height: 0 !important;
+          width: 0 !important;
+        }
+      `}</style>
       <Inicio />
     </>
   );

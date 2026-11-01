@@ -5,6 +5,7 @@ import Script from "next/script";
 import GoogleAnalytics from "./components/shared/GoogleAnalytics";
 import ChatbotIA from "./components/shared/ChatbotIA";
 import OfflineIndicator from "./components/shared/OfflineIndicator";
+import AdSenseManager from "./components/shared/AdSenseManager";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -104,11 +105,24 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Organizador" />
         {ADSENSE_CLIENT_ID && (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
-            crossOrigin="anonymous"
-          />
+          <>
+            <script
+              async
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+              crossOrigin="anonymous"
+            />
+            <script
+              id="adsense-init-pause"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  if (typeof window !== 'undefined' && window.location.pathname === '/') {
+                    window.adsbygoogle = window.adsbygoogle || [];
+                    window.adsbygoogle.pauseAdRequests = 1;
+                  }
+                `,
+              }}
+            />
+          </>
         )}
       </head>
       <body className={`${mulish.className} ${mulish.variable} ${arima.variable} font-mulish min-h-screen`}>
@@ -154,6 +168,9 @@ export default function RootLayout({
         </Suspense>
         <Suspense fallback={null}>
           <OfflineIndicator />
+        </Suspense>
+        <Suspense fallback={null}>
+          <AdSenseManager />
         </Suspense>
       </body>
     </html>
