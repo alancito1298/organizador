@@ -67,10 +67,10 @@ export const metadata: Metadata = {
       "Organizá tu agenda y planificaciones de clase, cursos, asistencia y calificaciones en un solo lugar. Diseñado por docentes.",
     images: [
       {
-        url: "/agenda-img.jpeg",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Agenda y planificaciones docentes en Organizador Docente",
+        alt: "Organizador Docente - App para docentes: asistencias, notas y agenda",
       },
     ],
   },
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     title: "Organizador Docente | Planificaciones, agenda y gestión de cursos",
     description:
       "Organizá tu agenda y planificaciones de clase, cursos, asistencia y calificaciones en un solo lugar.",
-    images: ["/agenda-img.jpeg"],
+    images: ["/og-image.png"],
   },
   // TODO: pegar acá el meta tag de verificación que te da Google Search Console
   // una vez que des de alta https://www.organizadordocente.com en search.google.com/search-console

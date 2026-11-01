@@ -95,7 +95,43 @@ export default function PrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-slate-900 mb-3">6. Contacto</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-3">6. Cookies y Publicidad de Terceros (Google AdSense)</h2>
+            <p className="mb-2">
+              Utilizamos servicios publicitarios provistos por terceros, incluyendo Google AdSense, en nuestro sitio web:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>
+                Google, como proveedor externo, utiliza cookies para publicar anuncios en nuestro sitio en función de las visitas anteriores del usuario a este u otros sitios web.
+              </li>
+              <li>
+                El uso de cookies de publicidad permite a Google y a sus socios mostrar anuncios a nuestros usuarios en función de las visitas realizadas a este sitio y a otros sitios de Internet.
+              </li>
+              <li>
+                Los usuarios pueden optar por inhabilitar la publicidad personalizada ingresando a la{' '}
+                <a
+                  href="https://www.google.com/settings/ads"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 underline font-medium"
+                >
+                  Configuración de anuncios de Google
+                </a>
+                {' '}o a través de{' '}
+                <a
+                  href="https://www.aboutads.info"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 underline font-medium"
+                >
+                  aboutads.info
+                </a>
+                .
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-slate-900 mb-3">7. Contacto</h2>
             <p>
               Si tenés dudas, consultas o sugerencias sobre esta Política de Privacidad o el tratamiento de tus datos, podés contactarnos a:{' '}
               <a

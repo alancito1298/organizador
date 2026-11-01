@@ -30,7 +30,7 @@ const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
   name: "Organizador Docente",
-  image: "https://www.organizadordocente.com/agenda-img.jpeg",
+  image: "https://www.organizadordocente.com/og-image.png",
   logo: "https://www.organizadordocente.com/odicono.svg",
   "@id": "https://www.organizadordocente.com/#organization",
   url: "https://www.organizadordocente.com",
