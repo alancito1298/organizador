@@ -216,32 +216,16 @@ export default function ResetPasswordForm() {
               type="password"
               placeholder="Nueva contraseña"
               value={password}
-              onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
-              }
-              className="
-              border
-              rounded-xl
-              p-3
-              "
+              onChange={(e) => setPassword(e.target.value)}
+              className="border border-violet-200 bg-white text-slate-900 placeholder:text-slate-400 rounded-xl p-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
 
             <input
               type="password"
               placeholder="Confirmar contraseña"
               value={confirmPassword}
-              onChange={(e) =>
-                setConfirmPassword(
-                  e.target.value
-                )
-              }
-              className="
-              border
-              rounded-xl
-              p-3
-              "
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="border border-violet-200 bg-white text-slate-900 placeholder:text-slate-400 rounded-xl p-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
 
             {error && (
