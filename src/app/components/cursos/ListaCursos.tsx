@@ -134,9 +134,6 @@ export default function ListaCursos({ id, anio, escuela, materia, orientacion, r
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="px-2 py-0.5 rounded bg-violet-100 text-violet-800 text-[11px] font-extrabold uppercase">
-                {formatearGradoCurso(anio)}
-              </span>
               <p className="text-xs text-violet-600 font-bold uppercase tracking-wider truncate">{escuela}</p>
             </div>
             <h3 className="text-base sm:text-lg font-bold text-gray-900 uppercase truncate">{materia}</h3>
