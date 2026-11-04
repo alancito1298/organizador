@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, X, ExternalLink } from 'lucide-react';
+import { isPremiumSubscription } from '@/utils/suscripcion';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
 const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
@@ -82,6 +83,11 @@ export default function AdBanner() {
   }, [mostrarAd, isRealAdSense, dismissed]);
 
   const verificarSuscripcion = async () => {
+    if (sessionStorage.getItem('user_is_premium') === 'true' || sessionStorage.getItem('user_plan_tipo') === 'pago') {
+      setMostrarAd(false);
+      return;
+    }
+
     const token = localStorage.getItem('token');
     if (!token) {
       setMostrarAd(true);
@@ -89,12 +95,6 @@ export default function AdBanner() {
     }
 
     try {
-      const cache = sessionStorage.getItem('user_plan_tipo');
-      if (cache === 'pago') {
-        setMostrarAd(false);
-        return;
-      }
-
       const res = await fetch(`${API}/suscripciones/estado`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -105,16 +105,18 @@ export default function AdBanner() {
       }
 
       const data = await res.json();
-      
-      // Si el plan es de pago y está activo, nunca mostrar publicidad
-      if (data && data.estado === 'activa' && data.periodo !== 'gratis') {
+      const esPremium = isPremiumSubscription(data);
+
+      if (esPremium) {
+        sessionStorage.setItem('user_is_premium', 'true');
         sessionStorage.setItem('user_plan_tipo', 'pago');
         setMostrarAd(false);
       } else {
+        sessionStorage.setItem('user_is_premium', 'false');
         sessionStorage.setItem('user_plan_tipo', 'gratis');
         setMostrarAd(true);
       }
-    } catch (err) {
+    } catch {
       setMostrarAd(true);
     }
   };
