@@ -23,6 +23,7 @@ export default function FormularioCurso({ onCursoCreado, onCerrar }: Props) {
     escuela: "",
     anio: "",
     materia: "",
+    orientacion: "",
   });
 
   // Configuración de horarios
@@ -77,6 +78,9 @@ export default function FormularioCurso({ onCursoCreado, onCerrar }: Props) {
           escuela: nuevoCurso.escuela.trim(),
           anio: anioFinal,
           materia: nuevoCurso.materia.trim(),
+          ...(nuevoCurso.orientacion.trim()
+            ? { orientacion: nuevoCurso.orientacion.trim() }
+            : {}),
         }),
       });
 
@@ -223,6 +227,22 @@ export default function FormularioCurso({ onCursoCreado, onCerrar }: Props) {
                 setNuevoCurso({ ...nuevoCurso, materia: e.target.value })
               }
               className="w-full bg-surface-bg neu-inset rounded-xl px-3.5 py-2.5 text-sm font-bold text-accent-violet focus:outline-none placeholder:text-secondary/50"
+            />
+          </div>
+
+          <div>
+            <label className="text-[11px] font-extrabold uppercase tracking-wider text-accent-violet block mb-1">
+              Orientación <span className="normal-case font-semibold text-secondary/70">(opcional)</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Ej. Económica, Humanidades, etc."
+              maxLength={80}
+              value={nuevoCurso.orientacion}
+              onChange={(e) =>
+                setNuevoCurso({ ...nuevoCurso, orientacion: e.target.value })
+              }
+              className="w-full bg-surface-bg neu-inset rounded-xl px-3.5 py-2.5 text-sm font-bold text-on-surface focus:outline-none placeholder:text-secondary/50"
             />
           </div>
 

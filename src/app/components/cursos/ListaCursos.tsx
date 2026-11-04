@@ -33,7 +33,7 @@ const formatearGradoCurso = (anio: string | number | undefined) => {
   return `${str}° Año`;
 };
 
-export default function ListaCursos({ id, anio, escuela, materia, ruta, onEliminar }: Props) {
+export default function ListaCursos({ id, anio, escuela, materia, orientacion, ruta, onEliminar }: Props) {
   const [confirmando, setConfirmando] = useState(false);
   const [eliminando, setEliminando] = useState(false);
 
@@ -141,6 +141,9 @@ export default function ListaCursos({ id, anio, escuela, materia, ruta, onElimin
               <p className="text-xs text-violet-600 font-bold uppercase tracking-wider truncate">{escuela}</p>
             </div>
             <h3 className="text-base sm:text-lg font-bold text-gray-900 uppercase truncate">{materia}</h3>
+              {orientacion ? (
+                <p className="text-[11px] text-gray-500 font-semibold truncate">Orientación: {orientacion}</p>
+              ) : null}
             <span className="inline-flex items-center gap-1 text-xs text-violet-700 font-semibold mt-1 hover:underline">
               Ingresar al aula →
             </span>

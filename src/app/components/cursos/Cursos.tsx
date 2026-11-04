@@ -12,6 +12,7 @@ export type Curso = {
   escuela: string;
   anio: string;
   materia: string;
+  orientacion?: string | null;
   ruta: string;
 };
 
@@ -119,6 +120,7 @@ export default function Cursos() {
               anio={curso.anio}
               escuela={curso.escuela}
               materia={curso.materia}
+              orientacion={curso.orientacion}
               ruta={`/sub-menu-curso/${curso.id}/alumnos`}
               onEliminar={(idEliminado) =>
                 setCursos((prev) => prev.filter((c) => c.id !== idEliminado))
