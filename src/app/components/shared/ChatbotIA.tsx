@@ -271,6 +271,14 @@ export default function ChatbotIA() {
             </div>
           </div>
 
+          {/* CARTEL AVISO: FASE DE PRUEBA */}
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-3.5 py-2 flex items-center gap-2 text-amber-900 dark:text-amber-200 text-[11px] leading-tight">
+            <span className="text-sm shrink-0">⚠️</span>
+            <p>
+              <strong>En fase de prueba:</strong> La IA puede cometer errores. Verificá siempre la información antes de usarla en tus clases.
+            </p>
+          </div>
+
           {/* MENSAJES */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-surface-container-low/50">
             {mensajes.map((msg) => (
@@ -326,30 +334,35 @@ export default function ChatbotIA() {
           )}
 
           {/* INPUT FORM */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              enviarMensaje();
-            }}
-            className="p-3 bg-surface border-t border-outline-variant flex items-center gap-2"
-          >
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Escribí tu consulta pedagógica..."
-              disabled={cargando}
-              className="flex-1 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/60 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-outline-variant focus:outline-none focus:border-primary transition"
-            />
-            <button
-              type="submit"
-              disabled={!input.trim() || cargando}
-              className="bg-primary hover:bg-primary/90 text-white p-2.5 rounded-xl disabled:opacity-40 transition flex items-center justify-center"
-              aria-label="Enviar consulta"
+          <div className="bg-surface border-t border-outline-variant p-2.5">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                enviarMensaje();
+              }}
+              className="flex items-center gap-2"
             >
-              <span className="material-symbols-outlined text-lg">send</span>
-            </button>
-          </form>
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Escribí tu consulta pedagógica..."
+                disabled={cargando}
+                className="flex-1 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/60 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-outline-variant focus:outline-none focus:border-primary transition"
+              />
+              <button
+                type="submit"
+                disabled={!input.trim() || cargando}
+                className="bg-primary hover:bg-primary/90 text-white p-2.5 rounded-xl disabled:opacity-40 transition flex items-center justify-center"
+                aria-label="Enviar consulta"
+              >
+                <span className="material-symbols-outlined text-lg">send</span>
+              </button>
+            </form>
+            <p className="text-[10px] text-center text-on-surface-variant/60 mt-1.5 leading-tight">
+              La IA puede cometer errores. Verificá los contenidos antes de utilizarlos.
+            </p>
+          </div>
         </div>
       )}
     </div>
