@@ -12,6 +12,7 @@ type Curso = {
   escuela: string;
   anio: string;
   materia: string;
+  orientacion?: string | null;
   ruta: string;
 };
 
@@ -630,6 +631,12 @@ export default function Menu() {
                       </div>
                       <div>
                         <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
+                        {curso.orientacion ? (
+                          <span className="text-[11px] font-bold text-accent-violet flex items-center gap-1 mt-0.5 truncate">
+                            <span className="material-symbols-outlined text-[13px]">explore</span>
+                            {curso.orientacion}
+                          </span>
+                        ) : null}
                         <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
                           <span className="material-symbols-outlined text-[14px]">domain</span>
                           {curso.escuela}
@@ -825,6 +832,12 @@ export default function Menu() {
                       </div>
                       <div>
                         <h3 className="font-headline-md-mobile text-on-surface truncate">{curso.materia}</h3>
+                        {curso.orientacion ? (
+                          <span className="text-[11px] font-bold text-accent-violet flex items-center gap-1 mt-0.5 truncate">
+                            <span className="material-symbols-outlined text-[13px]">explore</span>
+                            {curso.orientacion}
+                          </span>
+                        ) : null}
                         <p className="text-xs text-secondary flex items-center gap-1 mt-1 truncate">
                           <span className="material-symbols-outlined text-14px">domain</span>
                           {curso.escuela}

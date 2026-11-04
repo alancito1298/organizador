@@ -142,7 +142,10 @@ export default function ListaCursos({ id, anio, escuela, materia, orientacion, r
             </div>
             <h3 className="text-base sm:text-lg font-bold text-gray-900 uppercase truncate">{materia}</h3>
               {orientacion ? (
-                <p className="text-[11px] text-gray-500 font-semibold truncate">Orientación: {orientacion}</p>
+                <p className="text-xs text-violet-700 font-bold flex items-center gap-1 mt-0.5 truncate">
+                  <span className="material-symbols-outlined text-[14px]">explore</span>
+                  Orientación: <span className="font-semibold text-gray-700">{orientacion}</span>
+                </p>
               ) : null}
             <span className="inline-flex items-center gap-1 text-xs text-violet-700 font-semibold mt-1 hover:underline">
               Ingresar al aula →
