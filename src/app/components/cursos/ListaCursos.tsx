@@ -127,23 +127,23 @@ export default function ListaCursos({ id, anio, escuela, materia, orientacion, r
     <>
       <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-md hover:shadow-lg border border-violet-200 overflow-hidden transition-all duration-200 relative group my-2">
         {/* Tarjeta clickeable */}
-        <Link href={rutaFinal} className="flex items-center p-4 gap-4 pr-12">
-          <div className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 bg-violet-700 rounded-xl shrink-0 text-white shadow-sm text-center">
-            <span className="font-extrabold text-sm sm:text-base leading-none">{String(anio).replace('°', '')}°</span>
+        <Link href={rutaFinal} className="flex items-center p-5 sm:p-6 gap-5 pr-14">
+          <div className="flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-violet-700 rounded-2xl shrink-0 text-white shadow-md text-center">
+            <span className="font-extrabold text-lg sm:text-xl leading-none">{String(anio).replace('°', '')}°</span>
           </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <p className="text-xs text-violet-600 font-bold uppercase tracking-wider truncate">{escuela}</p>
+              <p className="text-xs sm:text-sm text-violet-600 font-bold uppercase tracking-wider truncate">{escuela}</p>
             </div>
-            <h3 className="text-base sm:text-lg font-bold text-gray-900 uppercase truncate">{materia}</h3>
+            <h3 className="text-lg sm:text-xl font-extrabold text-gray-900 uppercase truncate tracking-tight">{materia}</h3>
               {orientacion ? (
-                <p className="text-xs text-violet-700 font-bold flex items-center gap-1 mt-0.5 truncate">
-                  <span className="material-symbols-outlined text-[14px]">explore</span>
-                  Orientación: <span className="font-semibold text-gray-700">{orientacion}</span>
-                </p>
+                <p className="text-xs sm:text-sm text-violet-700 font-bold flex items-center gap-1.5 mt-1 truncate">
+                <span className="material-symbols-outlined text-[16px]">explore</span>
+                Orientación: <span className="font-semibold text-gray-700">{orientacion}</span>
+              </p>
               ) : null}
-            <span className="inline-flex items-center gap-1 text-xs text-violet-700 font-semibold mt-1 hover:underline">
+            <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-violet-700 font-bold mt-2 hover:underline">
               Ingresar al aula →
             </span>
           </div>
