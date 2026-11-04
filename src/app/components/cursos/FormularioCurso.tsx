@@ -49,10 +49,13 @@ export default function FormularioCurso({ onCursoCreado, onCerrar }: Props) {
   };
 
   const agregarCurso = async () => {
-    if (!nuevoCurso.escuela.trim() || !nuevoCurso.anio.trim() || !nuevoCurso.materia.trim()) {
-      alert("Por favor completa año, institución y materia.");
+    const anioDigito = nuevoCurso.anio.replace(/[^0-9]/g, '').slice(0, 1);
+    if (!nuevoCurso.escuela.trim() || !anioDigito || !nuevoCurso.materia.trim()) {
+      alert("Por favor completá año/grado (1 solo número), institución y materia.");
       return;
     }
+
+    const anioFinal = `${anioDigito}°`;
 
     setGuardando(true);
     try {
@@ -72,7 +75,7 @@ export default function FormularioCurso({ onCursoCreado, onCerrar }: Props) {
         },
         body: JSON.stringify({
           escuela: nuevoCurso.escuela.trim(),
-          anio: nuevoCurso.anio.trim(),
+          anio: anioFinal,
           materia: nuevoCurso.materia.trim(),
         }),
       });
@@ -98,7 +101,7 @@ export default function FormularioCurso({ onCursoCreado, onCerrar }: Props) {
         if (listaHorarios.length > 0) {
           const descPayload = JSON.stringify({
             materia: nuevoCurso.materia.trim(),
-            curso: nuevoCurso.anio.trim(),
+            curso: anioFinal,
             escuela: nuevoCurso.escuela.trim(),
             cursoId: data.id,
           });
@@ -168,17 +171,29 @@ export default function FormularioCurso({ onCursoCreado, onCerrar }: Props) {
         <div className="flex flex-col space-y-3.5">
           <div>
             <label className="text-[11px] font-extrabold uppercase tracking-wider text-accent-violet block mb-1">
-              Año o División *
+              Año / Grado *
             </label>
-            <input
-              type="text"
-              placeholder="Ej. 1° Año, 2° 1ra"
-              value={nuevoCurso.anio}
-              onChange={(e) =>
-                setNuevoCurso({ ...nuevoCurso, anio: e.target.value })
-              }
-              className="w-full bg-surface-bg neu-inset rounded-xl px-3.5 py-2.5 text-sm font-bold text-on-surface focus:outline-none placeholder:text-secondary/50"
-            />
+            <div className="flex items-center bg-surface-bg neu-inset rounded-xl px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-accent-violet/30 transition-all">
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={1}
+                placeholder="1"
+                value={nuevoCurso.anio}
+                onChange={(e) => {
+                  const soloNumero = e.target.value.replace(/[^0-9]/g, '').slice(0, 1);
+                  setNuevoCurso({ ...nuevoCurso, anio: soloNumero });
+                }}
+                className="w-7 text-center bg-transparent text-sm font-black text-on-surface focus:outline-none placeholder:text-secondary/40"
+              />
+              <span className="text-accent-violet font-black text-base select-none pl-0.5">
+                °
+              </span>
+              <span className="text-xs text-secondary/60 font-semibold ml-3 select-none">
+                {nuevoCurso.anio ? `${nuevoCurso.anio}° Año / Grado` : '(Ingresá 1 solo número: 1 al 9)'}
+              </span>
+            </div>
           </div>
 
           <div>
