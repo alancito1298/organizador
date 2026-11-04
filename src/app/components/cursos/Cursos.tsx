@@ -103,10 +103,10 @@ export default function Cursos() {
     <div className="bg-surface-container-low min-h-screen pb-20 pt-24 md:pt-32">
       <div className="max-w-4xl mx-auto px-4 py-4">
         <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-primary uppercase tracking-wide">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-primary uppercase tracking-tight">
             Panel de Cursos y Aulas Escolares
           </h1>
-          <p className="text-on-surface-variant text-sm mt-1">
+          <p className="text-on-surface-variant text-base sm:text-lg mt-2 font-medium">
             Administrá la asistencia, calificaciones y alumnos de tus materias.
           </p>
         </div>
