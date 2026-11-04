@@ -128,9 +128,8 @@ export default function ListaCursos({ id, anio, escuela, materia, orientacion, r
       <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-md hover:shadow-lg border border-violet-200 overflow-hidden transition-all duration-200 relative group my-2">
         {/* Tarjeta clickeable */}
         <Link href={rutaFinal} className="flex items-center p-4 gap-4 pr-12">
-          <div className="flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-violet-700 rounded-xl shrink-0 text-white shadow-sm p-1 text-center">
-            <span className="font-extrabold text-xl sm:text-2xl leading-none">{anio}°</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider opacity-90 mt-0.5">Año</span>
+          <div className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 bg-violet-700 rounded-xl shrink-0 text-white shadow-sm text-center">
+            <span className="font-extrabold text-sm sm:text-base leading-none">{String(anio).replace('°', '')}°</span>
           </div>
 
           <div className="flex-1 min-w-0">
