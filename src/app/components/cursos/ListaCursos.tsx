@@ -129,21 +129,21 @@ export default function ListaCursos({ id, anio, escuela, materia, orientacion, r
         {/* Tarjeta clickeable */}
         <Link href={rutaFinal} className="flex items-center p-6 sm:p-8 gap-6 sm:gap-8 pr-16 w-full">
           <div className="flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 bg-violet-700 rounded-3xl shrink-0 text-white shadow-lg text-center">
-            <span className="font-extrabold text-2xl sm:text-3xl leading-none">{String(anio).replace('°', '')}°</span>
+            <span className="font-bold text-2xl sm:text-3xl leading-none">{String(anio).replace('°', '')}°</span>
           </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <p className="text-base sm:text-lg text-violet-600 font-bold uppercase tracking-wider">{escuela}</p>
+              <p className="text-base sm:text-lg text-violet-600 font-semibold uppercase tracking-wider">{escuela}</p>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 uppercase tracking-tight">{materia}</h3>
+            <h3 className="text-2xl sm:text-3xl font-semibold text-gray-900 uppercase tracking-tight">{materia}</h3>
               {orientacion ? (
-                <p className="text-base sm:text-lg text-violet-700 font-bold flex items-center gap-2 mt-2">
+                <p className="text-base sm:text-lg text-violet-700 font-medium flex items-center gap-2 mt-2">
                 <span className="material-symbols-outlined text-[20px]">explore</span>
                 Orientación: <span className="font-semibold text-gray-700">{orientacion}</span>
               </p>
               ) : null}
-            <span className="inline-flex items-center gap-2 text-base sm:text-lg text-violet-700 font-extrabold mt-3 hover:underline">
+            <span className="inline-flex items-center gap-2 text-base sm:text-lg text-violet-700 font-semibold mt-3 hover:underline">
               Ingresar al aula →
             </span>
           </div>
