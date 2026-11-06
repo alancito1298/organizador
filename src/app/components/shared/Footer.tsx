@@ -74,8 +74,12 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="max-w-7xl mx-auto pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
         <div className="flex flex-wrap justify-center md:justify-start gap-4">
-          <span>Términos y Condiciones</span>
-          <span>Políticas de Privacidad</span>
+          <Link href="/terminos" className="hover:text-slate-400 transition-colors">
+            Términos y Condiciones
+          </Link>
+          <Link href="/privacidad" className="hover:text-slate-400 transition-colors">
+            Políticas de Privacidad
+          </Link>
           <a
             className="hover:text-slate-400 transition-colors"
             href="https://cv-sigma-umber.vercel.app/"
