@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import ShareAndInstallButtons from './ShareAndInstallButtons';
+import GooglePlayIcon from './GooglePlayIcon';
 
 export default function Footer() {
   return (
@@ -21,7 +22,17 @@ export default function Footer() {
           <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
             La plataforma definitiva para el docente. Simplificamos tu gestión pedagógica y administrativa para que puedas dedicarte a enseñar.
           </p>
-          <div className="flex gap-2 mt-2">
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Descargar app en Google Play Store"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-black text-white text-xs font-semibold transition border border-slate-700 shadow-sm shrink-0"
+            >
+              <GooglePlayIcon className="w-3.5 h-3.5 shrink-0" />
+              <span>Google Play</span>
+            </a>
             <ShareAndInstallButtons />
           </div>
         </div>

@@ -22,8 +22,8 @@ const FAQS = [
     respuesta: 'Tus datos nunca se pierden ni se borran. Tu cuenta vuelve al Plan Inicial y podrás seguir consultando todo tu historial de calificaciones, asistencias y alumnos.',
   },
   {
-    pregunta: '¿Tengo que descargar la app de Google Play o App Store?',
-    respuesta: 'No hace falta ocupar espacio de tu teléfono. Organizador Docente es una Progressive Web App (PWA). Solo tenés que ingresar desde tu navegador en celular, tablet o PC y podés instalar el acceso directo en tu pantalla de inicio en 2 segundos.',
+    pregunta: '¿Tengo que descargar la app de Google Play?',
+    respuesta: 'Podés descargar la aplicación oficial para Android directamente desde Google Play Store o utilizar la versión web desde cualquier navegador en celular, tablet o PC.',
   },
 ];
 

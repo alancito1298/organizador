@@ -91,10 +91,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "¿Tengo que descargar una aplicación desde Google Play o App Store?",
+      name: "¿Tengo que descargar una aplicación desde Google Play?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No hace falta instalar nada pesado. Organizador Docente es una Progressive Web App (PWA) moderna accesible desde cualquier celular (Android o iPhone), tablet o computadora. Además, podés agregar un acceso rápido a tu pantalla de inicio en 1 segundo y funciona offline.",
+        text: "Podés descargar la aplicación oficial para Android en Google Play Store o acceder directamente desde cualquier celular, tablet o computadora a través de la web sin necesidad de ocupar espacio.",
       },
     },
     {
