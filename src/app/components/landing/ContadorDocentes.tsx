@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://backend-organizador.vercel.app';
-const DEFAULT_DOCENTES_COUNT = 89;
+const DEFAULT_DOCENTES_COUNT = 100;
 
 interface ContadorDocentesProps {
   variant?: 'hero-inline' | 'floating-card';
@@ -17,18 +17,28 @@ export default function ContadorDocentes({
   const [count, setCount] = useState<number>(DEFAULT_DOCENTES_COUNT);
   const [displayCount, setDisplayCount] = useState<number>(0);
 
-  // Obtener último ID de usuario docente desde el backend
+  // Obtener conteo de docentes en vivo sin caché (con polling y detección de foco)
   useEffect(() => {
     let isMounted = true;
+    let abortController: AbortController | null = null;
+
     const fetchContador = async () => {
       try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
-        const res = await fetch(`${API}/docentes/public/contador`, {
-          signal: controller.signal,
+        abortController?.abort();
+        abortController = new AbortController();
+        const timeoutId = setTimeout(() => abortController?.abort(), 4000);
+
+        // Parámetro _t único y headers estrictos para evitar cualquier caché de navegador o CDN
+        const res = await fetch(`${API}/docentes/public/contador?_t=${Date.now()}`, {
+          signal: abortController.signal,
           cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            Pragma: 'no-cache',
+          },
         });
         clearTimeout(timeoutId);
+
         if (res.ok) {
           const data = await res.json();
           if (data?.total && typeof data.total === 'number' && isMounted) {
@@ -36,37 +46,68 @@ export default function ContadorDocentes({
           }
         }
       } catch {
-        // En caso de fallo o timeout se mantiene DEFAULT_DOCENTES_COUNT (89)
+        // En caso de fallo de red o timeout se mantiene el valor actual
       }
     };
 
+    // 1. Fetch inicial inmediato
     fetchContador();
+
+    // 2. Intervalo en vivo: re-consultar cada 15 segundos
+    const intervalId = setInterval(fetchContador, 15000);
+
+    // 3. Re-consultar cuando la pestaña vuelve a ser visible o enfocada
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchContador();
+      }
+    };
+    const handleFocus = () => {
+      fetchContador();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
     return () => {
       isMounted = false;
+      abortController?.abort();
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
     };
   }, []);
 
-  // Animación de conteo fluido de 0 a count
+  // Animación de conteo fluido de 0 a count (o actualización suave en vivo sin reiniciar a 0)
   useEffect(() => {
-    let start = 0;
+    if (count === displayCount) return;
+
+    const start = displayCount;
     const target = count;
-    const duration = 1200; // ms
+    const diff = Math.abs(target - start);
+
+    // Si es un incremento en vivo pequeño (+1, +2), la animación es corta; si es inicial, 1200ms
+    const duration = diff <= 3 && start > 0 ? 400 : 1200;
     const stepTime = 20;
-    const totalSteps = duration / stepTime;
-    const increment = Math.ceil(target / totalSteps) || 1;
+    const totalSteps = Math.max(1, Math.floor(duration / stepTime));
+    const step = (target - start) / totalSteps;
+
+    let current = start;
+    let stepCount = 0;
 
     const timer = setInterval(() => {
-      start += increment;
-      if (start >= target) {
+      stepCount++;
+      current += step;
+      if (stepCount >= totalSteps || (step > 0 ? current >= target : current <= target)) {
         setDisplayCount(target);
         clearInterval(timer);
       } else {
-        setDisplayCount(start);
+        setDisplayCount(Math.round(current));
       }
     }, stepTime);
 
     return () => clearInterval(timer);
-  }, [count]);
+  }, [count, displayCount]);
 
   if (variant === 'floating-card') {
     return (
