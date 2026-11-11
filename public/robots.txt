@@ -1,5 +1,13 @@
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: Google-adstxt
+Allow: /
+
 User-agent: *
 Allow: /
+Allow: /app-ads.txt
+Allow: /ads.txt
 Allow: /registro
 Allow: /login
 Allow: /planes
