@@ -1,6 +1,13 @@
 'use client';
 
+import { useState } from 'react';
+import GooglePlayIcon from '../shared/GooglePlayIcon';
+import AppleIcon from '../shared/AppleIcon';
+import IphoneInstallModal from '../shared/IphoneInstallModal';
+
 export default function InfoDispositivos() {
+  const [iphoneModalOpen, setIphoneModalOpen] = useState(false);
+
   const dispositivos = [
     { icono: 'smartphone', nombre: 'Celular', subtitulo: 'Android & iPhone' },
     { icono: 'tablet_mac', nombre: 'Tablet', subtitulo: 'iPad & Android' },
@@ -38,7 +45,32 @@ export default function InfoDispositivos() {
             </div>
           ))}
         </div>
+
+        {/* Botones de Descarga e Instalación Rápida */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-10 pt-8 border-t border-violet-100">
+          <a
+            href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Descargar app en Google Play Store (Android)"
+            className="bg-slate-950 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider px-5 py-3 rounded-2xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 border border-slate-800"
+          >
+            <GooglePlayIcon className="w-4 h-4 shrink-0" />
+            <span>Descargar para Android</span>
+          </a>
+          <button
+            type="button"
+            onClick={() => setIphoneModalOpen(true)}
+            title="Instalar acceso directo en iPhone / iPad"
+            className="bg-slate-950 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider px-5 py-3 rounded-2xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 border border-slate-800 cursor-pointer"
+          >
+            <AppleIcon className="w-4 h-4 shrink-0" />
+            <span>Instalar en iPhone (Acceso Directo)</span>
+          </button>
+        </div>
       </div>
+
+      <IphoneInstallModal isOpen={iphoneModalOpen} onClose={() => setIphoneModalOpen(false)} />
     </section>
   );
 }

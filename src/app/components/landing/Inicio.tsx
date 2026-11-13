@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import Features from "./Features";
@@ -10,6 +11,8 @@ import InfoDispositivos from "./InfoDispositivos";
 import Faq from "./Faq";
 import StickyMobileCta from "./StickyMobileCta";
 import GooglePlayIcon from "../shared/GooglePlayIcon";
+import AppleIcon from "../shared/AppleIcon";
+import IphoneInstallModal from "../shared/IphoneInstallModal";
 import ContadorDocentes from "./ContadorDocentes";
 
 const items = [
@@ -51,6 +54,8 @@ const items = [
 ];
 
 export default function Inicio() {
+  const [iphoneModalOpen, setIphoneModalOpen] = useState(false);
+
   return (
     <div className="bg-surface-bg text-text-main font-mulish antialiased overflow-x-hidden selection:bg-accent-violet/20 min-h-screen">
       {/* TopNavBar Neumórfica */}
@@ -116,12 +121,21 @@ export default function Inicio() {
                 href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                title="Descargar app en Google Play Store"
-                className="bg-slate-950 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider px-5 py-3.5 rounded-2xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 border border-slate-800"
+                title="Descargar app en Google Play Store (Android)"
+                className="bg-slate-950 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider px-4 sm:px-5 py-3.5 rounded-2xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 border border-slate-800"
               >
                 <GooglePlayIcon className="w-4 h-4 shrink-0" />
-                <span>Descargar App</span>
+                <span>Android</span>
               </a>
+              <button
+                type="button"
+                onClick={() => setIphoneModalOpen(true)}
+                title="Instalar acceso directo en iPhone / iPad"
+                className="bg-slate-950 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider px-4 sm:px-5 py-3.5 rounded-2xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 border border-slate-800 cursor-pointer"
+              >
+                <AppleIcon className="w-4 h-4 shrink-0" />
+                <span>Instalar en iPhone</span>
+              </button>
             </div>
 
             {/* Highlights */}
@@ -398,6 +412,9 @@ export default function Inicio() {
 
       {/* Botón Flotante Mobile */}
       <StickyMobileCta />
+
+      {/* Modal de instrucciones para iPhone / iPad */}
+      <IphoneInstallModal isOpen={iphoneModalOpen} onClose={() => setIphoneModalOpen(false)} />
     </div>
   );
 }
