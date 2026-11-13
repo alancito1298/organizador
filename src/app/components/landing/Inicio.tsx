@@ -117,16 +117,21 @@ export default function Inicio() {
                 <span>Ya tengo cuenta</span>
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </Link>
-              <a
-                href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Descargar app en Google Play Store (Android)"
-                className="bg-slate-950 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider px-4 sm:px-5 py-3.5 rounded-2xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 border border-slate-800"
-              >
-                <GooglePlayIcon className="w-4 h-4 shrink-0" />
-                <span>Android</span>
-              </a>
+              <div className="relative inline-block">
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="App Android en mantenimiento temporal por actualización"
+                  className="bg-slate-950 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider px-4 sm:px-5 py-3.5 rounded-2xl shadow-md hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 border border-slate-800"
+                >
+                  <GooglePlayIcon className="w-4 h-4 shrink-0" />
+                  <span>Android</span>
+                </a>
+                <span className="absolute -top-2 -right-1 bg-amber-500 text-slate-950 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow-sm border border-white">
+                  Mantenimiento
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => setIphoneModalOpen(true)}
@@ -136,6 +141,14 @@ export default function Inicio() {
                 <AppleIcon className="w-4 h-4 shrink-0" />
                 <span>Instalar en iPhone</span>
               </button>
+            </div>
+
+            {/* Aviso Mantenimiento App Mobile */}
+            <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-900 text-xs font-bold max-w-xl">
+              <span className="material-symbols-outlined text-base text-amber-600 shrink-0">build_circle</span>
+              <span className="leading-snug">
+                <strong>App móvil en mantenimiento:</strong> estamos desplegando una actualización en Google Play. Mientras tanto podés usar todas las funciones desde cualquier navegador en la web sin interrupciones.
+              </span>
             </div>
 
             {/* Highlights */}

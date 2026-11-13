@@ -175,3 +175,4 @@ export default function IphoneInstallModal({ isOpen, onClose }: IphoneInstallMod
     </div>
   );
 }
+

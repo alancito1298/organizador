@@ -69,16 +69,21 @@ export default function Header() {
 
         {/* Botones Auth Desktop */}
         <div className="hidden md:flex items-center gap-2 lg:gap-2.5">
-          <a
-            href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Descargar app en Google Play Store (Android)"
-            className="text-xs font-black bg-slate-950 hover:bg-black text-white px-3 py-2.5 rounded-2xl shadow-sm hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1.5 border border-slate-800"
-          >
-            <GooglePlayIcon className="w-4 h-4 shrink-0" />
-            <span>Android</span>
-          </a>
+          <div className="relative inline-block">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.organizadordocente.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Descargar app en Google Play Store (Android - En actualización)"
+              className="text-xs font-black bg-slate-950 hover:bg-black text-white px-3 py-2.5 rounded-2xl shadow-sm hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1.5 border border-slate-800"
+            >
+              <GooglePlayIcon className="w-4 h-4 shrink-0" />
+              <span>Android</span>
+            </a>
+            <span className="absolute -top-2 -right-1 bg-amber-500 text-slate-950 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-full shadow-sm border border-white">
+              Mantenimiento
+            </span>
+          </div>
           <button
             type="button"
             onClick={() => setIphoneModalOpen(true)}
@@ -186,6 +191,9 @@ export default function Header() {
             >
               <GooglePlayIcon className="w-4 h-4" />
               <span>Descargar en Google Play (Android)</span>
+              <span className="bg-amber-500 text-slate-950 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full ml-1">
+                Mantenimiento
+              </span>
             </a>
             <button
               type="button"

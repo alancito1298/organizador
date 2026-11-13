@@ -7,3 +7,4 @@ export default function AppleIcon({ className = 'w-4 h-4' }: { className?: strin
     </svg>
   );
 }
+
